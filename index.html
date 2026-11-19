@@ -227,6 +227,64 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .spec dt { font: 500 12px/1 var(--font); color: var(--tx-2); }
 .spec dd { margin: 6px 0 0; font: 500 17px/1 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
 
+/* Quedada, avisos y mensajes */
+.flag { flex: 0 0 auto; display: inline-block; width: 26px; height: 26px; background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.5 2.5v19' stroke='%23F4F7F8' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M6.5 3.5h13l-3.2 4.2 3.2 4.3h-13z' fill='%23FFD23F'/%3E%3C/svg%3E"); }
+.flag.big { width: 44px; height: 44px; border-radius: 50%; background-color: rgba(255,210,63,.14); background-size: 26px; box-shadow: inset 0 0 0 1px rgba(255,210,63,.45); }
+.meet { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 10px 12px; border-radius: var(--r-md); background: rgba(255,210,63,.12); border: 1px solid rgba(255,210,63,.45); color: var(--tx); min-height: 56px; }
+.meet > span:nth-child(2) { flex: 1 1 auto; min-width: 0; }
+.meet b { display: block; font-weight: 600; font-size: 16px; line-height: 1.25; }
+.meet small { display: block; color: var(--tx-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meet .chev { color: var(--tx-2); font-size: 24px; line-height: 1; }
+.chiprow { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+.chiprow::-webkit-scrollbar { display: none; }
+.chipbtn { flex: 0 0 auto; min-height: 44px; padding: 0 14px 0 12px; border-radius: 22px; font: 500 15px/1 var(--font); color: var(--tx); background: rgba(255,255,255,.06); border: 1px solid var(--hair); display: inline-flex; align-items: center; gap: 8px; }
+.chipbtn i { width: 11px; height: 11px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px rgba(255,255,255,.8); }
+.chipbtn[aria-pressed=true] { border-color: var(--acc); background: var(--acc-dim); }
+.chipbtn.meetbtn { border-color: rgba(255,210,63,.5); background: rgba(255,210,63,.1); }
+.chipbtn .flag { width: 18px; height: 18px; }
+.avtag { flex: 0 0 auto; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 12px; font: 700 12px/1 var(--font); letter-spacing: .02em; background: var(--c); color: var(--t); }
+.avlist { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: -4px; }
+.avlist small { color: var(--tx-2); font-size: 13px; margin-right: 6px; }
+.avs { list-style: none; margin: 0; padding: 0; }
+.avs button { width: 100%; border: 0; background: none; text-align: left; display: flex; gap: 12px; align-items: center; min-height: 56px; padding: 6px 0; border-bottom: 1px solid var(--hair); }
+.avs li:last-child button { border-bottom: 0; }
+.avs b { display: block; font-weight: 600; font-size: 16px; }
+.avs small { display: block; color: var(--tx-2); font-size: 13px; }
+.msgbtns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.msgbtns .btn { font-size: 15px; padding: 6px 8px; line-height: 1.15; }
+.msgbtns .btn.on { box-shadow: inset 0 0 0 2px var(--acc); background: var(--acc-dim); }
+.msgbtns .btn.danger.on { box-shadow: inset 0 0 0 2px #FF8A80; background: rgba(255,77,79,.15); }
+.msgline { margin: -4px 0 0; font-size: 16px; font-weight: 600; color: var(--tx); }
+.msgline.help { color: #FF8A80; }
+.pbtn small.pmsg { color: var(--tx); font-weight: 500; }
+.person.help { margin: 0 -16px; padding: 6px 16px; background: rgba(224,49,49,.16); }
+.person.help .pmsg { color: #FF8A80; font-weight: 700; }
+.eta { flex: 0 0 auto; text-align: right; }
+.eta b { display: block; font: 500 17px/1.1 var(--mono); }
+.eta small { display: block; color: var(--tx-2); font-size: 12px; margin-top: 3px; }
+.eta.late small { color: var(--warn); }
+.banners { grid-column: 1 / -1; display: grid; gap: 6px; min-width: 0; }
+.banners:empty { display: none; }
+.banner { min-width: 0; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 10px; border-radius: 24px; color: var(--tx); background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair-2); box-shadow: var(--shadow); }
+.banner > div { flex: 1 1 auto; min-width: 0; }
+.banner b { display: block; font-weight: 600; font-size: 15px; line-height: 1.25; }
+.banner small { display: block; color: var(--tx-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.banner .x { margin: 0; width: 40px; height: 40px; font-size: 20px; }
+.banner .btn.go { min-height: 42px; min-width: 56px; padding: 0 14px; }
+.banner.help { background: #C92A2A; border-color: #FFB3AD; animation: helppulse 1.6s ease-out infinite; }
+.banner.help b { font-size: 17px; }
+.banner.help small { color: rgba(255,255,255,.88); }
+.banner.help .btn.go { background: #fff; color: #A61E1E; }
+.banner.help .x { background: rgba(255,255,255,.18); }
+@keyframes helppulse { 0% { box-shadow: var(--shadow), 0 0 0 0 rgba(255,77,79,.6); } 100% { box-shadow: var(--shadow), 0 0 0 12px rgba(255,77,79,0); } }
+@media (prefers-reduced-motion: reduce) { .banner.help { animation: none; } }
+.mcard.sheetcard { text-align: left; padding: 20px 18px; border-radius: var(--r-lg); background: var(--glass-2); border: 1px solid var(--hair); box-shadow: var(--shadow); }
+.mcard.sheetcard p { color: var(--tx); font-size: 15px; }
+.timegrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.timegrid .btn { font: 500 16px/1 var(--mono); padding: 8px 4px; }
+.timerow { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.timerow input { height: 54px; min-width: 0; border-radius: 27px; padding: 0 18px; font: 500 17px/1 var(--mono); color: var(--tx); background: rgba(255,255,255,.06); border: 1px solid var(--hair); -webkit-appearance: none; color-scheme: dark; }
+
 /* Ruta */
 .warnline { margin: -4px 0 0; padding: 10px 12px; border-radius: 14px; font-size: 14px; line-height: 1.3; color: var(--tx); background: rgba(255,210,63,.13); border: 1px solid rgba(255,210,63,.35); }
 .stepcard { display: flex; gap: 14px; align-items: center; border-radius: var(--r-md); padding: 14px; background: var(--acc-dim); border: 1px solid rgba(91,231,242,.35); }
@@ -323,6 +381,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   <ul class="results" id="results"></ul>
   <div class="filters" id="filters" role="group" aria-label="Filtrar por color" hidden></div>
   <div class="chips" id="chips"></div>
+  <div class="banners" id="banners" aria-live="polite"></div>
 </header>
 <div class="mapctl" id="mapctl">
   <button data-act="zin" aria-label="Acercar"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
@@ -370,7 +429,18 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     tapis: { s: "Cinta", g: "la cinta", spd: 1 }
   };
   const PAL = ["#0C8599", "#D6336C", "#5C940D", "#862E9C", "#495057", "#1971C2", "#C2255C", "#2F9E44"];
-  const COLS = ["pistas", "aqui", "perfiles"];
+  const COLS = ["pistas", "aqui", "perfiles", "quedada", "avisos", "mensajes"];
+  /* Avisos tipo Waze en pistas y remontes. Caducan a las 2 h. L / R: para remontes / pistas */
+  const AVISOS = {
+    cerrado: { s: "Cerrado", c: "#E03131", t: "#fff", L: 1, R: 1 },
+    cola: { s: "Cola", c: "#FFD23F", t: "#0A1620", L: 1 },
+    hielo: { s: "Hielo", c: "#A5D8FF", t: "#0A1620", R: 1 },
+    niebla: { s: "Niebla", c: "#CED4DA", t: "#0A1620", L: 1, R: 1 }
+  };
+  const AVISO_MS = 2 * 3600e3, COLA_S = 600;
+  /* Mensajes de un toque. Salen como aviso a los demás si son de hace menos de 10 min (ayuda: 30 min) */
+  const MSGS = { espero: "Os espero aquí", bar: "Bajo al bar", ayuda: "Necesito ayuda" };
+  const MSG_NEW_MS = 10 * 60000, MSG_HELP_MS = 30 * 60000;
 
   const $ = s => document.querySelector(s);
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -383,10 +453,11 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
   const fmtNum = n => Math.round(n).toLocaleString("es-ES");
   const fmtLen = m => m >= 1000 ? (m / 1000).toLocaleString("es-ES", { maximumFractionDigits: 1 }) + " km" : (Math.round(m / 10) * 10) + " m";
+  const cap = s => String(s || "").replace(/^./, m => m.toUpperCase());
   const fmtMin = s => { const m = Math.max(1, Math.round(s / 60)); return m < 60 ? m + " min" : Math.floor(m / 60) + " h " + String(m % 60).padStart(2, "0"); };
 
   /* ================= Estado ================= */
-  const S = { pistas: new Map(), aqui: new Map(), perfiles: new Map() };
+  const S = { pistas: new Map(), aqui: new Map(), perfiles: new Map(), quedada: new Map(), avisos: new Map(), mensajes: new Map() };
   const PEND = {};       /* colecciones con escrituras sin confirmar (sin cobertura) */
   let pendSince = 0;
   let confirmAct = null, confirmT = 0;
@@ -489,7 +560,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     return best;
   }
   function route(src, dst, noBlack) {
-    const n = M.n, dist = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), pe = new Array(n);
+    const n = M.n, dist = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), pe = new Array(n), pc = new Float64Array(n);
+    avisos();   /* lo cerrado no se usa; los remontes con cola suman 10 min */
     const heap = [[0, src]]; dist[src] = 0;
     const push = it => { heap.push(it); let i = heap.length - 1; while (i) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
     const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
@@ -497,22 +569,23 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       const [d, u] = pop(); if (d > dist[u]) continue; if (u === dst) break;
       for (const e of ADJ[u]) {
         if (noBlack && e[3] === 0 && (F[e[2]].d === "n" || F[e[2]].d === "i")) continue;
-        const nd = d + e[1];
-        if (nd < dist[e[0]]) { dist[e[0]] = nd; prev[e[0]] = u; pe[e[0]] = e; push([nd, e[0]]); }
+        if (e[2] >= 0 && AVX.closed.has(e[2])) continue;
+        const c = e[1] + ((e[3] === 1 || e[3] === 3) && AVX.cola.has(e[2]) ? COLA_S : 0), nd = d + c;
+        if (nd < dist[e[0]]) { dist[e[0]] = nd; prev[e[0]] = u; pe[e[0]] = e; pc[e[0]] = c; push([nd, e[0]]); }
       }
     }
     if (!isFinite(dist[dst])) return null;
     const edges = []; let v = dst;
-    while (v !== src) { edges.push([prev[v], v, pe[v]]); v = prev[v]; }
+    while (v !== src) { edges.push([prev[v], v, pe[v], pc[v]]); v = prev[v]; }
     edges.reverse();
     /* Pasos legibles */
     const steps = [];
-    edges.forEach(([a, b, e]) => {
+    edges.forEach(([a, b, e, c]) => {
       const ty = e[3], f = e[2] >= 0 ? F[e[2]] : null;
       const key = ty === 2 ? "walk" : ty + "|" + (f.g ? f.g.key : "fi" + f.fi);
       const last = steps[steps.length - 1];
-      if (last && last.key === key) { last.m += e[4]; last.t += e[1]; last.nodes.push(b); last.fis.add(e[2]); }
-      else steps.push({ key, ty, f, m: e[4], t: e[1], nodes: [a, b], fis: new Set([e[2]]) });
+      if (last && last.key === key) { last.m += e[4]; last.t += c; last.nodes.push(b); last.fis.add(e[2]); }
+      else steps.push({ key, ty, f, m: e[4], t: c, nodes: [a, b], fis: new Set([e[2]]) });
     });
     /* Fusiona caminatas cortas en el paso anterior */
     const out = [];
@@ -657,6 +730,80 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     }
     return "en " + (nm ? (f.d === "i" ? "el itinerario " : "la " + DIF[f.d].s.toLowerCase() + " ") + nm : "una pista " + DIF[f.d].s.toLowerCase());
   }
+
+  /* ---------- Avisos, quedada y mensajes ---------- */
+  /* Referencia estable de una pista o remonte: la clave del grupo (tipo, nombre, color) o la pieza suelta */
+  const refOf = g => g.key || "fi" + g.fis[0];
+  let refMap = null;
+  function fisOfRef(ref) {
+    if (/^fi\d+$/.test(ref)) { const fi = +ref.slice(2); return F[fi] ? [fi] : []; }
+    if (!refMap) { refMap = new Map(); GROUPS.forEach(g => refMap.set(g.key, g.fis)); }
+    return refMap.get(ref) || [];
+  }
+  function groupOfRef(ref) {
+    const g = GROUPS.find(g => g.key === ref); if (g) return g;
+    const fi = fisOfRef(ref)[0]; if (fi == null) return null;
+    const f = F[fi]; return f.g || { k: f.k, name: "", d: f.d, t: f.t, fis: [fi], len: f.len, zt: f.zt, zb: f.zb, dur: f.dur };
+  }
+  const AVX = { closed: new Set(), cola: new Set() };
+  let avCache = [], avKey = null, avT = 0;
+  function avisos() {
+    if (!M.ok) return [];
+    const now = Date.now();
+    if (avKey === S.avisos && now - avT < 30000) return avCache;
+    avKey = S.avisos; avT = now; AVX.closed = new Set(); AVX.cola = new Set();
+    avCache = list("avisos").filter(a => AVISOS[a.tipo] && a.exp > now && typeof a.ref === "string").sort((a, b) => b.at - a.at);
+    avCache.forEach(a => fisOfRef(a.ref).forEach(fi => { if (a.tipo === "cerrado") AVX.closed.add(fi); else if (a.tipo === "cola" && F[fi].k === "L") AVX.cola.add(fi); }));
+    return avCache;
+  }
+  /* Punto de encuentro: uno por grupo (quedada/actual) */
+  let mtCache = null, mtKey = null, mtT = 0;
+  function meet() {
+    if (!M.ok) return null;
+    const now = Date.now();
+    if (mtKey === S.quedada && now - mtT < 30000) return mtCache;
+    mtKey = S.quedada; mtT = now;
+    const q = S.quedada.get("actual");
+    if (!q || !(q.exp > now) || typeof q.lat !== "number" || typeof q.lon !== "number") return mtCache = null;
+    const [x, y] = toXY(q.lon, q.lat), node = nearestNode(x, y, 400);
+    return mtCache = Object.assign({}, q, { x, y, node, near: node >= 0 ? node : nearestNode(x, y, 3000) });
+  }
+  /* Cuánto le falta a cada uno (solo quien tiene posición), con el mismo cálculo de rutas */
+  let etaKey = [], etaVal = [];
+  function meetEtas(mt) {
+    const ps = positions(), key = [ps, mt.near, avisos()];
+    if (key.every((k, i) => k === etaKey[i])) return etaVal;
+    etaKey = key;
+    return etaVal = ps.map(p => {
+      if (p.near < 0 || mt.near < 0) return { p, t: null };
+      if (p.near === mt.near) return { p, t: 0 };
+      const r = route(p.near, mt.near, false); return { p, t: r ? r.time : null };
+    }).sort((a, b) => (a.t == null ? 1e9 : a.t) - (b.t == null ? 1e9 : b.t));
+  }
+  const etaTxt = t => t == null ? "sin ruta" : t < 60 ? "ya está" : fmtMin(t);
+  function canEditMeet(mt) { const G = window.PISTEA_GROUP; return !mt || mt.uid === me || mode === "demo" || !!(G && G.isOwner); }
+  /* Avisos nuevos de los demás (mensajes y quedada) que salen arriba */
+  const SEEN = new Set((() => { try { return JSON.parse(localStorage.getItem("pistea.vistos") || "[]"); } catch (e) { return []; } })());
+  const shownAt = new Map();
+  function markSeen(k) { SEEN.add(k); try { localStorage.setItem("pistea.vistos", JSON.stringify([...SEEN].slice(-60))); } catch (e) {} }
+  function banners() {
+    const now = Date.now(), out = [];
+    list("mensajes").forEach(m => {
+      if (m.uid === me || !MSGS[m.tipo] || typeof m.at !== "number") return;
+      const k = m.uid + ":" + m.at, age = now - m.at;
+      if (!SEEN.has(k) && age > -120000 && age < (m.tipo === "ayuda" ? MSG_HELP_MS : MSG_NEW_MS)) out.push({ k, m, help: m.tipo === "ayuda" });
+    });
+    const q = S.quedada.get("actual");
+    if (q && q.uid !== me && q.exp > now && now - q.at < MSG_NEW_MS && !SEEN.has("q:" + q.at)) out.push({ k: "q:" + q.at, q });
+    return out.sort((a, b) => (b.help ? 1 : 0) - (a.help ? 1 : 0) || (b.m || b.q).at - (a.m || a.q).at).slice(0, 2);
+  }
+  function bannerHtml(b) {
+    const x = `<button class="x" data-act="banner-x" data-k="${esc(b.k)}" aria-label="Cerrar aviso">×</button>`;
+    if (b.q) return `<div class="banner" role="status"><span class="flag" aria-hidden="true"></span><div><b>${esc(who(b.q.uid))} propone quedar${b.q.hora ? " a las " + esc(b.q.hora) : ""}</b><small>${esc(cap(b.q.en))}</small></div><button class="btn go" data-act="banner-meet" data-k="${esc(b.k)}">Ver</button>${x}</div>`;
+    const m = b.m;
+    return `<div class="banner${b.help ? " help" : ""}" role="${b.help ? "alert" : "status"}">${av(m.uid)}<div><b>${esc(who(m.uid))}${b.help ? " necesita ayuda" : ": «" + esc(MSGS[m.tipo]) + "»"}</b><small>${m.en ? esc(m.en) + " · " : ""}${esc(ago(m.at))}</small></div>${b.help || m.tipo === "espero" ? `<button class="btn go" data-act="banner-go" data-uid="${esc(m.uid)}" data-k="${esc(b.k)}">Ir</button>` : ""}${x}</div>`;
+  }
+  const msgOf = uid => { const m = S.mensajes.get(uid); return m && MSGS[m.tipo] && Date.now() - m.at < HIDE_MS ? m : null; };
 
   /* ================= Mapa 3D: terreno y cámara ================= */
   const EXAG = 1.5, FOV = 40;
@@ -1188,6 +1335,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     };
     const pins = positions().map(p => Object.assign({ q: proj(p.x, p.y, (p.node >= 0 ? NH[p.node] : hOf(p.x, p.y))) }, p)).filter(p => p.q);
     pins.forEach(p => { const [X, Y] = p.q; boxes.push([X - 18, Y - 42, X + 18, Y + 18]); });
+    const mt = meet(), mq = mt ? proj(mt.x, mt.y, mt.node >= 0 ? NH[mt.node] : hOf(mt.x, mt.y)) : null;
+    if (mq) boxes.push([mq[0] - 6, mq[1] - 40, mq[0] + 70, mq[1] + 4]);
     /* Pueblos */
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     M.places.forEach(([name, x, y, alt]) => {
@@ -1229,6 +1378,37 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       if (s > 0.1) vis.filter(f => f.name && f.d !== "e").sort((a, b) => b.len - a.len).forEach(f => pill(f, f.name, false, false));
       if (s > 0.25 && filt.L) lifts.filter(f => (f.name || f.ref) && small(f)).forEach(f => pill(f, f.name || f.ref, false, false));
       LBL.list = LBL.rec; LBL.rec = null;
+    }
+
+    /* Avisos del grupo: etiqueta de color sobre la pista o el remonte */
+    const avDone = new Map();
+    avisos().forEach(a => {
+      const A = AVISOS[a.tipo], fs = fisOfRef(a.ref).map(fi => F[fi]).sort((x, y) => y.len - x.len);
+      let m = fs.length ? mid(fs[0]) : null;
+      if (!m && typeof a.lat === "number") { const [x, y] = toXY(a.lon, a.lat), q = proj(x, y, hOf(x, y)); if (q) m = { x: q[0], y: q[1] }; }
+      if (!m || m.x < -40 || m.x > V.w + 40 || m.y < -20 || m.y > V.h + 20) return;
+      const n = avDone.get(a.ref) || [];
+      if (n.includes(a.tipo)) return;
+      ctx.font = `700 12px "Geist", sans-serif`;
+      const t = A.s.toUpperCase(), w = ctx.measureText(t).width + 22, h = 20, X = m.x - w / 2 + n.length * (w + 4), Y = m.y - 33;
+      n.push(a.tipo); avDone.set(a.ref, n);
+      ctx.beginPath(); ctx.moveTo(m.x - 5, Y + h - 1); ctx.lineTo(m.x, Y + h + 6); ctx.lineTo(m.x + 5, Y + h - 1); ctx.fillStyle = A.c; ctx.fill();
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(X, Y, w, h, h / 2) : ctx.rect(X, Y, w, h);
+      ctx.shadowColor = "rgba(16,33,49,.35)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 1; ctx.fillStyle = A.c; ctx.fill();
+      ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; ctx.lineWidth = 1.5; ctx.strokeStyle = "#fff"; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X + 10, Y + 5); ctx.lineTo(X + 14.5, Y + 14); ctx.lineTo(X + 5.5, Y + 14); ctx.closePath(); ctx.fillStyle = A.t; ctx.fill();
+      ctx.fillStyle = A.c; ctx.fillRect(X + 9.4, Y + 8, 1.2, 3); ctx.fillRect(X + 9.4, Y + 12, 1.2, 1.2);
+      ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillStyle = A.t; ctx.fillText(t, X + 17, Y + h / 2 + 0.5);
+    });
+    /* Punto de encuentro: bandera amarilla */
+    if (mq) {
+      const [X, Y] = mq;
+      ctx.beginPath(); ctx.ellipse(X, Y, 7, 3, 0, 0, 7); ctx.fillStyle = "rgba(16,33,49,.35)"; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X, Y - 36); ctx.lineCap = "round"; ctx.lineWidth = 5; ctx.strokeStyle = "#fff"; ctx.stroke(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#0A1620"; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X + 1, Y - 36); ctx.lineTo(X + 26, Y - 36); ctx.lineTo(X + 19, Y - 28.5); ctx.lineTo(X + 26, Y - 21); ctx.lineTo(X + 1, Y - 21); ctx.closePath();
+      ctx.fillStyle = "#FFD23F"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#0A1620"; ctx.stroke();
+      const t = mt.hora || "Quedada"; ctx.font = `700 13px "Geist", sans-serif`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X + 30, Y - 28.5); ctx.fillStyle = "#0A1620"; ctx.fillText(t, X + 30, Y - 28.5);
     }
 
     /* Gente */
@@ -1311,6 +1491,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   }
   function pick(X, Y) {
     camUpdate(); projectAll();
+    const mt = meet(); if (mt) { const q = proj(mt.x, mt.y, mt.node >= 0 ? NH[mt.node] : hOf(mt.x, mt.y)); if (q && X > q[0] - 12 && X < q[0] + 40 && Y > q[1] - 44 && Y < q[1] + 6) return { meet: true }; }
     for (const p of positions()) { const q = proj(p.x, p.y, p.node >= 0 ? NH[p.node] : hOf(p.x, p.y)); if (q && Math.hypot(q[0] - X, q[1] - 22 - Y) < 18) return { person: p }; }
     let best = null, bd = 18;
     F.forEach(f => {
@@ -1340,6 +1521,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const p = pick(X, Y);
     if (rt) return;
     if (!p) { if (sel || personSheet) { sel = null; personSheet = null; updateMapUI(); } return; }
+    if (p.meet) { sel = null; personSheet = null; meetSheet = true; if (snap === "full") setSnap("peek"); ui(); return; }
     if (p.person) { sel = null; showPerson(p.person); return; }
     if (snap === "full") setSnap("peek");
     selectGroup(p.f.g || { k: p.f.k, name: "", d: p.f.d, t: p.f.t, fis: [p.f.fi], len: p.f.len, zt: p.f.zt, zb: p.f.zb, dur: p.f.dur }, p.node, false);
@@ -1598,7 +1780,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 
   /* ================= Interfaz: hoja inferior ================= */
   let snap = "peek", diario = false, diarioScope = "hoy", filtOpen = false, markCand = null, offline = !navigator.onLine, dq = "";
-  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : personSheet ? "person" : sunOn ? "sun" : diario ? "diario" : "home"; }
+  let meetSheet = false, meetDraft = null;
+  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : "home"; }
   function updateMapUI() { ui(); }
 
   /* Datos para el diario: desnivel y longitud de cada pista registrada */
@@ -1627,7 +1810,10 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (mode === "nocon") return { speek: `
       <div class="me-line"><span class="dot-off"></span><div><b>Sin conexión con el grupo</b><small>La primera vez hace falta cobertura para entrar.</small></div></div>
       <div class="acts one"><button class="btn" data-act="retry">Reintentar</button></div>`, smore: `<p class="quiet">El mapa y las rutas funcionan sin conexión. En cuanto haya cobertura entras en el grupo.</p>` };
-    const speek = `
+    const mt = meet();
+    const meetCard = mt ? (() => { const et = meetEtas(mt).filter(e => e.t != null).slice(0, 4);
+      return `<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Quedada${mt.hora ? " a las " + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}${et.length ? " · " + et.map(e => esc(e.p.uid === me ? "Tú" : who(e.p.uid)) + " " + etaTxt(e.t)).join(", ") : ""}</small></span><span class="chev" aria-hidden="true">›</span></button>`; })() : "";
+    const speek = meetCard + `
       <div class="me-line">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small>${LIVE.on ? `<span class="live-dot"></span>En directo · ` : ""}${pendingLong() && PEND.aqui ? "pendiente de enviar" : esc(ago(mp.at))}</small></div>` : LIVE.on ? `<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small><span class="live-dot"></span>En directo</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}</div>
       <div class="acts three">
         <button class="btn" data-act="mark">${mp ? "Estoy aquí" : "Marcar dónde estoy"}</button>
@@ -1636,11 +1822,11 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       </div>${navigator.geolocation && window.PISTEA_GROUP ? `
       <button class="btn wide ${LIVE.on ? "ghost on" : "dark"} livebtn" data-act="live">${LIVE.on ? `<span class="live-dot"></span>En directo · Parar` : "Compartir en directo"}</button>` : ""}${LIVE.on && WAKE.ok ? `
       <button class="toggle wake" data-act="wake" aria-pressed="${WAKE.want}"><span class="sw2"></span><span>Pantalla encendida<small>Sigue enviando con el móvil en el bolsillo. Gasta más batería.</small></span></button>` : ""}`;
-    const people = others.length ? `<ul class="people">${others.map(p => `
-        <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}">
-          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(p.en || "")} · ${esc(isLive(p) ? "en directo" : ago(p.at))}</small></span></button>
+    const people = others.length ? `<ul class="people">${others.map(p => { const m = msgOf(p.uid), mNew = m && Date.now() - m.at < MSG_HELP_MS, help = mNew && m.tipo === "ayuda"; return `
+        <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}${help ? " help" : ""}">
+          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b>${mNew ? `<small class="pmsg">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</small>` : ""}<small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(p.en || "")} · ${esc(isLive(p) ? "en directo" : ago(p.at))}</small></span></button>
           <button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">Ir</button>
-        </li>`).join("")}</ul>`
+        </li>`; }).join("")}</ul>`
       : `<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`;
     const G = window.PISTEA_GROUP;
     const invite = G ? `<div class="codebox"><span><small>Código del grupo</small><b>${esc(G.code)}</b></span><button class="btn go" data-act="copy-code">Copiar código</button></div>
@@ -1648,7 +1834,16 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       <button class="btn dark wide" data-act="invite">Invitar al grupo</button>
       <button class="btn ghost wide danger" data-act="leave">${confirmAct === "leave" ? "Toca otra vez para salir" : "Salir del grupo"}</button>
       ${G.isOwner ? `<p class="quiet">Creaste este grupo. Para quitar a alguien, toca su nombre.</p>` : ""}` : "";
-    const smore = `
+    const myMsg = S.mensajes.get(me), myT = myMsg && Date.now() - myMsg.at < MSG_HELP_MS ? myMsg.tipo : null;
+    const msgs = mode === "live" || mode === "demo" ? `
+      <h3 class="sec">Avisar al grupo</h3>
+      <div class="msgbtns">${Object.entries(MSGS).map(([k, t]) => `<button class="btn ${k === "ayuda" ? "ghost danger" : "dark"}${myT === k ? " on" : ""}" data-act="msg" data-t="${k}" aria-pressed="${myT === k}">${k === "ayuda" && confirmAct === "msg:ayuda" ? "Toca otra vez para enviar" : t}</button>`).join("")}</div>
+      ${myT ? `<p class="quiet">Enviaste «${esc(MSGS[myT])}» ${esc(ago(myMsg.at))}. Tócalo otra vez para quitarlo.</p>` : `<p class="quiet">Se envía con tu posición. Los demás lo ven al momento.</p>`}` : "";
+    const avs = avisos();
+    const avList = avs.length ? `
+      <h3 class="sec">Avisos en pistas y remontes</h3>
+      <ul class="avs">${avs.map(a => `<li><button data-act="aviso-go" data-ref="${esc(a.ref)}"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><span><b>${esc(a.nombre || "Sin nombre")}</b><small>${esc(a.uid === me ? "Tú" : who(a.uid))} · ${esc(ago(a.at))} · hasta las ${hhmm(a.exp)}</small></span></button></li>`).join("")}</ul>` : "";
+    const smore = `${msgs}${avList}
       <h3 class="sec">Ir a la zona</h3>
       <div class="zones">${ZONES.map((z, i) => `<button data-act="zone" data-i="${i}">${esc(z.n)}</button>`).join("")}<button data-act="zfit">Las 3 Vallées</button></div>
       <h3 class="sec" id="grupo">El grupo</h3>${people}${invite}
@@ -1678,6 +1873,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const tipoT = !isL && D.tipo;
     const regs = tipoT && g.name ? list("pistas").filter(p => norm(p.nombre) === norm(g.name)) : [];
     const doneToday = regs.some(p => p.day === today() && p.uid === me);
+    const ref = refOf(g), avs = avisos().filter(a => a.ref === ref), mineAv = new Set(avs.filter(a => a.uid === me).map(a => a.tipo));
     const facts = isL
       ? [g.zb && g.zt ? `${fmtNum(g.zb)} → ${fmtNum(g.zt)} m` : "", g.dur ? fmtMin(g.dur) + " de subida" : "", fmtLen(g.len)]
       : [fmtLen(g.len), g.zt - g.zb > 10 ? fmtNum(g.zt - g.zb) + " m de desnivel" : ""];
@@ -1686,12 +1882,14 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         <div class="title-wrap">${plate(g.k, g.d)}<div><small class="kicker">${esc(kind)}</small><h2 class="title">${esc(g.name || (isL ? "Remonte sin nombre" : "Pista sin nombre"))}</h2></div></div>
         <button class="x" data-act="close-sel" aria-label="Cerrar">×</button>
       </div>
-      <p class="facts">${facts.filter(Boolean).map(esc).join(" · ")}</p>
+      <p class="facts">${facts.filter(Boolean).map(esc).join(" · ")}</p>${avs.length ? `
+      <div class="avlist">${avs.map(a => `<span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><small>${esc(a.uid === me ? "Tú" : who(a.uid))} · ${esc(ago(a.at))}</small>`).join("")}</div>` : ""}
       <div class="acts ${tipoT && g.name ? "three" : "two"}">
         <button class="btn" data-act="here">Estoy aquí</button>
         <button class="btn dark" data-act="route-here">Cómo llegar</button>
         ${tipoT && g.name ? `<button class="btn ghost${doneToday ? " on" : ""}" data-act="sel-add">${doneToday ? "Hecha ✓" : "La hice"}</button>` : ""}
-      </div>`;
+      </div>
+      <div class="chiprow" role="group" aria-label="Quedar o avisar al grupo"><button class="chipbtn meetbtn" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Quedar aquí</button>${Object.keys(AVISOS).filter(k => AVISOS[k][g.k]).map(k => `<button class="chipbtn" data-act="aviso" data-t="${k}" aria-pressed="${mineAv.has(k)}"><i style="--c:${AVISOS[k].c}"></i>${AVISOS[k].s}</button>`).join("")}</div>`;
     const smore = `
       <dl class="spec">
         ${isL ? `<div><dt>Salida</dt><dd>${g.zb ? fmtNum(g.zb) + " m" : "?"}</dd></div><div><dt>Llegada</dt><dd>${g.zt ? fmtNum(g.zt) + " m" : "?"}</dd></div><div><dt>Viaje</dt><dd>${g.dur ? fmtMin(g.dur) : "?"}</dd></div>`
@@ -1699,7 +1897,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         <div><dt>Longitud</dt><dd>${fmtLen(g.len)}</dd></div>
       </dl>
       ${tipoT && g.name ? `<h3 class="sec">En vuestro diario</h3>${regs.length ? `<p class="quiet">${regs.length === 1 ? "Una bajada" : regs.length + " bajadas"}: ${esc([...new Set(regs.map(p => who(p.uid)))].join(", "))}.</p>` : `<p class="quiet">Nadie la ha apuntado todavía.</p>`}` : ""}
-      <p class="quiet">${sel.node != null ? "Estoy aquí y Cómo llegar usan el punto que tocaste." : isL ? "Estoy aquí te pone arriba del remonte. Cómo llegar te lleva a la salida." : "Estoy aquí y Cómo llegar usan el inicio de la pista."}</p>`;
+      <p class="quiet">${sel.node != null ? "Estoy aquí y Cómo llegar usan el punto que tocaste." : isL ? "Estoy aquí te pone arriba del remonte. Cómo llegar te lleva a la salida." : "Estoy aquí y Cómo llegar usan el inicio de la pista."}</p>
+      <p class="quiet">Los avisos (${Object.keys(AVISOS).filter(k => AVISOS[k][g.k]).map(k => AVISOS[k].s.toLowerCase()).join(", ")}) duran 2 h. ${isL ? "Las rutas evitan lo cerrado y suman 10 min si hay cola." : "Las rutas evitan lo cerrado."} Toca otra vez el tuyo para quitarlo.</p>`;
     return { speek, smore };
   }
 
@@ -1709,18 +1908,70 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const mine = p.uid === me;
     const speek = `
       <div class="headrow"><div class="title-wrap">${av(p.uid, true)}<div><small class="kicker">${isLive(p) ? `<span class="live-dot"></span>En directo` : esc(ago(p.at))}</small><h2 class="title">${esc(mine ? "Tú" : who(p.uid))}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
-      <p class="facts">${esc(p.en || "")}</p>
+      <p class="facts">${esc(p.en || "")}</p>${msgOf(p.uid) ? (m => `
+      <p class="msgline${m.tipo === "ayuda" ? " help" : ""}">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</p>`)(msgOf(p.uid)) : ""}
       <div class="acts two">${mine ? `<button class="btn" data-act="mark">Cambiar dónde estoy</button><button class="btn ghost" data-act="unmark">Quitar</button>` : `<button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}">Cómo llegar</button><button class="btn ghost" data-act="center-person" data-uid="${esc(p.uid)}">Centrar</button>`}</div>
       ${!mine && window.PISTEA_GROUP && window.PISTEA_GROUP.isOwner ? `<button class="btn ghost wide danger" data-act="kick" data-uid="${esc(p.uid)}">${confirmAct === "kick:" + p.uid ? "Toca otra vez para quitar a " + esc(who(p.uid)) : "Quitar del grupo"}</button>` : ""}`;
     return { speek, smore: Date.now() - p.at > 4 * 3600e3 ? `<p class="quiet">Esta posición tiene más de 4 horas. Puede que ya no esté ahí.</p>` : "" };
   }
 
+  function meetHtml() {
+    const mt = meet();
+    if (!mt) { meetSheet = false; return homeHtml(); }
+    const canDel = canEditMeet(mt), mine = mt.uid === me;
+    const speek = `
+      <div class="headrow"><div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Punto de encuentro${mt.hora ? " · a las " + esc(mt.hora) : ""}</small><h2 class="title">${esc(cap(mt.en))}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
+      <p class="facts">${mine ? "La pusiste tú" : "La puso " + esc(who(mt.uid))} ${esc(ago(mt.at))}</p>
+      <div class="acts ${canDel ? "two" : "one"}"><button class="btn" data-act="meet-route">Cómo llegar</button>${canDel ? `<button class="btn ghost danger" data-act="meet-del">Quitar quedada</button>` : ""}</div>`;
+    const et = meetEtas(mt), hT = mt.hora ? (() => { const [h, m] = mt.hora.split(":").map(Number), d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); })() : null;
+    const smore = `
+      <h3 class="sec">Cuánto le falta a cada uno</h3>
+      ${et.length ? `<ul class="people">${et.map(e => { const arr = e.t != null ? Date.now() + e.t * 1000 : null, late = hT && arr && arr > hT + 60000; return `
+        <li class="person"><button class="pbtn" data-act="person" data-uid="${esc(e.p.uid)}">${av(e.p.uid)}<span><b>${esc(e.p.uid === me ? "Tú" : who(e.p.uid))}</b><small>${esc(e.p.en || "")} · ${esc(ago(e.p.at))}</small></span></button>
+          <span class="eta${late ? " late" : ""}"><b>${etaTxt(e.t)}</b>${arr && e.t >= 60 ? `<small>${late ? "llega tarde, " : "llega "}${hhmm(arr)}</small>` : ""}</span></li>`; }).join("")}</ul>` : `<p class="quiet">Nadie ha marcado dónde está todavía.</p>`}
+      <p class="quiet">Tiempo aproximado por la ruta más rápida, con la espera de los remontes. Solo sale quien ha marcado dónde está.${canDel ? "" : " Solo quien la puso o quien creó el grupo puede quitarla."}</p>`;
+    return { speek, smore };
+  }
+  function meetAsk(node, en) {
+    meetDraft = { node, en };
+    const d = new Date(), m0 = Math.ceil((d.getHours() * 60 + d.getMinutes() + 10) / 30) * 30;
+    const hs = [0, 30, 60, 90].map(k => m0 + k).filter(m => m < 1440).map(m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0"));
+    $("#modal").innerHTML = `<div class="mcard sheetcard" role="dialog" aria-label="Punto de encuentro">
+      <div><small class="kicker">Quedar aquí</small><h2 class="title">${esc(cap(en))}</h2></div>
+      <p>¿A qué hora?</p>
+      ${hs.length ? `<div class="timegrid">${hs.map(h => `<button class="btn dark" data-act="meet-set" data-h="${h}">${h}</button>`).join("")}</div>` : ""}
+      <div class="timerow"><input type="time" id="mtime" value="${hs[0] || ""}" aria-label="Otra hora"><button class="btn dark" data-act="meet-set" data-h="otra">A esa hora</button></div>
+      <button class="btn" data-act="meet-set" data-h="">Sin hora</button>
+      <button class="btn ghost" data-act="modal-close">Cancelar</button>
+    </div>`;
+    $("#modal").hidden = false;
+  }
+  function meetSet(h) {
+    const d = meetDraft; meetDraft = null;
+    $("#modal").hidden = true; $("#modal").innerHTML = "";
+    if (!d) return;
+    const now = Date.now(); let tH = now;
+    if (h) { const [hh, mm] = h.split(":").map(Number), t = new Date(); t.setHours(hh, mm, 0, 0); tH = t.getTime(); if (tH < now - 3600e3) tH += 864e5; }
+    const [lon, lat] = toLL(NX[d.node], NY[d.node]);
+    const data = { uid: me, lat: +lat.toFixed(6), lon: +lon.toFixed(6), en: d.en.slice(0, 100), at: now, exp: Math.min(now + 15 * 3600e3, Math.max(tH, now) + 2 * 3600e3) };
+    if (h) data.hora = h;
+    put("quedada", "actual", data).then(ok => { if (!ok) return; sel = null; personSheet = null; meetSheet = true; setSnap("peek"); centerOn(NX[d.node], NY[d.node], 0.2); toast(sentMsg("Quedada " + (h ? "a las " + h + ", " : "") + d.en)); ui(); });
+  }
+  function msgSend(t) {
+    const mp = S.aqui.get(me), data = { uid: me, tipo: t, at: Date.now() };
+    if (mp && typeof mp.lat === "number" && typeof mp.lon === "number") { data.lat = mp.lat; data.lon = mp.lon; if (mp.en) data.en = String(mp.en).slice(0, 120); }
+    put("mensajes", me, data).then(ok => {
+      if (!ok) return;
+      if (!data.lat && t !== "bar") { toast("Enviado. Buscando tu ubicación para que puedan llegar…"); setTimeout(gpsHere, 1200); }
+      else toast(sentMsg("Enviado al grupo: «" + MSGS[t] + "»"));
+    });
+  }
   function stepInfo(st) {
     const f = st.f;
     if (st.ty === 2) return { cls: "walk", ic: "→", t1: "Camina unos " + fmtLen(st.m), t2: "A pie o empujando con los bastones" };
     if (st.ty === 1 || st.ty === 3) {
       const L = LIFT[f.t] || LIFT.tsd, nm = f.name || f.ref;
-      return { cls: "lift", ic: st.ty === 1 ? "▲" : "▼", t1: (st.ty === 1 ? "Sube en " : "Baja en ") + L.g + (nm ? " " + nm : ""), t2: fmtMin(st.t) + " con la espera" + (f.zt && f.zb ? " · llegas a " + fmtNum(st.ty === 1 ? f.zt : f.zb) + " m" : "") };
+      return { cls: "lift", ic: st.ty === 1 ? "▲" : "▼", t1: (st.ty === 1 ? "Sube en " : "Baja en ") + L.g + (nm ? " " + nm : ""), t2: fmtMin(st.t) + " con la espera" + ([...st.fis].some(fi => AVX.cola.has(fi)) ? " (avisan de cola)" : "") + (f.zt && f.zb ? " · llegas a " + fmtNum(st.ty === 1 ? f.zt : f.zb) + " m" : "") };
     }
     const nm = f.name || f.ref, D = DIF[f.d];
     const z0 = NZ[st.nodes[0]], z1 = NZ[st.nodes[st.nodes.length - 1]];
@@ -1769,7 +2020,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       ${r.steps.some(s => s.ty === 0 && (s.f.d === "n" || s.f.d === "i")) ? `<p class="quiet">La ruta más rápida pasa por una negra o un itinerario.</p>` : ""}
       <ol class="steps">${r.steps.map((st, k) => { const si = stepInfo(st); return `<li class="${k === i ? "cur" : k < i ? "past" : ""}"><button data-act="step-go" data-i="${k}"><span class="ic ${si.cls}" style="--c:${si.c || "transparent"}">${si.ic}</span><span><b>${esc(si.t1)}</b><small>${esc(si.t2)}</small></span></button></li>`; }).join("")}</ol>
       <button class="btn ghost wide" data-act="route-all">Ver la ruta entera</button>
-      <p class="quiet">Tiempo aproximado, con unos 2 min de espera por remonte. Comprobad en la estación qué está abierto.</p>`;
+      ${AVX.closed.size ? `<p class="quiet">La ruta evita lo que el grupo ha marcado como cerrado.</p>` : ""}
+      <p class="quiet">Tiempo aproximado, con unos 2 min de espera por remonte${AVX.cola.size ? " y 10 más donde avisan de cola" : ""}. Comprobad en la estación qué está abierto.</p>`;
     return { speek, smore };
   }
 
@@ -1832,7 +2084,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   function ui() {
     if (!$("#sheet")) return;
     if (ptrDown && !dragging) { uiLater = true; drawSoon(); return; }
-    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, person: personHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
+    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, person: personHtml, meet: meetHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
     const sb = $("#sheet");
     const ae = document.activeElement, fid = ae && ae.id && sb.contains(ae) ? ae.id : null;
     let selr = null; try { if (fid && ae.selectionStart != null) selr = [ae.selectionStart, ae.selectionEnd]; } catch (e) {}
@@ -1851,6 +2103,10 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     else if (stale) chips.push(`<span class="chip">Conexión lenta</span>`);
     if (mode === "live" && !canWrite) chips.push(`<span class="chip warn">Solo lectura</span>`);
     setHtml($("#chips"), chips.join(""));
+    /* Mensajes nuevos: los normales se van solos a los 12 s; «Necesito ayuda» se queda hasta cerrarlo */
+    const bs = banners();
+    bs.forEach(b => { if (!shownAt.has(b.k)) { shownAt.set(b.k, Date.now()); if (!b.help) setTimeout(() => { markSeen(b.k); ui(); }, 12000); } });
+    setHtml($("#banners"), bs.map(bannerHtml).join(""));
     const nOff = ["v", "a", "r", "n", "i", "L"].filter(k => !filt[k]).length;
     $("#filtbtn").setAttribute("aria-expanded", filtOpen); $("#filtbadge").textContent = nOff ? nOff : ""; $("#filtbadge").hidden = !nOff;
     $("#filters").hidden = !filtOpen;
@@ -2047,7 +2303,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   document.addEventListener("focusin", e => { if (e.target.id === "q") { document.body.classList.add("searching"); $("#results").innerHTML = resultsHtml(); } if (e.target.id === "dq" && snap !== "full") setSnap("full"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.id === "q") closeSearch(); });
   document.addEventListener("pointerdown", e => { if (!e.target.closest(".topbar")) { const r = $("#results"); if (r && r.innerHTML) { r.innerHTML = ""; document.body.classList.remove("searching"); } } });
-  function clearModes() { sel = null; personSheet = null; marking = false; }
+  function clearModes() { sel = null; personSheet = null; marking = false; meetSheet = false; }
   document.addEventListener("click", e => {
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
     const act = el.dataset.act, id = el.dataset.id;
@@ -2063,7 +2319,48 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       case "res-g": { closeSearch(); rt = null; diario = false; marking = false; selectGroup(GROUPS[+el.dataset.i], null, true); setSnap("peek"); break; }
       case "res-place": { closeSearch(); clearModes(); const p = M.places[+el.dataset.i]; centerOn(p[1], p[2], 0.1); ui(); break; }
       case "res-person": case "person": case "center-person": { closeSearch(); const p = positions().find(q => q.uid === el.dataset.uid); if (p) { rt = null; diario = false; showPerson(p); setSnap("peek"); } break; }
-      case "close-sel": sel = null; personSheet = null; ui(); break;
+      case "close-sel": sel = null; personSheet = null; meetSheet = false; ui(); break;
+      /* Punto de encuentro */
+      case "meet-here": {
+        if (!sel) break;
+        const mt = meet();
+        if (mt && !canEditMeet(mt)) { toast("Ya hay una quedada de " + who(mt.uid) + ". Solo esa persona o quien creó el grupo puede cambiarla."); break; }
+        const n = selNode(sel.g.k === "L" ? "bottom" : "top");
+        if (n >= 0) meetAsk(n, describeNode(n, [...sel.fis][0]).replace(/^en /, ""));
+        break;
+      }
+      case "meet-set": {
+        let h = el.dataset.h;
+        if (h === "otra") { const t = $("#mtime"); h = t ? t.value : ""; if (!/^\d{2}:\d{2}$/.test(h)) { toast("Elige una hora."); break; } }
+        meetSet(h); break;
+      }
+      case "meet-open": clearModes(); rt = null; diario = false; meetSheet = true; { const mt = meet(); if (mt) centerOn(mt.x, mt.y, 0.25); } setSnap("peek"); ui(); break;
+      case "banner-meet": markSeen(el.dataset.k); clearModes(); rt = null; diario = false; meetSheet = true; { const mt = meet(); if (mt) centerOn(mt.x, mt.y, 0.25); } setSnap("peek"); ui(); break;
+      case "meet-route": { const mt = meet(); if (!mt) break; if (mt.near < 0) { toast("La quedada está lejos de las pistas."); break; } meetSheet = false; startRoute({ node: mt.near, label: "la quedada" }); break; }
+      case "meet-del": { const mt = meet(); if (!mt || !canEditMeet(mt)) break; meetSheet = false; del("quedada", "actual").then(ok => ok && toast(sentMsg("Quedada quitada"))); ui(); break; }
+      /* Avisos en pistas y remontes */
+      case "aviso": {
+        if (!sel) break;
+        const g = sel.g, ref = refOf(g), t = el.dataset.t, A = AVISOS[t]; if (!A) break;
+        const mine = avisos().find(a => a.ref === ref && a.tipo === t && a.uid === me);
+        if (mine) { del("avisos", mine.id).then(ok => ok && toast("Aviso quitado")); break; }
+        const fi = [...sel.fis][0], n = sel.node != null && sel.node >= 0 ? sel.node : F[fi].ns[F[fi].ns.length >> 1];
+        const [lon, lat] = toLL(NX[n], NY[n]), now = Date.now();
+        put("avisos", newId(), { uid: me, tipo: t, ref, nombre: String(g.name || "").slice(0, 60), lat: +lat.toFixed(6), lon: +lon.toFixed(6), at: now, exp: now + AVISO_MS })
+          .then(ok => { if (ok) { toast(sentMsg(A.s + (g.name ? " en " + g.name : "") + ". El grupo lo verá 2 h.")); if (rt) recalc(false); } });
+        break;
+      }
+      case "aviso-go": { const g = groupOfRef(el.dataset.ref); if (!g) { toast("No encuentro esa pista en el mapa."); break; } clearModes(); rt = null; diario = false; selectGroup(g, null, true); setSnap("peek"); break; }
+      /* Mensajes de un toque */
+      case "msg": {
+        const t = el.dataset.t, cur = S.mensajes.get(me);
+        if (!MSGS[t]) break;
+        if (cur && cur.tipo === t && Date.now() - cur.at < MSG_HELP_MS) { del("mensajes", me).then(ok => ok && toast("Aviso quitado")); break; }
+        if (t === "ayuda" && confirmAct !== "msg:ayuda") { confirmAct = "msg:ayuda"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
+        confirmAct = null; msgSend(t); break;
+      }
+      case "banner-x": markSeen(el.dataset.k); ui(); break;
+      case "banner-go": markSeen(el.dataset.k); clearModes(); diario = false; startRoute({ uid: el.dataset.uid }); break;
       case "sheet-toggle": setSnap(snap === "peek" ? "half" : snap === "half" ? "full" : "peek"); break;
       case "goto-list": {
         const others = positions().filter(p => p.uid !== me);
@@ -2128,7 +2425,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       case "sun-close": setSun(false); setSnap("peek"); break;
       case "sun-now": sunMin = defaultSunMin(); const sr = $("#sunrange"); if (sr) sr.value = sunMin; sunSoon(); break;
       case "card": dayCard(); break;
-      case "modal-close": $("#modal").hidden = true; $("#modal").innerHTML = ""; break;
+      case "modal-close": meetDraft = null; $("#modal").hidden = true; $("#modal").innerHTML = ""; break;
       case "retry": if (mode === "nocon") connect(); break;
       case "demo-info": toast("Datos de ejemplo. El grupo todavía no está conectado."); break;
     }
@@ -2253,6 +2550,10 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         m.set(uid, { uid, lon, lat, en: describeNode(node), at: now - mm * 60000 });
       });
       S.aqui = m;
+      /* Un aviso de cola y un mensaje, para ver cómo quedan */
+      const cc = GROUPS.find(g => g.k === "L" && g.n === norm("Cime Caron"));
+      if (cc) { const n = F[cc.fis[0]].ns[0], [lon, lat] = toLL(NX[n], NY[n]); S.avisos = new Map([["a1", { uid: "d-pablo", tipo: "cola", ref: cc.key, nombre: cc.name, lon, lat, at: now - 20 * 60000, exp: now + 100 * 60000 }]]); }
+      const pa = m.get("d-ana"); if (pa) S.mensajes = new Map([["d-ana", { uid: "d-ana", tipo: "bar", lat: pa.lat, lon: pa.lon, en: pa.en, at: now - 3 * 60000 }]]);
     };
     mapReady.then(() => { demoPos(); schedule(); });
     schedule();

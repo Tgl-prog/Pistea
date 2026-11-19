@@ -209,14 +209,14 @@
         isOwner: owner === uid,
         leave() {
           // Sin esperar a la red: se borra al recuperar cobertura.
-          ["aqui", "perfiles"].forEach(c => group.collection(c).doc(uid).delete().catch(() => {}));
+          ["aqui", "perfiles", "mensajes"].forEach(c => group.collection(c).doc(uid).delete().catch(() => {}));
           goOut("Has salido del grupo.");
         },
         kick(id, onErr) {
           if (!G.isOwner || id === uid) return false;
           const fail = e => { if (onErr) onErr(e); };
           group.collection("fuera").doc(id).set({ at: Date.now(), by: uid }).catch(fail);
-          ["aqui", "perfiles"].forEach(c => group.collection(c).doc(id).delete().catch(() => {}));
+          ["aqui", "perfiles", "mensajes"].forEach(c => group.collection(c).doc(id).delete().catch(() => {}));
           return true;
         }
       };
