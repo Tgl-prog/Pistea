@@ -60,6 +60,8 @@
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
+  /* En iPhone con esquinas redondeadas (hay barra de inicio) el panel sigue la curva de la pantalla: radio concéntrico */
+  --r-bot: calc(var(--r-lg) + min(var(--sab), 1px) * 22);
   --blur: blur(18px) saturate(1.4);
   color-scheme: dark;
 }
@@ -163,7 +165,7 @@ body.searching .mapctl, body.searching .filters { visibility: hidden; }
 body.marking .mapctl { top: calc(var(--sat) + 74px); }
 
 /* ---------- Hoja inferior ---------- */
-.sheet { position: fixed; z-index: 5; left: 8px; right: 8px; bottom: 8px; max-width: 640px; margin: 0 auto; border-radius: var(--r-lg); display: flex; flex-direction: column; transition: height .32s cubic-bezier(.2,.8,.2,1); overflow: hidden; background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
+.sheet { position: fixed; z-index: 5; left: 8px; right: 8px; bottom: 8px; max-width: 640px; margin: 0 auto; border-radius: var(--r-lg) var(--r-lg) var(--r-bot) var(--r-bot); display: flex; flex-direction: column; transition: height .32s cubic-bezier(.2,.8,.2,1); overflow: hidden; background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
 .sheet.dragging { transition: none; }
 #grab { flex: 0 0 auto; height: 24px; width: 100%; border: 0; background: none; display: grid; place-items: center; touch-action: none; }
 #grab span { width: 40px; height: 4px; border-radius: 2px; background: var(--hair-2); }
