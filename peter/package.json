@@ -1,0 +1,1 @@
+{ "name": "pistea-peter", "private": true, "version": "1.0.0", "description": "Peter, el guía con IA de Pistea (función de Vercel)", "engines": { "node": ">=20" } }

@@ -9,3 +9,6 @@ window.PISTEA_FIREBASE = {
   messagingSenderId: "113462040978",
   appId: "1:113462040978:web:ea25bc8e2a6ea72462094b"
 };
+
+/* Peter, el guía con IA: dirección de su servidor (ver peter/README.md). Vacío = Peter avisa de que no está conectado. */
+window.PISTEA_PETER = { url: "" };

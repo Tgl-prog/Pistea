@@ -88,6 +88,42 @@ button { cursor: pointer; }
 .search { position: relative; }
 .search input { width: 100%; height: 52px; border-radius: 26px; color: var(--tx); background: var(--glass) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256.00 256.00'%3E%3Cdefs%3E%3CclipPath id='pc'%3E%3Cpath d='M128 226 C114 204 54 166 54 102 A74 74 0 1 1 202 102 C202 166 142 204 128 226 Z'/%3E%3C/clipPath%3E%3C/defs%3E%0A%3Cpath d='M128 226 C114 204 54 166 54 102 A74 74 0 1 1 202 102 C202 166 142 204 128 226 Z' fill='%235BE7F2'/%3E%0A%3Crect x='40' y='93' width='176' height='18' fill='%230A1620' clip-path='url%28%23pc%29'/%3E%0A%3Crect x='72' y='72' width='112' height='60' rx='30' fill='%230A1620'/%3E%0A%3Cpath d='M92 120 L113 98 L124 109 L141 90 L164 120' fill='none' stroke='%235BE7F2' stroke-width='9' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 14px 50% / 24px 24px; -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); padding: 0 16px 0 48px; font-size: 16px; box-shadow: var(--shadow); -webkit-appearance: none; }
 .search input::placeholder { color: var(--tx-3); }
+.search input { padding-right: 56px; }
+.peterbtn { position: absolute; right: 5px; top: 5px; width: 42px; height: 42px; border: 0; border-radius: 21px; padding: 0; background: rgba(91,231,242,.14); box-shadow: inset 0 0 0 1px rgba(91,231,242,.45); display: grid; place-items: center; }
+.peterbtn .eye { transform-origin: center; transform-box: fill-box; animation: blink 5s infinite; }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+@media (prefers-reduced-motion: reduce) { .peterbtn .eye { animation: none; } }
+body.searching .peterbtn { display: none; }
+.peterhi { position: fixed; right: 74px; z-index: 6; width: 236px; padding: 12px 14px; border-radius: 18px 4px 18px 18px; background: #F4F7F8; color: #0A1620; box-shadow: var(--shadow); font-size: 14px; line-height: 1.35; border: 0; text-align: left; }
+.peterhi b { display: block; font-size: 15px; margin-bottom: 2px; }
+.peter { position: fixed; inset: 0; z-index: 30; background: rgba(6,12,18,.55); display: flex; padding: calc(var(--sat) + 10px) 8px calc(var(--sab) + 8px); }
+.peter[hidden] { display: none; }
+.peter .pbox { flex: 1; display: flex; flex-direction: column; border-radius: 30px; background: #0F1C27; border: 1px solid var(--hair); box-shadow: var(--shadow); overflow: hidden; min-height: 0; }
+.peter .phead { display: flex; align-items: center; gap: 12px; padding: 14px 14px 12px 16px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.peter .phead .pav { width: 48px; height: 48px; border-radius: 50%; background: rgba(91,231,242,.12); display: grid; place-items: center; flex: 0 0 48px; }
+.peter .phead h2 { margin: 0; font: 700 20px/1.1 var(--font); }
+.peter .phead small { display: block; font-size: 13px; color: var(--tx-2); margin-top: 2px; }
+.peter .phead > div { flex: 1; }
+.peter .plog { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+.peter .msg { max-width: 86%; padding: 10px 14px; font-size: 15px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.peter .msg.u { align-self: flex-end; background: var(--acc); color: #0A1620; border-radius: 18px 18px 4px 18px; }
+.peter .msg.a { align-self: flex-start; background: rgba(255,255,255,.08); border-radius: 18px 18px 18px 4px; }
+.peter .msg.err { background: rgba(255,77,79,.14); color: #FFB3AD; }
+.peter .msg.typing { color: var(--tx-2); }
+.peter .pcard { display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 12px; border-radius: 18px; background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px var(--c, rgba(255,255,255,.15)); align-self: stretch; }
+.peter .pcard .ic { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.06); }
+.peter .pcard div { flex: 1; min-width: 0; }
+.peter .pcard b { display: block; font-size: 15px; }
+.peter .pcard small { display: block; font-size: 13px; color: var(--tx-2); }
+.peter .pcard .btn { min-height: 40px; min-width: 56px; padding: 0 14px; font-size: 14px; }
+.peter .psug { display: flex; gap: 8px; padding: 0 16px 8px; overflow-x: auto; scrollbar-width: none; }
+.peter .psug .btn { flex: 0 0 auto; min-height: 36px; padding: 0 14px; font-size: 14px; }
+.peter form { display: flex; gap: 8px; padding: 8px 12px 14px; }
+.peter form input { flex: 1; min-width: 0; height: 52px; border-radius: 26px; border: 1px solid rgba(255,255,255,.14); background: #17252F; color: var(--tx); font: 16px var(--font); padding: 0 18px; outline: none; }
+.peter form .btn { width: 52px; min-height: 52px; padding: 0; }
+.poisheet .facts a { color: var(--acc); }
+.poilinks { display: flex; gap: 8px; }
+.poilinks > * { flex: 1; min-height: 44px; font-size: 14px; text-decoration: none; display: flex; align-items: center; justify-content: center; }
 .search input:focus { outline: none; border-color: var(--acc); }
 .iconbtn { width: 52px; height: 52px; border-radius: 26px; display: grid; place-items: center; position: relative; color: var(--tx); background: var(--glass); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
 .iconbtn[aria-expanded=true] { background: var(--acc); color: var(--acc-ink); border-color: var(--acc); }
@@ -283,6 +319,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .meethora b { display: block; font: 600 24px/1 var(--mono); color: var(--sol); }
 .meethora small { display: block; margin-top: 4px; font-size: 12px; color: var(--tx-2); }
 .title.md { font-size: 20px; line-height: 1.2; }
+.poiic { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1.5px var(--c); }
+.meet-gold { color: var(--sol) !important; box-shadow: inset 0 0 0 1px rgba(255,210,63,.45) !important; }
 .ofiline { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; color: var(--tx-2); }
 .ofiline i { width: 10px; height: 10px; border-radius: 50%; background: #37B24D; }
 .ofiline.c { color: #FF8A80; font-weight: 600; }
@@ -429,7 +467,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 </div>
 <div id="cross" hidden aria-hidden="true"><svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="14" fill="none" stroke="#fff" stroke-width="7"/><circle cx="32" cy="32" r="14" fill="none" stroke="#5BE7F2" stroke-width="3.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#0A1016" stroke-width="3" stroke-linecap="round"/></svg></div>
 <header class="topbar" id="topbar">
-  <div class="search"><input type="search" id="q" placeholder="Buscar pista, remonte o amigo" autocomplete="off" enterkeyhint="search" aria-label="Buscar en el mapa"></div>
+  <div class="search"><input type="search" id="q" placeholder="Buscar pista, sitio o amigo" autocomplete="off" enterkeyhint="search" aria-label="Buscar en el mapa"><button class="peterbtn" data-act="peter" aria-label="Preguntar a Peter"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#5BE7F2"/><ellipse class="eye" cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse class="eye" cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0A1620"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0A1620"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0A1620" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
   <button class="iconbtn" id="filtbtn" data-act="filt-toggle" aria-expanded="false" aria-label="Filtrar por color"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h16M6 11h10M9 16h4"/></svg><span class="badge" id="filtbadge" hidden></span></button>
   <ul class="results" id="results"></ul>
   <div class="filters" id="filters" role="group" aria-label="Filtrar por color" hidden></div>
@@ -897,6 +935,140 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   }
   const agoMin = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? "ahora" : m < 60 ? "hace " + m + " min" : "hace " + Math.round(m / 60) + " h"; };
 
+  /* ================= Sitios: restaurantes y bares (OpenStreetMap) ================= */
+  const POI_CAT = { c: { s: "Comer", c: "#FFB347" }, b: { s: "Copas", c: "#B197FC" } };
+  const POI_AM = { restaurant: "Restaurante", fast_food: "Comida rápida", cafe: "Café", bar: "Bar", pub: "Pub", biergarten: "Terraza" };
+  let POIS = [], poiSheet = null, POI_SCREEN = [];
+  function loadPois() {
+    return fetch("pois.json").then(r => r.ok ? r.json() : null).then(D => {
+      if (!D || !Array.isArray(D.p)) return;
+      POIS = D.p.map(([id, cat, name, x, y, z, am, info]) => ({ id, cat, name, x, y, z, am, info: info || {}, node: undefined, n: norm(name) }));
+    }).catch(() => {});
+  }
+  const poiById = id => POIS.find(p => p.id === id);
+  function poiNode(p) { if (p.node === undefined) p.node = M.ok ? nearestNode(p.x, p.y, 400) : -1; return p.node; }
+  const poiKind = p => POI_AM[p.am] || (p.cat === "b" ? "Bar" : "Restaurante");
+  const POI_ICON = { c: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>`,
+    b: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B197FC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12l-6 8z"/><path d="M12 12v7M8 20h8"/></svg>` };
+  /* Tiempos desde un punto a todos los nodos (una sola pasada): para «X min de ti» y para Peter */
+  let DALL = { src: -2, t: 0, d: null };
+  function distAll(src) {
+    if (src < 0 || !M.ok) return null;
+    if (DALL.src === src && Date.now() - DALL.t < 60e3) return DALL.d;
+    avisos(); const cl = ofiClosed();
+    const dist = new Float64Array(M.n).fill(Infinity), heap = [[0, src]]; dist[src] = 0;
+    const push = it => { heap.push(it); let i = heap.length - 1; while (i) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+    const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
+    while (heap.length) {
+      const [d, u] = pop(); if (d > dist[u]) continue;
+      for (const e of ADJ[u]) {
+        if (e[2] >= 0 && (AVX.closed.has(e[2]) || (cl && cl.has(e[2])))) continue;
+        const nd = d + e[1] + ((e[3] === 1 || e[3] === 3) && AVX.cola.has(e[2]) ? COLA_S : 0);
+        if (nd < dist[e[0]]) { dist[e[0]] = nd; push([nd, e[0]]); }
+      }
+    }
+    DALL = { src, t: Date.now(), d: dist };
+    return dist;
+  }
+  function minsTo(node) { const mp = myPos(); if (!mp || mp.near < 0 || node < 0) return null; const d = distAll(mp.near); return d && isFinite(d[node]) ? Math.max(1, Math.round(d[node] / 60)) : null; }
+
+  /* ================= Peter: guía de Les 3 Vallées con IA ================= */
+  const PETER_URL = (window.PISTEA_PETER && window.PISTEA_PETER.url) || "";
+  const PETER = { msgs: [], busy: false };
+  try { const o = JSON.parse(sessionStorage.getItem("pistea.peter") || "null"); if (o && Array.isArray(o.msgs)) PETER.msgs = o.msgs.slice(-30); } catch (e) {}
+  const PETER_SUG = ["¿Dónde tomamos algo al sol?", "Ruta bonita para esta tarde", "Comer bien en Méribel", "Après-ski cerca"];
+  const PETER_AV = `<svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#5BE7F2"/><ellipse cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0A1620"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0A1620"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0A1620" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+  function peterSave() { try { sessionStorage.setItem("pistea.peter", JSON.stringify({ msgs: PETER.msgs.slice(-30) })); } catch (e) {} }
+  /* Lo que Peter necesita saber: dónde estás, la hora, qué hay cerca y qué está cerrado. Nada de nombres del grupo. */
+  function peterContext() {
+    const mp = myPos(), d = mp && mp.near >= 0 ? distAll(mp.near) : null;
+    const near = POIS.map(p => { const n = poiNode(p); return { p, m: d && n >= 0 && isFinite(d[n]) ? Math.round(d[n] / 60) : null }; })
+      .filter(o => o.m != null).sort((a, b) => a.m - b.m).slice(0, 45)
+      .map(({ p, m }) => ({ id: p.id, nombre: p.name, tipo: poiKind(p), alt: p.z || null, min: m, cocina: p.info.cuisine || undefined, horario: p.info.opening_hours || undefined }));
+    const far = d ? [] : POIS.slice(0, 60).map(p => ({ id: p.id, nombre: p.name, tipo: poiKind(p), alt: p.z || null }));
+    const cl = ofiClosed();
+    const cerrados = cl ? [...new Set([...cl].map(fi => F[fi].g ? F[fi].g.name : F[fi].name).filter(Boolean))].slice(0, 80) : null;
+    const mt = meet();
+    return {
+      hora: new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Paris", weekday: "long", hour: "2-digit", minute: "2-digit" }).format(new Date()),
+      donde: mp ? (mp.en || "en el mapa") : "sin posición marcada",
+      sitios_cerca: near.length ? near : far,
+      estado_oficial: cl ? { actualizado: agoMin(OFI.at), cerrados } : "sin datos (la web oficial solo se lee desde la app)",
+      quedada: mt ? { donde: mt.en, hora: mt.hora || null } : null,
+      avisos_del_grupo: avisos().slice(0, 15).map(a => ({ tipo: a.tipo, donde: a.ref }))
+    };
+  }
+  async function peterAsk(text) {
+    text = String(text || "").trim().slice(0, 600); if (!text || PETER.busy) return;
+    PETER.msgs.push({ r: "u", t: text }); PETER.busy = true; peterRender(true);
+    try {
+      if (!PETER_URL) throw new Error("nourl");
+      let token = "";
+      try { const u = window.firebase && firebase.auth && firebase.auth().currentUser; if (u) token = await u.getIdToken(); } catch (e) {}
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
+      const res = await fetch(PETER_URL, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json", "Authorization": token ? "Bearer " + token : "" },
+        body: JSON.stringify({ messages: PETER.msgs.slice(-12).map(m => ({ role: m.r === "u" ? "user" : "assistant", content: m.t })), context: peterContext() }) });
+      clearTimeout(to);
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || !j.text) throw new Error(j.error || ("http " + res.status));
+      PETER.msgs.push({ r: "a", t: String(j.text).slice(0, 4000) });
+    } catch (e) {
+      PETER.msgs.push({ r: "a", err: 1, t: e.message === "nourl" ? "Todavía no estoy conectado. Falta poner mi clave en el servidor." : navigator.onLine === false ? "Sin cobertura no puedo pensar. Prueba cuando tengas señal." : "Ahora mismo no puedo responder. Prueba en un rato." });
+    }
+    PETER.busy = false; peterSave(); peterRender(true);
+  }
+  /* Peter marca sitios y pistas así: [[sitio:n123]] o [[pista:Nombre]]. Se convierten en tarjetas con «Ir». */
+  function peterMsgHtml(m) {
+    if (m.r === "u") return `<div class="msg u">${esc(m.t)}</div>`;
+    const cards = [];
+    const txt = esc(m.t).replace(/\[\[(sitio|pista):([^\]]{1,80})\]\]/g, (_, k, v) => {
+      if (k === "sitio") { const p = poiById(v.trim()); if (!p) return ""; cards.push({ p }); return esc(p.name); }
+      const raw = v.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&").trim();
+      const g = GROUPS.find(g => g.n === norm(raw)); if (!g) return v; cards.push({ g }); return esc(g.name);
+    });
+    const seen = new Set();
+    return `<div class="msg a${m.err ? " err" : ""}">${txt.trim()}</div>` + cards.filter(c => { const k = c.p ? c.p.id : c.g.key; if (seen.has(k)) return false; seen.add(k); return true; }).map(c => {
+      if (c.p) { const p = c.p, mm = minsTo(poiNode(p)); return `<div class="pcard" style="--c:${POI_CAT[p.cat].c}66"><span class="ic">${POI_ICON[p.cat]}</span><div><b>${esc(p.name)}</b><small>${esc(POI_CAT[p.cat].s)}${p.z ? " · " + fmtNum(p.z) + " m" : ""}${mm ? " · " + mm + " min de ti" : ""}</small></div><button class="btn" data-act="poi-go" data-id="${esc(p.id)}">Ir</button></div>`; }
+      const g = c.g; return `<div class="pcard"><span class="ic">${plate(g.k, g.d)}</span><div><b>${esc(g.name)}</b><small>${g.k === "L" ? (LIFT[g.t] || LIFT.tsd).s : DIF[g.d].s}</small></div><button class="btn" data-act="res-g" data-i="${GROUPS.indexOf(g)}">Ver</button></div>`;
+    }).join("");
+  }
+  function peterRender(scroll) {
+    const el = $("#peter"); if (!el || el.hidden) return;
+    const log = el.querySelector(".plog");
+    log.innerHTML = (PETER.msgs.length ? "" : `<div class="msg a">Hola, soy Peter. Te digo dónde comer, dónde tomar algo y qué rutas hacer por Les 3 Vallées, contando con dónde estás y lo que está abierto.</div>`)
+      + PETER.msgs.map(peterMsgHtml).join("") + (PETER.busy ? `<div class="msg a typing">Peter está pensando…</div>` : "");
+    el.querySelector(".psug").hidden = PETER.msgs.length > 2;
+    el.querySelector("form .btn").disabled = PETER.busy;
+    if (scroll) log.scrollTop = log.scrollHeight;
+  }
+  function peterOpen(prefill) {
+    let el = $("#peter");
+    if (!el) {
+      el = document.createElement("div"); el.id = "peter"; el.className = "peter";
+      el.innerHTML = `<div class="pbox" role="dialog" aria-labelledby="peter-t">
+        <div class="phead"><span class="pav">${PETER_AV}</span><div><h2 id="peter-t">Peter</h2><small>Tu guía de Les 3 Vallées</small></div><button class="x" data-act="peter-close" aria-label="Cerrar">×</button></div>
+        <div class="plog" aria-live="polite"></div>
+        <div class="psug">${PETER_SUG.map(t => `<button class="btn ghost" data-act="peter-sug">${esc(t)}</button>`).join("")}</div>
+        <form><input name="t" placeholder="Pregúntale a Peter…" autocomplete="off" enterkeyhint="send" aria-label="Escribe a Peter" maxlength="600"><button class="btn" type="submit" aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+      </div>`;
+      document.body.appendChild(el);
+      el.querySelector("form").addEventListener("submit", ev => { ev.preventDefault(); const i = ev.target.t; const v = i.value; i.value = ""; peterAsk(v); });
+      el.addEventListener("click", ev => { if (ev.target === el) peterClose(); });
+    }
+    el.hidden = false; try { localStorage.setItem("pistea.peterhi", "1"); } catch (e) {} const hi = $("#peterhi"); if (hi) hi.remove();
+    peterRender(true);
+    if (prefill) peterAsk(prefill);
+  }
+  function peterClose() { const el = $("#peter"); if (el) el.hidden = true; }
+  function peterHello() {
+    let seen = false; try { seen = localStorage.getItem("pistea.peterhi") === "1"; } catch (e) {}
+    if (seen || $("#peterhi")) return;
+    const b = document.createElement("button"); b.id = "peterhi"; b.className = "peterhi"; b.dataset.act = "peter";
+    b.innerHTML = `<b>Hola, soy Peter</b>Pregúntame dónde comer, dónde tomar algo o qué ruta hacer por Les 3 Vallées.`;
+    const tb = $("#topbar"); b.style.top = ((tb ? tb.offsetTop + tb.offsetHeight : topInset() + 60) + 6) + "px"; document.body.appendChild(b);
+    setTimeout(() => { b.remove(); try { localStorage.setItem("pistea.peterhi", "1"); } catch (e) {} }, 9000);
+  }
+
   /* Punto de encuentro: uno por grupo (quedada/actual) */
   let mtCache = null, mtKey = null, mtT = 0;
   function meet() {
@@ -955,7 +1127,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   const EYE = { x: 0, y: 0, z: 0 }, AX = { fx: 0, fy: 0, fz: 0, rx: 0, ry: 0, rz: 0, ux: 0, uy: 0, uz: 0 };
   let PX = null, PY = null, PV = null, POLY3 = null;
   let GL = null, GLfail = false, anim = null, inertia = null;
-  const filt = { v: true, a: true, r: true, n: true, i: true, L: true };
+  const filt = { v: true, a: true, r: true, n: true, i: true, L: true, c: true, b: true };
   let sel = null;        /* { g, fis:Set, node } */
   let rt = null;         /* { to:{uid}|{node,label}, noBlack, res } */
   let marking = false, query = "", cv = null, ctx = null, drawQueued = false, gestured = false;
@@ -1506,6 +1678,28 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       ctx.font = `600 12px "Geist", sans-serif`; const at = fmtNum(pk.z) + " m";
       ctx.lineWidth = 3.5; ctx.strokeText(at, X, Y - 24); ctx.fillStyle = "#C92A2A"; ctx.fillText(at, X, Y - 24);
     });
+    /* Sitios: comer (ámbar) y copas (violeta). De cerca, con nombre. */
+    POI_SCREEN = [];
+    if (s > 0.06 && POIS.length) {
+      POIS.forEach(p => {
+        if (!filt[p.cat] || (poiSheet && poiSheet !== p.id && s < 0.12)) return;
+        const q = proj(p.x, p.y, hOf(p.x, p.y) + 6); if (!q) return; const [X, Y] = q;
+        if (X < 12 || X > V.w - 12 || Y < 40 || Y > V.h - 12) return;
+        const on = poiSheet === p.id, r = on ? 15 : 11, box = [X - r - 2, Y - r - 2, X + r + 2, Y + r + 2];
+        if (!on && hit(box)) return; boxes.push(box); POI_SCREEN.push([X, Y, p]);
+        const c = POI_CAT[p.cat].c;
+        ctx.beginPath(); ctx.arc(X, Y, r, 0, 7); ctx.fillStyle = on ? c : "#0F1C27"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = on ? "#fff" : c; ctx.stroke();
+        ctx.strokeStyle = on ? "#0A1620" : c; ctx.lineWidth = 1.6; ctx.lineCap = "round"; ctx.beginPath();
+        const k = r / 11;
+        if (p.cat === "b") { ctx.moveTo(X - 5 * k, Y - 5 * k); ctx.lineTo(X + 5 * k, Y - 5 * k); ctx.lineTo(X, Y + 1 * k); ctx.closePath(); ctx.moveTo(X, Y + 1 * k); ctx.lineTo(X, Y + 5 * k); ctx.moveTo(X - 3 * k, Y + 5.5 * k); ctx.lineTo(X + 3 * k, Y + 5.5 * k); }
+        else { ctx.moveTo(X - 3 * k, Y - 6 * k); ctx.lineTo(X - 3 * k, Y + 6 * k); ctx.moveTo(X - 5 * k, Y - 6 * k); ctx.lineTo(X - 5 * k, Y - 2 * k); ctx.moveTo(X - 1 * k, Y - 6 * k); ctx.lineTo(X - 1 * k, Y - 2 * k); ctx.moveTo(X + 4 * k, Y - 6 * k); ctx.quadraticCurveTo(X + 1.5 * k, Y - 3 * k, X + 4 * k, Y); ctx.lineTo(X + 4 * k, Y + 6 * k); }
+        ctx.stroke(); ctx.lineCap = "butt";
+        if (s > 0.2 || on) {
+          ctx.font = `600 ${on ? 13 : 11.5}px "Geist", sans-serif`; const tw = ctx.measureText(p.name).width, lb = [X + r + 4, Y - 9, X + r + 10 + tw, Y + 9];
+          if (on || !hit(lb)) { boxes.push(lb); ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.lineWidth = 3.5; ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.strokeText(p.name, X + r + 6, Y + .5); ctx.fillStyle = "#16242F"; ctx.fillText(p.name, X + r + 6, Y + .5); }
+        }
+      });
+    }
     if (sel) {
       const seen = new Set();
       [...sel.fis].map(fi => F[fi]).sort((a, b) => b.len - a.len).forEach(f => { const t = f.name || f.ref; if (t && !seen.has(t)) { seen.add(t); pill(f, t, true, true); } });
@@ -1634,6 +1828,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     camUpdate(); projectAll();
     const mt = meet(); if (mt) { const q = proj(mt.x, mt.y, mt.node >= 0 ? NH[mt.node] : hOf(mt.x, mt.y)); if (q && X > q[0] - 12 && X < q[0] + 40 && Y > q[1] - 44 && Y < q[1] + 6) return { meet: true }; }
     for (const p of positions()) { const q = proj(p.x, p.y, p.node >= 0 ? NH[p.node] : hOf(p.x, p.y)); if (q && Math.hypot(q[0] - X, q[1] - 22 - Y) < 18) return { person: p }; }
+    for (const [PXs, PYs, p] of POI_SCREEN) if (Math.hypot(PXs - X, PYs - Y) < 18) return { poi: p };
     let best = null, bd = 18;
     F.forEach(f => {
       if (!visibleF(f)) return;
@@ -1664,10 +1859,12 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (!p) { if (sel || personSheet) { sel = null; personSheet = null; updateMapUI(); } return; }
     if (p.meet) { sel = null; personSheet = null; meetSheet = true; if (snap === "full") setSnap("peek"); ui(); return; }
     if (p.person) { sel = null; showPerson(p.person); return; }
+    if (p.poi) { showPoi(p.poi); return; }
     if (snap === "full") setSnap("peek");
     selectGroup(p.f.g || { k: p.f.k, name: "", d: p.f.d, t: p.f.t, fis: [p.f.fi], len: p.f.len, zt: p.f.zt, zb: p.f.zb, dur: p.f.dur }, p.node, false);
   }
   let personSheet = null;
+  function showPoi(p) { sel = null; personSheet = null; meetSheet = false; diario = false; poiSheet = p.id; if (snap === "full") setSnap("peek"); updateMapUI(); centerOn(p.x, p.y, 0.3); }
   function showPerson(p) { personSheet = p.uid; sel = null; marking = false; updateMapUI(); centerOn(p.x, p.y, 0.25); }
   function groupBB(fis) { let bb = [1e9, 1e9, -1e9, -1e9]; fis.forEach(fi => { const b = F[fi].bb; bb = [Math.min(bb[0], b[0]), Math.min(bb[1], b[1]), Math.max(bb[2], b[2]), Math.max(bb[3], b[3])]; }); return bb; }
   function selectGroup(g, node, fit) {
@@ -1922,7 +2119,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   /* ================= Interfaz: hoja inferior ================= */
   let snap = "peek", diario = false, diarioScope = "hoy", filtOpen = false, markCand = null, offline = !navigator.onLine, dq = "";
   let meetSheet = false, meetDraft = null;
-  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : "home"; }
+  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : "home"; }
   function updateMapUI() { ui(); }
 
   /* Datos para el diario: desnivel y longitud de cada pista registrada */
@@ -2007,6 +2204,19 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     return Object.entries(TIPOS).map(([k, t]) => `<span class="bar${compact ? " c" : ""}" style="--c:${t.c}"><i style="width:${Math.round(st.by[k] / max * 100)}%"></i>${compact ? "" : `<em>${t.p}</em>`}<b>${st.by[k]}</b></span>`).join("");
   }
 
+  function poiHtml() {
+    const p = poiById(poiSheet); if (!p) { poiSheet = null; return homeHtml(); }
+    const n = poiNode(p), mm = minsTo(n), near = n >= 0 ? describeNode(n) : "";
+    const ph = p.info.phone ? String(p.info.phone).split(";")[0].trim() : "", web = p.info.website && /^https?:\/\//.test(p.info.website) ? p.info.website : "";
+    const speek = `<div class="headrow poisheet"><div class="title-wrap"><span class="poiic" style="--c:${POI_CAT[p.cat].c}">${POI_ICON[p.cat]}</span><div><small class="kicker">${esc(poiKind(p))}${p.z ? " · " + fmtNum(p.z) + " m" : ""}</small><h2 class="title md">${esc(p.name)}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
+      <p class="facts">${[near ? cap(near) : "", mm ? mm + " min de ti" : ""].filter(Boolean).map(esc).join(" · ")}</p>
+      <div class="acts two"><button class="btn" data-act="poi-go" data-id="${esc(p.id)}">Cómo llegar</button><button class="btn ghost meet-gold" data-act="poi-meet" data-id="${esc(p.id)}">Quedar aquí</button></div>`;
+    const smore = `<div class="poilinks">${ph ? `<a class="btn ghost" href="tel:${esc(ph.replace(/[^+\d]/g, ""))}">Llamar</a>` : ""}${web ? `<a class="btn ghost" href="${esc(web)}" target="_blank" rel="noopener">Web</a>` : ""}<button class="btn dark" data-act="peter-poi" data-id="${esc(p.id)}">Preguntar a Peter</button></div>
+      ${p.info.cuisine ? `<p class="facts">Cocina: ${esc(String(p.info.cuisine).replace(/_/g, " ").replace(/;/g, ", "))}</p>` : ""}
+      ${p.info.opening_hours ? `<p class="facts">Horario: ${esc(p.info.opening_hours)}</p>` : ""}
+      <p class="quiet">Datos de OpenStreetMap. El horario puede cambiar.</p>`;
+    return { speek, smore };
+  }
   function featHtml() {
     const g = sel.g, isL = g.k === "L";
     const L = isL ? (LIFT[g.t] || LIFT.tsd) : null, D = isL ? null : DIF[g.d];
@@ -2240,7 +2450,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   function ui() {
     if (!$("#sheet")) return;
     if (ptrDown && !dragging) { uiLater = true; drawSoon(); return; }
-    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, person: personHtml, meet: meetHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
+    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
     const sb = $("#sheet");
     const ae = document.activeElement, fid = ae && ae.id && sb.contains(ae) ? ae.id : null;
     let selr = null; try { if (fid && ae.selectionStart != null) selr = [ae.selectionStart, ae.selectionEnd]; } catch (e) {}
@@ -2266,7 +2476,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const nOff = ["v", "a", "r", "n", "i", "L"].filter(k => !filt[k]).length;
     $("#filtbtn").setAttribute("aria-expanded", filtOpen); $("#filtbadge").textContent = nOff ? nOff : ""; $("#filtbadge").hidden = !nOff;
     $("#filters").hidden = !filtOpen;
-    setHtml($("#filters"), ["v", "a", "r", "n", "i"].map(d => `<button class="fchip" style="--c:${DIF[d].hex}" data-act="filt" data-d="${d}" aria-pressed="${filt[d]}"><i></i>${DIF[d].p}</button>`).join("") + `<button class="fchip lift" data-act="filt" data-d="L" aria-pressed="${filt.L}"><i></i>Remontes</button>`);
+    setHtml($("#filters"), ["v", "a", "r", "n", "i"].map(d => `<button class="fchip" style="--c:${DIF[d].hex}" data-act="filt" data-d="${d}" aria-pressed="${filt[d]}"><i></i>${DIF[d].p}</button>`).join("") + `<button class="fchip lift" data-act="filt" data-d="L" aria-pressed="${filt.L}"><i></i>Remontes</button>` + Object.keys(POI_CAT).map(k => `<button class="fchip" style="--c:${POI_CAT[k].c}" data-act="filt" data-d="${k}" aria-pressed="${filt[k]}"><i></i>${POI_CAT[k].s}</button>`).join(""));
     $("#cross").hidden = !marking;
     $("#sunbtn").setAttribute("aria-pressed", sunOn);
     document.body.classList.toggle("marking", marking);
@@ -2306,10 +2516,12 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     positions().forEach(p => { const n = p.uid === me ? "tu" : norm(who(p.uid)); if (n.startsWith(q)) res.push({ person: p, sc: 0 }); });
     GROUPS.forEach(g => { const i = g.n.indexOf(q); if (i >= 0) res.push({ g, sc: (i === 0 ? 1 : 2) }); });
     M.places.forEach(pl => { const n = norm(pl[0]); if (n.includes(q)) res.push({ pl, sc: n.startsWith(q) ? 0.5 : 1.5 }); });
+    POIS.forEach(p => { const i = p.n.indexOf(q); if (i >= 0) res.push({ poi: p, sc: i === 0 ? 1.2 : 2.2 }); });
     res.sort((a, b) => a.sc - b.sc);
     if (!res.length) return `<li class="none">Nada con ese nombre</li>`;
     return res.slice(0, 25).map(r => {
       if (r.person) return `<li><button data-act="res-person" data-uid="${esc(r.person.uid)}">${av(r.person.uid)}<span><b>${esc(who(r.person.uid))}</b><small>${esc(r.person.en || "")}</small></span></button></li>`;
+      if (r.poi) return `<li><button data-act="res-poi" data-id="${esc(r.poi.id)}"><span class="poiic" style="--c:${POI_CAT[r.poi.cat].c};width:36px;height:36px;flex-basis:36px">${POI_ICON[r.poi.cat]}</span><span><b>${esc(r.poi.name)}</b><small>${esc(poiKind(r.poi))}${r.poi.z ? " · " + fmtNum(r.poi.z) + " m" : ""}</small></span></button></li>`;
       if (r.pl) return `<li><button data-act="res-place" data-i="${M.places.indexOf(r.pl)}"><span class="plate town" aria-hidden="true"></span><span><b>${esc(r.pl[0])}</b><small>Estación</small></span></button></li>`;
       const g = r.g, isL = g.k === "L";
       return `<li><button data-act="res-g" data-i="${GROUPS.indexOf(g)}">${plate(g.k, g.d)}<span><b>${esc(g.name)}</b><small>${isL ? (LIFT[g.t] || LIFT.tsd).s : DIF[g.d].s}${g.zt ? " · " + fmtNum(g.zt) + " m" : ""}</small></span></button></li>`;
@@ -2492,7 +2704,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   document.addEventListener("focusin", e => { if (e.target.id === "q") { document.body.classList.add("searching"); $("#results").innerHTML = resultsHtml(); } if (e.target.id === "dq" && snap !== "full") setSnap("full"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.id === "q") closeSearch(); });
   document.addEventListener("pointerdown", e => { if (!e.target.closest(".topbar")) { const r = $("#results"); if (r && r.innerHTML) { r.innerHTML = ""; document.body.classList.remove("searching"); } } });
-  function clearModes() { sel = null; personSheet = null; marking = false; meetSheet = false; }
+  function clearModes() { sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; }
   document.addEventListener("click", e => {
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
     const act = el.dataset.act, id = el.dataset.id;
@@ -2508,7 +2720,14 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       case "res-g": { closeSearch(); rt = null; diario = false; marking = false; selectGroup(GROUPS[+el.dataset.i], null, true); setSnap("peek"); break; }
       case "res-place": { closeSearch(); clearModes(); const p = M.places[+el.dataset.i]; centerOn(p[1], p[2], 0.1); ui(); break; }
       case "res-person": case "person": case "center-person": { closeSearch(); const p = positions().find(q => q.uid === el.dataset.uid); if (p) { rt = null; diario = false; showPerson(p); setSnap("peek"); } break; }
-      case "close-sel": sel = null; personSheet = null; meetSheet = false; ui(); break;
+      case "close-sel": sel = null; personSheet = null; meetSheet = false; poiSheet = null; ui(); break;
+      case "peter": peterOpen(); break;
+      case "peter-close": peterClose(); break;
+      case "peter-sug": peterAsk(el.textContent); break;
+      case "peter-poi": { const p = poiById(el.dataset.id); peterOpen(p ? `Háblame de ${p.name}: qué es, cómo llego y qué tal está.` : ""); break; }
+      case "poi-go": { const p = poiById(el.dataset.id); if (!p) break; peterClose(); const n = poiNode(p); if (n < 0) { toast("Ese sitio queda lejos de las pistas."); break; } poiSheet = null; closeSearch(); startRoute({ node: n, label: p.name }); break; }
+      case "poi-meet": { const p = poiById(el.dataset.id); if (!p) break; const n = poiNode(p); if (n >= 0) meetAsk(n, p.name); break; }
+      case "res-poi": { closeSearch(); clearModes(); rt = null; const p = poiById(el.dataset.id); if (p) { showPoi(p); setSnap("peek"); } break; }
       /* Punto de encuentro */
       case "meet-here": {
         if (!sel) break;
@@ -2758,12 +2977,13 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     mapSetup();
     if ((location.hash || "") === "#pistas") { diario = true; snap = "full"; }
     ui();
-    mapReady = Promise.all([loadMap(), loadTerrain().catch(() => {})]).then(() => {
+    mapReady = Promise.all([loadMap(), loadTerrain().catch(() => {}), loadPois()]).then(() => {
       NH = new Float32Array(M.n);
       for (let i = 0; i < M.n; i++) NH[i] = (NZ[i] > 0 ? NZ[i] : groundZ(NX[i], NY[i])) * EXAG + 4;
       POLY3 = M.polys.map(p => { const out = []; for (let i = 0; i < p.flat.length; i += 2) out.push(p.flat[i], p.flat[i + 1], groundZ(p.flat[i], p.flat[i + 1]) * EXAG + 2); return { d: p.d, pts: out }; });
       M.ok = true; RUNG = null; buildPeaks();
       ofiRefresh(); setInterval(() => { if (!document.hidden) ofiRefresh(); }, 60e3);
+      setTimeout(peterHello, 2500);
       const l = $("#mload"); if (l) l.remove();
       sizeCanvas(); initGL(); layoutSheet(); camUpdate(); overview(0);
       schedule();
