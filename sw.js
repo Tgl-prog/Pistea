@@ -1,5 +1,5 @@
 /* Pistea · service worker: la app y el mapa se guardan en el móvil y abren sin cobertura. */
-const VERSION = "pistea-v3";
+const VERSION = "pistea-v4";
 const CORE = [
   "./", "index.html", "manifest.webmanifest", "backend.js", "firebase-config.js",
   "mapdata.json", "dem.json", "relief.jpg",

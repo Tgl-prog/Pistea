@@ -76,7 +76,7 @@ button { cursor: pointer; }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 18px; color: #0A1620; }
 .loading .lock svg { width: min(56vw, 220px); height: auto; display: block; }
 .loading small { font: 500 14px/1.3 var(--font); color: #4A5B68; }
-.attr { position: fixed; left: 12px; z-index: 2; font: 500 10px/1 var(--mono); color: rgba(10,16,22,.7); top: calc(var(--sat) + 128px); letter-spacing: .02em; }
+.attr { position: fixed; left: 22px; z-index: 2; font: 500 9px/1 var(--mono); color: rgba(244,247,248,.72); top: calc(var(--sat) + 80px); letter-spacing: .02em; padding: 4px 7px; border-radius: 999px; background: rgba(10,22,32,.45); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .attr a { color: inherit; }
 #cross { position: fixed; left: 50%; z-index: 3; width: 64px; height: 64px; margin: -32px 0 0 -32px; pointer-events: none; }
 #cross[hidden] { display: none; }
@@ -143,6 +143,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .btn[disabled] { opacity: .35; pointer-events: none; }
 .btn.go { min-height: 46px; min-width: 66px; padding: 0 18px; border-radius: 23px; }
 .btn.wide { width: 100%; }
+.btn.wide + .btn.wide { margin-top: 10px; }
+.btn.danger { color: #FF8A80; box-shadow: inset 0 0 0 1px rgba(255,138,128,.35); }
 .acts { display: grid; gap: 8px; }
 .acts.one { grid-template-columns: 1fr; }
 .acts.two { grid-template-columns: 1fr 1fr; }
@@ -375,6 +377,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 
   /* ================= Estado ================= */
   const S = { pistas: new Map(), aqui: new Map() };
+  let confirmAct = null, confirmT = 0;
   let db = null, U = null, me = null, mode = "loading", canWrite = true, stale = false;
   const names = {}, pendingNames = new Set(), fresh = new Set();
   let dragging = false;
@@ -1577,7 +1580,10 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
           <button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">Ir</button>
         </li>`).join("")}</ul>`
       : `<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`;
-    const invite = window.PISTEA_GROUP ? `<button class="btn dark wide" data-act="invite">Invitar al grupo</button>` : "";
+    const G = window.PISTEA_GROUP;
+    const invite = G ? `<button class="btn dark wide" data-act="invite">Invitar al grupo</button>
+      <button class="btn ghost wide danger" data-act="leave">${confirmAct === "leave" ? "Toca otra vez para salir" : "Salir del grupo"}</button>
+      ${G.isOwner ? `<p class="quiet">Creaste este grupo. Para quitar a alguien, toca su nombre.</p>` : ""}` : "";
     const smore = `
       <h3 class="sec">Ir a la zona</h3>
       <div class="zones">${ZONES.map((z, i) => `<button data-act="zone" data-i="${i}">${esc(z.n)}</button>`).join("")}<button data-act="zfit">Las 3 Vallées</button></div>
@@ -1640,7 +1646,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const speek = `
       <div class="headrow"><div class="title-wrap">${av(p.uid, true)}<div><small class="kicker">${esc(ago(p.at))}</small><h2 class="title">${esc(mine ? "Tú" : who(p.uid))}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
       <p class="facts">${esc(p.en || "")}</p>
-      <div class="acts two">${mine ? `<button class="btn" data-act="mark">Cambiar dónde estoy</button><button class="btn ghost" data-act="unmark">Quitar</button>` : `<button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}">Cómo llegar</button><button class="btn ghost" data-act="center-person" data-uid="${esc(p.uid)}">Centrar</button>`}</div>`;
+      <div class="acts two">${mine ? `<button class="btn" data-act="mark">Cambiar dónde estoy</button><button class="btn ghost" data-act="unmark">Quitar</button>` : `<button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}">Cómo llegar</button><button class="btn ghost" data-act="center-person" data-uid="${esc(p.uid)}">Centrar</button>`}</div>
+      ${!mine && window.PISTEA_GROUP && window.PISTEA_GROUP.isOwner ? `<button class="btn ghost wide danger" data-act="kick" data-uid="${esc(p.uid)}">${confirmAct === "kick:" + p.uid ? "Toca otra vez para quitar a " + esc(who(p.uid)) : "Quitar del grupo"}</button>` : ""}`;
     return { speek, smore: Date.now() - p.at > 4 * 3600e3 ? `<p class="quiet">Esta posición tiene más de 4 horas. Puede que ya no esté ahí.</p>` : "" };
   }
 
@@ -1918,6 +1925,17 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       case "mark-cancel": marking = false; ui(); break;
       case "gps": gpsHere(); break;
       case "invite": inviteGroup(); break;
+      case "leave": {
+        if (confirmAct !== "leave") { confirmAct = "leave"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
+        confirmAct = null; window.PISTEA_GROUP.leave(); break;
+      }
+      case "kick": {
+        const k = "kick:" + el.dataset.uid, nm = who(el.dataset.uid);
+        if (confirmAct !== k) { confirmAct = k; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
+        confirmAct = null; personSheet = null;
+        window.PISTEA_GROUP.kick(el.dataset.uid).then(ok => { toast(ok ? nm + " ya no está en el grupo" : "No se ha podido quitar"); ui(); }, () => toast("No se ha podido quitar. Revisa la conexión."));
+        ui(); break;
+      }
       case "unmark": del("aqui", me).then(ok => ok && toast("Ya no apareces en el mapa")); personSheet = null; ui(); break;
       case "here": { const n = selNode("top"); if (n >= 0) setMyPos(n, describeNode(n, [...sel.fis][0])).then(() => { sel = null; ui(); }); break; }
       case "route-here": {
