@@ -2,7 +2,9 @@
  *
  * La app habla con una interfaz mínima (use("db"), use("user")). Este archivo la implementa
  * con Firestore y acceso anónimo, y pide el nombre y el código del grupo la primera vez.
- * Si falta la configuración (firebase-config.js) o no hay red, la app arranca en modo ejemplo.
+ * Si falta la configuración (firebase-config.js), la app arranca en modo ejemplo.
+ * Pensado para la montaña: nada espera a la red. Lo guardado se ve al momento y lo que
+ * escribes se envía cuando vuelve la cobertura.
  */
 (function () {
   "use strict";
@@ -76,61 +78,78 @@
   firebase.initializeApp(cfg);
   const auth = firebase.auth();
   const fs = firebase.firestore();
+  // Copia local de los datos del grupo (IndexedDB): sin cobertura se ve lo último que llegó,
+  // y lo que escribas se guarda y se envía al recuperarla. Con el SDK compat 10.x es enablePersistence.
   try { fs.enablePersistence({ synchronizeTabs: true }).catch(() => {}); } catch (e) {}
+
+  // Con mala cobertura Firestore puede tardar mucho en contestar: las lecturas del arranque
+  // tienen un límite y, si no llegan a tiempo, se sigue con lo guardado.
+  const TIMEOUT = {};
+  const within = (p, ms) => Promise.race([p.catch(() => null), new Promise(r => setTimeout(() => r(TIMEOUT), ms))]);
+  const got = s => s && s !== TIMEOUT ? s : null;
+
+  // El usuario anónimo se guarda en el móvil: sin cobertura sigue valiendo el de la última vez.
+  // Solo la primera vez hace falta red para crearlo.
+  let authP = null;
+  function ensureAuth() {
+    if (!authP) authP = new Promise(res => { const off = auth.onAuthStateChanged(u => { off(); res(u); }); })
+      .then(u => u || auth.signInAnonymously().then(c => c.user))
+      .catch(e => { authP = null; throw e; });
+    return authP;
+  }
 
   let ready = null;
   function goOut(aviso) {
     LS.del("pistea.grupo");
     if (aviso) LS.set("pistea.aviso", aviso);
     try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
-    location.reload();
+    // Un momento para que las escrituras pendientes queden guardadas en el móvil antes de recargar.
+    setTimeout(() => location.reload(), 400);
   }
   function boot() {
     if (ready) return ready;
     ready = (async () => {
       if (!code || !myName) await askJoin();
       else { try { history.replaceState(null, "", location.pathname + location.search + "#g=" + code); } catch (e) {} }
-      if (!auth.currentUser) await auth.signInAnonymously();
-      const uid = auth.currentUser.uid;
+      const uid = (await ensureAuth()).uid;
       const group = fs.collection("grupos").doc(code);
       const kicked = () => goOut("Te han quitado de ese grupo. Puedes crear uno nuevo o entrar en otro con su código.");
 
-      // ¿Me han quitado de este grupo?
-      try { if ((await group.collection("fuera").doc(uid).get()).exists) { kicked(); return new Promise(() => {}); } } catch (e) {}
+      // ¿Me han quitado? ¿Quién creó el grupo? Las dos lecturas a la vez y como mucho 2,5 s.
+      const [out, g] = (await Promise.all([within(group.collection("fuera").doc(uid).get(), 2500), within(group.get(), 2500)])).map(got);
+      if (out && out.exists) { kicked(); return new Promise(() => {}); }
 
-      // Quién creó el grupo. Si el grupo aún no tiene creador, lo es quien entra primero.
+      // Si el grupo aún no tiene creador, lo es quien entra primero. Las escrituras no se esperan:
+      // sin cobertura se quedan en cola y se envían solas.
       let owner = null;
-      try {
-        const g = await group.get();
-        if (g.exists) owner = g.data().owner;
-        else { await group.set({ owner: uid, at: Date.now() }); owner = uid; }
-      } catch (e) {}
-
-      await group.collection("perfiles").doc(uid).set({ name: myName, at: Date.now() });
+      if (g && g.exists) owner = g.data().owner;
+      else if (g && !g.metadata.fromCache) { owner = uid; group.set({ owner: uid, at: Date.now() }).catch(() => {}); }
+      group.collection("perfiles").doc(uid).set({ name: myName, at: Date.now() }).catch(() => {});
 
       // Si me quitan mientras tengo la app abierta, salgo en el momento.
       group.collection("fuera").doc(uid).onSnapshot(s => { if (s.exists) kicked(); }, () => {});
 
       const base = location.origin + location.pathname;
-      window.PISTEA_GROUP = {
+      const G = window.PISTEA_GROUP = {
         code,
         link: base + "#g=" + code,
         isOwner: owner === uid,
-        async leave() {
-          try { await group.collection("aqui").doc(uid).delete(); } catch (e) {}
-          try { await group.collection("perfiles").doc(uid).delete(); } catch (e) {}
+        leave() {
+          // Sin esperar a la red: se borra al recuperar cobertura.
+          ["aqui", "perfiles"].forEach(c => group.collection(c).doc(uid).delete().catch(() => {}));
           goOut("Has salido del grupo.");
         },
-        async kick(id) {
-          if (owner !== uid || id === uid) return false;
-          await group.collection("fuera").doc(id).set({ at: Date.now(), by: uid });
-          try { await group.collection("aqui").doc(id).delete(); } catch (e) {}
-          try { await group.collection("perfiles").doc(id).delete(); } catch (e) {}
+        kick(id, onErr) {
+          if (!G.isOwner || id === uid) return false;
+          const fail = e => { if (onErr) onErr(e); };
+          group.collection("fuera").doc(id).set({ at: Date.now(), by: uid }).catch(fail);
+          ["aqui", "perfiles"].forEach(c => group.collection(c).doc(id).delete().catch(() => {}));
           return true;
         }
       };
       return { uid, group };
     })();
+    ready.catch(() => { ready = null; });              // sin red la primera vez: se puede reintentar
     return ready;
   }
 

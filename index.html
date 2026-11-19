@@ -364,7 +364,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     tapis: { s: "Cinta", g: "la cinta", spd: 1 }
   };
   const PAL = ["#0C8599", "#D6336C", "#5C940D", "#862E9C", "#495057", "#1971C2", "#C2255C", "#2F9E44"];
-  const COLS = ["pistas", "aqui"];
+  const COLS = ["pistas", "aqui", "perfiles"];
 
   const $ = s => document.querySelector(s);
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -380,7 +380,9 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   const fmtMin = s => { const m = Math.max(1, Math.round(s / 60)); return m < 60 ? m + " min" : Math.floor(m / 60) + " h " + String(m % 60).padStart(2, "0"); };
 
   /* ================= Estado ================= */
-  const S = { pistas: new Map(), aqui: new Map() };
+  const S = { pistas: new Map(), aqui: new Map(), perfiles: new Map() };
+  const PEND = {};       /* colecciones con escrituras sin confirmar (sin cobertura) */
+  let pendSince = 0;
   let confirmAct = null, confirmT = 0;
   let db = null, U = null, me = null, mode = "loading", canWrite = true, stale = false;
   const names = {}, pendingNames = new Set(), fresh = new Set();
@@ -535,26 +537,42 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 
   /* ================= Datos compartidos ================= */
   function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true; }, 3200); }
+  /* Las escrituras no se esperan: la pantalla cambia al momento y Firestore las envía cuando hay
+     cobertura. Si al final las rechaza, se avisa aquí. */
   async function guard(fn) {
-    if (!canWrite) { toast("Solo puedes mirar. Pide a quien creó la app acceso de editor."); return false; }
     try { await fn(); return true; }
     catch (e) {
       const code = e && e.code;
       if (code === "invalid_argument") { canWrite = false; schedule(); toast("No tienes permiso para guardar. Pide acceso de editor."); }
-      else if (code === "quota_exceeded") toast("Se llenó el espacio de la app.");
-      else if (code === "revoked") toast("Se perdió el acceso a los datos del grupo.");
+      else if (code === "permission-denied") toast("No se pudo guardar: no tienes permiso en este grupo.");
+      else if (code === "resource-exhausted" || code === "quota_exceeded") toast("El grupo ha llegado al límite gratis de hoy. Mañana vuelve a funcionar.");
+      else if (code === "unavailable") toast("Sin cobertura. Se enviará en cuanto haya.");
+      else if (code === "revoked" || code === "unauthenticated") toast("Se perdió el acceso a los datos del grupo.");
       else toast("No se pudo guardar. Prueba otra vez.");
       return false;
     }
   }
+  function writable() {
+    if (mode === "demo") return true;
+    if (mode !== "live") { toast("Todavía no estás conectado al grupo."); return false; }
+    if (!canWrite) { toast("Solo puedes mirar. Pide a quien creó la app acceso de editor."); return false; }
+    return true;
+  }
   function put(col, id, data) {
-    if (mode !== "live") { S[col] = new Map(S[col]).set(id, data); schedule(); return Promise.resolve(true); }
-    return guard(() => db.collection(col).doc(id).set(data));
+    if (!writable()) return Promise.resolve(false);
+    S[col] = new Map(S[col]).set(id, data); schedule();
+    if (mode === "live") guard(() => db.collection(col).doc(id).set(data));
+    return Promise.resolve(true);
   }
   function del(col, id) {
-    if (mode !== "live") { S[col] = new Map(S[col]); S[col].delete(id); schedule(); return Promise.resolve(true); }
-    return guard(() => db.collection(col).doc(id).delete());
+    if (!writable()) return Promise.resolve(false);
+    S[col] = new Map(S[col]); S[col].delete(id); schedule();
+    if (mode === "live") guard(() => db.collection(col).doc(id).delete());
+    return Promise.resolve(true);
   }
+  /* Hay algo sin enviar desde hace más de 3 s (con buena cobertura se confirma en milisegundos) */
+  const pendingLong = () => !!pendSince && Date.now() - pendSince > 3000;
+  const sentMsg = ok => offline ? "Guardado. Se enviará al grupo en cuanto haya cobertura." : ok;
   function ensureNames() {
     if (mode !== "live" || !U) return;
     const ids = new Set(); COLS.forEach(c => S[c].forEach(v => v.uid && ids.add(v.uid)));
@@ -572,6 +590,11 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       S[col] = new Map(snap.docs.map(d => [d.id, d.data()]));
       if (!snap.metadata.fromCache) fresh.add(col);
       if (fresh.size >= COLS.length) stale = false;
+      const wasPend = Object.values(PEND).some(Boolean);
+      PEND[col] = !!(snap.metadata && snap.metadata.hasPendingWrites);
+      const isPend = Object.values(PEND).some(Boolean);
+      if (isPend && !wasPend) { pendSince = Date.now(); setTimeout(schedule, 3100); } else if (!isPend) pendSince = 0;
+      if (col === "perfiles") S.perfiles.forEach((v, id) => { if (v && v.name) names[id] = v.name; });
       ensureNames(); schedule();
     }, () => { fresh.add(col); schedule(); });
   }
@@ -592,7 +615,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const [lon, lat] = toLL(NX[node], NY[node]);
     if (LIVE.on) liveStop(true);   // si te marcas a mano, manda la marca, no el GPS
     const data = { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en, at: Date.now() };
-    return put("aqui", me, data).then(ok => { if (ok) toast("Listo. El grupo te ve " + en); return ok; });
+    return put("aqui", me, data).then(ok => { if (ok) toast(sentMsg("Listo. El grupo te ve " + en)); return ok; });
   }
   function describeNode(node, fi) {
     let f = fi != null ? F[fi] : null;
@@ -1572,8 +1595,11 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   function homeHtml() {
     const mp = myPos(), ps = positions(), others = ps.filter(p => p.uid !== me);
     const hoy = stats(list("pistas").filter(p => p.day === today()));
+    if (mode === "nocon") return { speek: `
+      <div class="me-line"><span class="dot-off"></span><div><b>Sin conexión con el grupo</b><small>La primera vez hace falta cobertura para entrar.</small></div></div>
+      <div class="acts one"><button class="btn" data-act="retry">Reintentar</button></div>`, smore: `<p class="quiet">El mapa y las rutas funcionan sin conexión. En cuanto haya cobertura entras en el grupo.</p>` };
     const speek = `
-      <div class="me-line">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small>${LIVE.on ? `<span class="live-dot"></span>En directo · ${esc(ago(mp.at))}` : esc(ago(mp.at))}</small></div>` : LIVE.on ? `<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small><span class="live-dot"></span>En directo</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}</div>
+      <div class="me-line">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small>${LIVE.on ? `<span class="live-dot"></span>En directo · ` : ""}${pendingLong() && PEND.aqui ? "pendiente de enviar" : esc(ago(mp.at))}</small></div>` : LIVE.on ? `<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small><span class="live-dot"></span>En directo</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}</div>
       <div class="acts three">
         <button class="btn" data-act="mark">${mp ? "Estoy aquí" : "Marcar dónde estoy"}</button>
         <button class="btn dark" data-act="goto-list">Ir hasta…</button>
@@ -1779,6 +1805,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const chips = [];
     if (mode === "loading") chips.push(`<span class="chip">Conectando con el grupo…</span>`);
     if (mode === "demo") chips.push(`<button class="chip warn" data-act="demo-info">Ejemplo · ¿qué es esto?</button>`);
+    if (mode === "nocon") chips.push(`<button class="chip bad" data-act="retry">Sin conexión con el grupo · Reintentar</button>`);
+    if (mode === "live" && pendingLong()) chips.push(`<span class="chip warn">Pendiente de enviar</span>`);
     if (offline) chips.push(`<span class="chip bad">Sin conexión · ves lo último que cargó</span>`);
     else if (stale) chips.push(`<span class="chip">Conexión lenta</span>`);
     if (mode === "live" && !canWrite) chips.push(`<span class="chip warn">Solo lectura</span>`);
@@ -1886,7 +1914,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       marking = false;
       const en = describeNode(node);
       put("aqui", me, { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en, at: Date.now() })
-        .then(ok => { if (ok) toast("Listo. El grupo te ve " + en); if (rt) recalc(true); ui(); });
+        .then(ok => { if (ok) toast(sentMsg("Listo. El grupo te ve " + en)); if (rt) recalc(true); ui(); });
       ui();
     }, err => toast(err && err.code === 1 ? "No diste permiso de ubicación. Márcalo a mano en el mapa." : "No se pudo leer tu ubicación. Márcalo a mano en el mapa."),
     { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 });
@@ -1938,6 +1966,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     ui();
   }
   document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) { sizeCanvas(); drawSoon(); schedule(); }   // al volver del bolsillo el mapa podía quedar en blanco
     if (!LIVE.on) return;
     if (document.hidden) liveUnwatch();
     else { LIVE.last = LIVE.last && { x: LIVE.last.x, y: LIVE.last.y, t: 0 }; liveWatch(); }   // al volver, envía en la primera lectura buena
@@ -1998,7 +2027,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         const k = "kick:" + el.dataset.uid, nm = who(el.dataset.uid);
         if (confirmAct !== k) { confirmAct = k; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
         confirmAct = null; personSheet = null;
-        window.PISTEA_GROUP.kick(el.dataset.uid).then(ok => { toast(ok ? nm + " ya no está en el grupo" : "No se ha podido quitar"); ui(); }, () => toast("No se ha podido quitar. Revisa la conexión."));
+        const kok = window.PISTEA_GROUP.kick(el.dataset.uid, () => toast("No se ha podido quitar a " + nm + "."));
+        toast(kok ? sentMsg(nm + " ya no está en el grupo") : "No se ha podido quitar");
         ui(); break;
       }
       case "unmark": if (LIVE.on) liveStop(true); del("aqui", me).then(ok => ok && toast("Ya no apareces en el mapa")); personSheet = null; ui(); break;
@@ -2035,13 +2065,14 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       case "sun-now": sunMin = defaultSunMin(); const sr = $("#sunrange"); if (sr) sr.value = sunMin; sunSoon(); break;
       case "card": dayCard(); break;
       case "modal-close": $("#modal").hidden = true; $("#modal").innerHTML = ""; break;
+      case "retry": if (mode === "nocon") connect(); break;
       case "demo-info": toast("Datos de ejemplo. El grupo todavía no está conectado."); break;
     }
   });
   function askTipo(n) {
     $("#sugg").innerHTML = `<li class="ask">¿De qué color es «${esc(n)}»?</li>` + Object.entries(TIPOS).map(([k, t]) => `<li><button data-act="tipo-pick" data-n="${esc(n)}" data-t="${k}"><span class="plate" style="--c:${t.c}"></span><b>${t.s}</b><span class="plus">+</span></button></li>`).join("");
   }
-  window.addEventListener("online", () => { offline = false; ui(); });
+  window.addEventListener("online", () => { offline = false; if (mode === "nocon") connect(); ui(); });
   window.addEventListener("offline", () => { offline = true; ui(); });
 
   /* ================= Mapa: gestos ================= */
@@ -2180,18 +2211,28 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       sizeCanvas(); initGL(); layoutSheet(); camUpdate(); overview(0);
       schedule();
     }).catch(() => { const l = $("#mload"); if (l) l.innerHTML = "No se pudo cargar el mapa<small>Revisa la conexión y recarga la página.</small>"; });
+    /* Sin configuración de Firebase (ni almacén de Claude): datos de ejemplo. Con configuración,
+       si falla la conexión no se inventan personas: se queda en «sin conexión» y se puede reintentar. */
     const c = window.claude;
     if (!c || !c.use) { demo(); return; }
+    connect();
+  }
+  let connecting = false, connected = false;
+  async function connect() {
+    if (connecting || connected) return;
+    connecting = true; mode = "loading"; ui();
+    const c = window.claude;
     let d = null, u = null;
     try { [d, u] = await Promise.all([c.use("db"), c.use("user")]); } catch (e) {}
-    if (!d) { demo(); return; }
+    connecting = false;
+    if (!d) { mode = "nocon"; schedule(); return; }
+    connected = true;
     db = d; U = u; mode = "live";
     try { me = u ? await u.id() : null; } catch (e) { me = null; }
     if (!me) me = "anon";
     try { const can = u ? await u.can("data.write") : null; if (can === false) canWrite = false; } catch (e) {}
     ensureNames();
-    subscribe("pistas", db.collection("pistas"));
-    subscribe("aqui", db.collection("aqui"));
+    COLS.forEach(col => subscribe(col, db.collection(col)));
     setTimeout(() => { if (fresh.size < COLS.length) { stale = true; schedule(); } }, 10000);
     setInterval(() => ui(), 60000);
     if (liveSaved() && window.PISTEA_GROUP && !LIVE.on) liveStart();   // si lo dejaste activado, sigue al volver a abrir
