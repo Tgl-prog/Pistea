@@ -12,7 +12,8 @@
 
   const LS = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
 
   /* ----- Código de grupo: viene en el enlace (#g=...) y se recuerda ----- */
@@ -30,12 +31,14 @@
 
   /* ----- Pantalla de entrada: nombre y grupo ----- */
   function askJoin() {
+    const note = LS.get("pistea.aviso") || ""; LS.del("pistea.aviso");
     return new Promise(resolve => {
       const el = document.createElement("div");
       el.className = "join";
       el.innerHTML = `
         <form class="join-card glass" autocomplete="off">
           <h2>Entra en tu grupo</h2>
+          ${note ? `<p class="join-note">${note}</p>` : ""}
           <p>Tus amigos te verán con este nombre.</p>
           <label>Tu nombre<input name="n" maxlength="24" required value="${myName.replace(/"/g, "&quot;")}" autocapitalize="words" enterkeyhint="done"></label>
           ${code ? "" : `<label>Código del grupo<input name="c" maxlength="32" placeholder="Déjalo vacío para crear uno nuevo" autocapitalize="none" spellcheck="false"></label>`}
@@ -46,6 +49,7 @@
       .join-card{width:min(100%,380px);border-radius:var(--r-lg,28px);padding:24px 20px 20px;display:grid;gap:14px;background:var(--glass-2)}
       .join-card h2{margin:0;font:700 22px/26px var(--font);letter-spacing:-.02em}
       .join-card p{margin:-8px 0 0;color:var(--tx-2);font-size:14px}
+      .join-card .join-note{margin:0;padding:12px 14px;border-radius:14px;background:rgba(255,210,63,.12);color:var(--tx);font-size:14px}
       .join-card label{display:grid;gap:6px;font:600 13px/16px var(--font);color:var(--tx-2)}
       .join-card input{height:52px;border-radius:26px;padding:0 18px;font-size:16px;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid var(--hair);-webkit-appearance:none}
       .join-card input:focus{outline:none;border-color:var(--acc)}`;
@@ -75,6 +79,12 @@
   try { fs.enablePersistence({ synchronizeTabs: true }).catch(() => {}); } catch (e) {}
 
   let ready = null;
+  function goOut(aviso) {
+    LS.del("pistea.grupo");
+    if (aviso) LS.set("pistea.aviso", aviso);
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+    location.reload();
+  }
   function boot() {
     if (ready) return ready;
     ready = (async () => {
@@ -83,8 +93,42 @@
       if (!auth.currentUser) await auth.signInAnonymously();
       const uid = auth.currentUser.uid;
       const group = fs.collection("grupos").doc(code);
+      const kicked = () => goOut("Te han quitado de ese grupo. Puedes crear uno nuevo o entrar en otro con su código.");
+
+      // ¿Me han quitado de este grupo?
+      try { if ((await group.collection("fuera").doc(uid).get()).exists) { kicked(); return new Promise(() => {}); } } catch (e) {}
+
+      // Quién creó el grupo. Si el grupo aún no tiene creador, lo es quien entra primero.
+      let owner = null;
+      try {
+        const g = await group.get();
+        if (g.exists) owner = g.data().owner;
+        else { await group.set({ owner: uid, at: Date.now() }); owner = uid; }
+      } catch (e) {}
+
       await group.collection("perfiles").doc(uid).set({ name: myName, at: Date.now() });
-      window.PISTEA_GROUP = { code, link: location.origin + location.pathname + "#g=" + code };
+
+      // Si me quitan mientras tengo la app abierta, salgo en el momento.
+      group.collection("fuera").doc(uid).onSnapshot(s => { if (s.exists) kicked(); }, () => {});
+
+      const base = location.origin + location.pathname;
+      window.PISTEA_GROUP = {
+        code,
+        link: base + "#g=" + code,
+        isOwner: owner === uid,
+        async leave() {
+          try { await group.collection("aqui").doc(uid).delete(); } catch (e) {}
+          try { await group.collection("perfiles").doc(uid).delete(); } catch (e) {}
+          goOut("Has salido del grupo.");
+        },
+        async kick(id) {
+          if (owner !== uid || id === uid) return false;
+          await group.collection("fuera").doc(id).set({ at: Date.now(), by: uid });
+          try { await group.collection("aqui").doc(id).delete(); } catch (e) {}
+          try { await group.collection("perfiles").doc(id).delete(); } catch (e) {}
+          return true;
+        }
+      };
       return { uid, group };
     })();
     return ready;
