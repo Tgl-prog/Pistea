@@ -4,23 +4,48 @@ service cloud.firestore {
 
     // Todo vive bajo grupos/{código}. El código del grupo (10 caracteres al azar) hace de llave:
     // solo quien lo conoce puede leer o escribir, y nadie puede listar los grupos.
+
+    function signedIn() { return request.auth != null; }
+    function grupo(g) { return /databases/$(database)/documents/grupos/$(g); }
+    function esCreador(g) { return get(grupo(g)).data.owner == request.auth.uid; }
+    // A quien han quitado del grupo ya no puede leer ni escribir en él (con ese mismo usuario).
+    function noExpulsado(g) { return !exists(/databases/$(database)/documents/grupos/$(g)/fuera/$(request.auth.uid)); }
+
+    // El documento del grupo guarda quién lo creó. Se puede leer (get) pero no listar,
+    // se crea una sola vez con tu propio uid como creador y no se puede cambiar.
+    match /grupos/{g} {
+      allow get: if signedIn();
+      allow create: if signedIn() && request.resource.data.owner == request.auth.uid;
+      allow update, delete: if false;
+    }
+
     match /grupos/{g}/perfiles/{uid} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == uid;
+      allow read: if signedIn() && noExpulsado(g);
+      allow write: if signedIn() && request.auth.uid == uid && noExpulsado(g);
+      // El creador puede borrar el perfil de alguien al quitarlo del grupo.
+      allow delete: if signedIn() && esCreador(g) && request.auth.uid != uid;
     }
 
     match /grupos/{g}/aqui/{uid} {
-      allow read: if request.auth != null;
-      allow create, update: if request.auth != null && request.auth.uid == uid
-                   && request.resource.data.uid == uid;
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      allow read: if signedIn() && noExpulsado(g);
+      allow create, update: if signedIn() && request.auth.uid == uid
+                   && request.resource.data.uid == uid && noExpulsado(g);
+      allow delete: if signedIn() && (request.auth.uid == uid || esCreador(g));
     }
 
     match /grupos/{g}/pistas/{id} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow read: if signedIn() && noExpulsado(g);
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid && noExpulsado(g);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
       allow update: if false;
+    }
+
+    // Lista de quitados: cada uno puede ver su propia entrada (la app la vigila para salir al momento),
+    // y solo el creador puede añadir a otros.
+    match /grupos/{g}/fuera/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || esCreador(g));
+      allow create: if signedIn() && esCreador(g) && request.auth.uid != uid;
+      allow update, delete: if false;
     }
   }
 }

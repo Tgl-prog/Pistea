@@ -177,6 +177,10 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .me-line { display: flex; gap: 12px; align-items: center; }
 .me-line b { display: block; font-weight: 600; font-size: 16px; line-height: 1.25; }
 .me-line small { color: var(--tx-2); font-size: 13px; }
+.live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #FF4D4F; margin-right: 6px; vertical-align: 1px; box-shadow: 0 0 0 0 rgba(255,77,79,.6); animation: livepulse 1.6s ease-out infinite; }
+@keyframes livepulse { 0% { box-shadow: 0 0 0 0 rgba(255,77,79,.6); } 100% { box-shadow: 0 0 0 7px rgba(255,77,79,0); } }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+.livebtn { margin-top: 8px; width: 100%; }
 .dot-off { width: 34px; height: 34px; border-radius: 50%; border: 2px dashed var(--hair-2); flex: 0 0 auto; }
 .av { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: var(--c); color: #0A1620; display: grid; place-items: center; font: 700 14px/1 var(--font); }
 .person.old .av { background: var(--raised); color: var(--tx-2); box-shadow: 0 0 0 2px var(--sol); }
@@ -586,6 +590,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   function setMyPos(node, en) {
     if (!me) return;
     const [lon, lat] = toLL(NX[node], NY[node]);
+    if (LIVE.on) liveStop(true);   // si te marcas a mano, manda la marca, no el GPS
     const data = { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en, at: Date.now() };
     return put("aqui", me, data).then(ok => { if (ok) toast("Listo. El grupo te ve " + en); return ok; });
   }
@@ -1568,15 +1573,16 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const mp = myPos(), ps = positions(), others = ps.filter(p => p.uid !== me);
     const hoy = stats(list("pistas").filter(p => p.day === today()));
     const speek = `
-      <div class="me-line">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small>${esc(ago(mp.at))}</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}</div>
+      <div class="me-line">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small>${LIVE.on ? `<span class="live-dot"></span>En directo · ${esc(ago(mp.at))}` : esc(ago(mp.at))}</small></div>` : LIVE.on ? `<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small><span class="live-dot"></span>En directo</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}</div>
       <div class="acts three">
         <button class="btn" data-act="mark">${mp ? "Estoy aquí" : "Marcar dónde estoy"}</button>
         <button class="btn dark" data-act="goto-list">Ir hasta…</button>
         <button class="btn ghost" data-act="diario">Diario</button>
-      </div>`;
+      </div>${navigator.geolocation && window.PISTEA_GROUP ? `
+      <button class="btn wide ${LIVE.on ? "ghost on" : "dark"} livebtn" data-act="live">${LIVE.on ? `<span class="live-dot"></span>En directo · Parar` : "Compartir en directo"}</button>` : ""}`;
     const people = others.length ? `<ul class="people">${others.map(p => `
         <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}">
-          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${esc(p.en || "")} · ${esc(ago(p.at))}</small></span></button>
+          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(p.en || "")} · ${esc(isLive(p) ? "en directo" : ago(p.at))}</small></span></button>
           <button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">Ir</button>
         </li>`).join("")}</ul>`
       : `<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`;
@@ -1644,7 +1650,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (!p) { personSheet = null; return homeHtml(); }
     const mine = p.uid === me;
     const speek = `
-      <div class="headrow"><div class="title-wrap">${av(p.uid, true)}<div><small class="kicker">${esc(ago(p.at))}</small><h2 class="title">${esc(mine ? "Tú" : who(p.uid))}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
+      <div class="headrow"><div class="title-wrap">${av(p.uid, true)}<div><small class="kicker">${isLive(p) ? `<span class="live-dot"></span>En directo` : esc(ago(p.at))}</small><h2 class="title">${esc(mine ? "Tú" : who(p.uid))}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
       <p class="facts">${esc(p.en || "")}</p>
       <div class="acts two">${mine ? `<button class="btn" data-act="mark">Cambiar dónde estoy</button><button class="btn ghost" data-act="unmark">Quitar</button>` : `<button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}">Cómo llegar</button><button class="btn ghost" data-act="center-person" data-uid="${esc(p.uid)}">Centrar</button>`}</div>
       ${!mine && window.PISTEA_GROUP && window.PISTEA_GROUP.isOwner ? `<button class="btn ghost wide danger" data-act="kick" data-uid="${esc(p.uid)}">${confirmAct === "kick:" + p.uid ? "Toca otra vez para quitar a " + esc(who(p.uid)) : "Quitar del grupo"}</button>` : ""}`;
@@ -1750,17 +1756,24 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   }
 
   /* ---------- Pintar la hoja y la capa superior ---------- */
+  /* Si el dedo está apoyado, no repintamos (el botón desaparecería bajo el dedo y el toque no contaría).
+     Se repinta justo después de soltar. Y solo se toca el HTML que de verdad cambia. */
+  let ptrDown = 0, uiLater = false;
+  document.addEventListener("pointerdown", () => { ptrDown++; }, true);
+  const ptrEnd = () => { ptrDown = 0; if (uiLater) { uiLater = false; setTimeout(ui, 0); } };
+  document.addEventListener("pointerup", ptrEnd, true); document.addEventListener("pointercancel", ptrEnd, true);
+  const setHtml = (el, h) => { if (el && el.__h !== h) { el.innerHTML = h; el.__h = h; return true; } return false; };
   function ui() {
     if (!$("#sheet")) return;
+    if (ptrDown && !dragging) { uiLater = true; drawSoon(); return; }
     const m = sheetMode(), H = { home: homeHtml, feat: featHtml, person: personHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
     const sb = $("#sheet");
     const ae = document.activeElement, fid = ae && ae.id && sb.contains(ae) ? ae.id : null;
     let selr = null; try { if (fid && ae.selectionStart != null) selr = [ae.selectionStart, ae.selectionEnd]; } catch (e) {}
     const scroll = $("#smore") ? $("#smore").scrollTop : 0, prevMode = sb.dataset.mode;
     sb.dataset.mode = m;
-    $("#speek").innerHTML = H.speek;
-    $("#smore").innerHTML = H.smore;
-    $("#smore").scrollTop = prevMode === m ? scroll : 0;
+    setHtml($("#speek"), H.speek);
+    if (setHtml($("#smore"), H.smore)) $("#smore").scrollTop = prevMode === m ? scroll : 0;
     if (fid) { const el = document.getElementById(fid); if (el) { el.focus({ preventScroll: true }); if (selr) try { el.setSelectionRange(selr[0], selr[1]); } catch (e) {} } }
     /* capa superior */
     const chips = [];
@@ -1769,11 +1782,11 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (offline) chips.push(`<span class="chip bad">Sin conexión · ves lo último que cargó</span>`);
     else if (stale) chips.push(`<span class="chip">Conexión lenta</span>`);
     if (mode === "live" && !canWrite) chips.push(`<span class="chip warn">Solo lectura</span>`);
-    $("#chips").innerHTML = chips.join("");
+    setHtml($("#chips"), chips.join(""));
     const nOff = ["v", "a", "r", "n", "i", "L"].filter(k => !filt[k]).length;
     $("#filtbtn").setAttribute("aria-expanded", filtOpen); $("#filtbadge").textContent = nOff ? nOff : ""; $("#filtbadge").hidden = !nOff;
     $("#filters").hidden = !filtOpen;
-    $("#filters").innerHTML = ["v", "a", "r", "n", "i"].map(d => `<button class="fchip" style="--c:${DIF[d].hex}" data-act="filt" data-d="${d}" aria-pressed="${filt[d]}"><i></i>${DIF[d].p}</button>`).join("") + `<button class="fchip lift" data-act="filt" data-d="L" aria-pressed="${filt.L}"><i></i>Remontes</button>`;
+    setHtml($("#filters"), ["v", "a", "r", "n", "i"].map(d => `<button class="fchip" style="--c:${DIF[d].hex}" data-act="filt" data-d="${d}" aria-pressed="${filt[d]}"><i></i>${DIF[d].p}</button>`).join("") + `<button class="fchip lift" data-act="filt" data-d="L" aria-pressed="${filt.L}"><i></i>Remontes</button>`);
     $("#cross").hidden = !marking;
     $("#sunbtn").setAttribute("aria-pressed", sunOn);
     document.body.classList.toggle("marking", marking);
@@ -1878,6 +1891,57 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     }, err => toast(err && err.code === 1 ? "No diste permiso de ubicación. Márcalo a mano en el mapa." : "No se pudo leer tu ubicación. Márcalo a mano en el mapa."),
     { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 });
   }
+  /* En directo: mientras la app está abierta, tu posición se actualiza sola.
+     Para no gastar batería ni escrituras, solo se envía si te has movido 40 m (como mucho cada 20 s)
+     o, si estás parado, cada 2 min para que el grupo vea que sigues ahí.
+     iPhone y Android cortan el GPS de las webs en segundo plano: al volver a la app se reanuda solo. */
+  const LIVE = { on: false, watch: null, last: null, off: false };
+  const LIVE_MIN_MS = 20000, LIVE_BEAT_MS = 120000, LIVE_MOVE_M = 40, LIVE_MAX_ACC = 80, LIVE_FRESH_MS = 3 * 60000;
+  const isLive = p => !!(p && p.live && Date.now() - p.at < LIVE_FRESH_MS);
+  function liveSaved() { try { return localStorage.getItem("pistea.live") === "1"; } catch (e) { return false; } }
+  function liveSave(v) { try { localStorage.setItem("pistea.live", v ? "1" : "0"); } catch (e) {} }
+  function liveFix(pos) {
+    if (!LIVE.on || !me) return;
+    const c = pos.coords, now = Date.now();
+    if (c.accuracy && c.accuracy > LIVE_MAX_ACC) return;            // lectura mala (túnel, telecabina, recién arrancado)
+    const lon = c.longitude, lat = c.latitude, [x, y] = toXY(lon, lat);
+    const l = LIVE.last, moved = l ? Math.hypot(x - l.x, y - l.y) : Infinity, dt = l ? now - l.t : Infinity;
+    if (!(dt >= LIVE_BEAT_MS || (moved >= LIVE_MOVE_M && dt >= LIVE_MIN_MS))) return;
+    if (!M.ok) return;                                              // el mapa aún está cargando
+    const node = nearestNode(x, y, 400);
+    if (node < 0) { if (!LIVE.off) { LIVE.off = true; toast("Estás lejos de las pistas. Te seguimos en cuanto vuelvas."); } return; }
+    LIVE.off = false;
+    LIVE.last = { x, y, t: now };
+    // Sin await: si no hay cobertura, Firestore lo guarda y lo envía al recuperarla.
+    put("aqui", me, { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en: describeNode(node), at: now, live: true });
+  }
+  function liveWatch() {
+    if (LIVE.watch != null || !LIVE.on || document.hidden || !navigator.geolocation) return;
+    LIVE.watch = navigator.geolocation.watchPosition(liveFix, err => {
+      if (err && err.code === 1) { liveStop(true); toast("No diste permiso de ubicación. Actívalo en Ajustes para compartir en directo."); }
+    }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 });
+  }
+  function liveUnwatch() { if (LIVE.watch != null) { navigator.geolocation.clearWatch(LIVE.watch); LIVE.watch = null; } }
+  function liveStart() {
+    if (!navigator.geolocation) { toast("Este móvil no da la ubicación."); return; }
+    if (!window.PISTEA_GROUP) return;
+    LIVE.on = true; LIVE.last = null; LIVE.off = false; liveSave(true);
+    liveWatch(); toast("En directo. El grupo te sigue mientras tengas Pistea abierta."); ui();
+  }
+  function liveStop(quiet) {
+    const was = LIVE.on;
+    LIVE.on = false; liveUnwatch(); liveSave(false);
+    // Deja tu última posición, pero sin la marca de "en directo".
+    const mp = was && me ? S.aqui.get(me) : null;
+    if (mp && mp.live) put("aqui", me, Object.assign({}, mp, { live: false }));
+    if (!quiet) toast("Has dejado de compartir en directo. El grupo ve tu última posición.");
+    ui();
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!LIVE.on) return;
+    if (document.hidden) liveUnwatch();
+    else { LIVE.last = LIVE.last && { x: LIVE.last.x, y: LIVE.last.y, t: 0 }; liveWatch(); }   // al volver, envía en la primera lectura buena
+  });
   function inviteGroup() {
     const g = window.PISTEA_GROUP; if (!g) return;
     if (navigator.share) { navigator.share({ title: "Pistea", text: "Únete a mi grupo en Pistea", url: g.link }).catch(() => {}); return; }
@@ -1924,6 +1988,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       case "mark-ok": if (markCand) { const c = markCand; marking = false; setMyPos(c.node, describeNode(c.node, c.fi)).then(() => { if (rt) recalc(true); ui(); }); ui(); } break;
       case "mark-cancel": marking = false; ui(); break;
       case "gps": gpsHere(); break;
+      case "live": LIVE.on ? liveStop() : liveStart(); break;
       case "invite": inviteGroup(); break;
       case "leave": {
         if (confirmAct !== "leave") { confirmAct = "leave"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
@@ -1936,7 +2001,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         window.PISTEA_GROUP.kick(el.dataset.uid).then(ok => { toast(ok ? nm + " ya no está en el grupo" : "No se ha podido quitar"); ui(); }, () => toast("No se ha podido quitar. Revisa la conexión."));
         ui(); break;
       }
-      case "unmark": del("aqui", me).then(ok => ok && toast("Ya no apareces en el mapa")); personSheet = null; ui(); break;
+      case "unmark": if (LIVE.on) liveStop(true); del("aqui", me).then(ok => ok && toast("Ya no apareces en el mapa")); personSheet = null; ui(); break;
       case "here": { const n = selNode("top"); if (n >= 0) setMyPos(n, describeNode(n, [...sel.fis][0])).then(() => { sel = null; ui(); }); break; }
       case "route-here": {
         const n = selNode(sel.g.k === "L" ? "bottom" : "top");
@@ -2129,6 +2194,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     subscribe("aqui", db.collection("aqui"));
     setTimeout(() => { if (fresh.size < COLS.length) { stale = true; schedule(); } }, 10000);
     setInterval(() => ui(), 60000);
+    if (liveSaved() && window.PISTEA_GROUP && !LIVE.on) liveStart();   // si lo dejaste activado, sigue al volver a abrir
     schedule();
   }
   init();
