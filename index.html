@@ -186,6 +186,9 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .person.old .av { background: var(--raised); color: var(--tx-2); box-shadow: 0 0 0 2px var(--sol); }
 .av.big { width: 48px; height: 48px; font-size: 19px; }
 
+.codebox { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 10px 10px 16px; border-radius: var(--r-md); background: var(--raised); border: 1px solid var(--line); }
+.codebox small { display: block; font: 500 12px/16px var(--font); color: var(--tx-2); }
+.codebox b { display: block; font: 500 19px/1.2 var(--mono); letter-spacing: .04em; user-select: all; -webkit-user-select: all; overflow-wrap: anywhere; }
 .people { list-style: none; margin: 0; padding: 0; }
 .person { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--hair); }
 .person:last-child { border-bottom: 0; }
@@ -1613,7 +1616,9 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         </li>`).join("")}</ul>`
       : `<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`;
     const G = window.PISTEA_GROUP;
-    const invite = G ? `<button class="btn dark wide" data-act="invite">Invitar al grupo</button>
+    const invite = G ? `<div class="codebox"><span><small>Código del grupo</small><b>${esc(G.code)}</b></span><button class="btn go" data-act="copy-code">Copiar código</button></div>
+      <p class="quiet">Si añades Pistea a la pantalla de inicio del iPhone, al abrirla pega este código.</p>
+      <button class="btn dark wide" data-act="invite">Invitar al grupo</button>
       <button class="btn ghost wide danger" data-act="leave">${confirmAct === "leave" ? "Toca otra vez para salir" : "Salir del grupo"}</button>
       ${G.isOwner ? `<p class="quiet">Creaste este grupo. Para quitar a alguien, toca su nombre.</p>` : ""}` : "";
     const smore = `
@@ -1976,6 +1981,10 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (navigator.share) { navigator.share({ title: "Pistea", text: "Únete a mi grupo en Pistea", url: g.link }).catch(() => {}); return; }
     (navigator.clipboard ? navigator.clipboard.writeText(g.link) : Promise.reject()).then(() => toast("Enlace copiado. Envíalo al grupo."), () => toast(g.link));
   }
+  function copyCode() {
+    const g = window.PISTEA_GROUP; if (!g) return;
+    (navigator.clipboard ? navigator.clipboard.writeText(g.code) : Promise.reject()).then(() => toast("Código copiado: " + g.code), () => toast("Tu código: " + g.code));
+  }
   function addPista(nombre, t) { return put("pistas", newId(), { nombre, tipo: t, uid: me, at: Date.now(), day: today() }); }
   document.addEventListener("input", e => {
     if (e.target.id === "q") { query = e.target.value; $("#results").innerHTML = resultsHtml(); }
@@ -2019,6 +2028,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       case "gps": gpsHere(); break;
       case "live": LIVE.on ? liveStop() : liveStart(); break;
       case "invite": inviteGroup(); break;
+      case "copy-code": copyCode(); break;
       case "leave": {
         if (confirmAct !== "leave") { confirmAct = "leave"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
         confirmAct = null; window.PISTEA_GROUP.leave(); break;

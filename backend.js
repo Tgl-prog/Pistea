@@ -19,32 +19,46 @@
   };
 
   /* ----- Código de grupo: viene en el enlace (#g=...) y se recuerda ----- */
+  // Solo se crean grupos con un código generado de 10 caracteres (no se puede elegir uno a mano:
+  // «amigos» se adivina y da la posición de todos). Para entrar, el grupo tiene que existir.
   const ALPHA = "abcdefghjkmnpqrstuvwxyz23456789";
   function newCode() {
     const a = new Uint8Array(10); crypto.getRandomValues(a);
     return Array.from(a, n => ALPHA[n % ALPHA.length]).join("");
   }
-  function codeFromUrl() {
-    const m = /[#&?]g=([a-z0-9]{6,32})/i.exec(location.hash || "");
-    return m ? m[1].toLowerCase() : null;
+  const CODE_RE = /[#&?]g=([a-z0-9]{6,32})/i;
+  function codeIn(text) { const m = CODE_RE.exec(text || ""); return m ? m[1].toLowerCase() : null; }
+  function codeFromUrl() { return codeIn(location.hash); }
+  // Lo pegado puede ser el enlace entero (se saca g=) o solo el código.
+  function codeFromPaste(t) {
+    t = String(t || "").trim();
+    const c = codeIn(t); if (c) return c;
+    const s = t.toLowerCase().replace(/[\s-]/g, "");
+    return /^[a-z0-9]{6,32}$/.test(s) ? s : null;
   }
-  let code = codeFromUrl() || LS.get("pistea.grupo");
+  const savedCode = LS.get("pistea.grupo"), urlCode = codeFromUrl();
+  let code = urlCode || savedCode;
+  let fromLink = !!urlCode && urlCode !== savedCode;   // enlace de otro grupo: se comprueba y se guarda al entrar
+  let creating = false;
   let myName = LS.get("pistea.nombre") || "";
 
   /* ----- Pantalla de entrada: nombre y grupo ----- */
+  // En iPhone, la app de la pantalla de inicio no comparte datos con Safari: al abrirla hay que
+  // volver a entrar. Por eso se acepta pegar el enlace entero o el código.
   function askJoin() {
     const note = LS.get("pistea.aviso") || ""; LS.del("pistea.aviso");
     return new Promise(resolve => {
       const el = document.createElement("div");
       el.className = "join";
       el.innerHTML = `
-        <form class="join-card glass" autocomplete="off">
+        <form class="join-card glass" autocomplete="off" novalidate>
           <h2>Entra en tu grupo</h2>
-          ${note ? `<p class="join-note">${note}</p>` : ""}
+          <p class="join-note" role="status" hidden></p>
           <p>Tus amigos te verán con este nombre.</p>
-          <label>Tu nombre<input name="n" maxlength="24" required value="${myName.replace(/"/g, "&quot;")}" autocapitalize="words" enterkeyhint="done"></label>
-          ${code ? "" : `<label>Código del grupo<input name="c" maxlength="32" placeholder="Déjalo vacío para crear uno nuevo" autocapitalize="none" spellcheck="false"></label>`}
+          <label>Tu nombre<input name="n" maxlength="24" value="${myName.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" autocapitalize="words" enterkeyhint="next"></label>
+          ${code ? "" : `<label>Enlace o código del grupo<input name="c" maxlength="400" placeholder="Pega el enlace o el código" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go"></label>`}
           <button class="btn wide" type="submit">Entrar</button>
+          ${code ? "" : `<button class="btn ghost wide" type="button" data-new>Crear un grupo nuevo</button>`}
         </form>`;
       const st = document.createElement("style");
       st.textContent = `.join{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:rgba(10,22,32,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
@@ -52,24 +66,46 @@
       .join-card h2{margin:0;font:700 22px/26px var(--font);letter-spacing:-.02em}
       .join-card p{margin:-8px 0 0;color:var(--tx-2);font-size:14px}
       .join-card .join-note{margin:0;padding:12px 14px;border-radius:14px;background:rgba(255,210,63,.12);color:var(--tx);font-size:14px}
+      .join-card .join-note[hidden]{display:none}
       .join-card label{display:grid;gap:6px;font:600 13px/16px var(--font);color:var(--tx-2)}
       .join-card input{height:52px;border-radius:26px;padding:0 18px;font-size:16px;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid var(--hair);-webkit-appearance:none}
-      .join-card input:focus{outline:none;border-color:var(--acc)}`;
+      .join-card input:focus{outline:none;border-color:var(--acc)}
+      .join-card .btn.wide+.btn.wide{margin-top:-4px}
+      .join-card .btn[disabled]{opacity:.5}`;
       document.head.appendChild(st);
       document.body.appendChild(el);
-      const f = el.querySelector("form");
-      f.n.focus();
-      f.addEventListener("submit", e => {
-        e.preventDefault();
-        myName = f.n.value.trim().slice(0, 24);
-        if (!myName) return;
-        if (!code) {
-          const typed = f.c ? f.c.value.trim().toLowerCase().replace(/[^a-z0-9]/g, "") : "";
-          code = typed.length >= 6 ? typed : newCode();
-        }
-        LS.set("pistea.nombre", myName); LS.set("pistea.grupo", code);
+      const f = el.querySelector("form"), noteEl = el.querySelector(".join-note"), btns = el.querySelectorAll("button");
+      const say = t => { noteEl.textContent = t || ""; noteEl.hidden = !t; };
+      const busy = on => btns.forEach(b => { b.disabled = on; });
+      say(note);
+      (myName && f.c ? f.c : f.n).focus();
+      const nameOk = () => { myName = f.n.value.trim().slice(0, 24); if (!myName) { say("Escribe tu nombre."); f.n.focus(); } return !!myName; };
+      const finish = () => {
+        LS.set("pistea.nombre", myName);
         try { history.replaceState(null, "", location.pathname + location.search + "#g=" + code); } catch (e2) {}
         el.remove(); st.remove(); resolve();
+      };
+      f.addEventListener("submit", async e => {
+        e.preventDefault();
+        if (!nameOk()) return;
+        if (code) { finish(); return; }                 // vino en el enlace: se comprueba al arrancar
+        const raw = f.c.value.trim(), c = codeFromPaste(raw);
+        if (!raw) { say("Pega el enlace o el código que te han enviado. Si eres el primero, crea un grupo nuevo."); f.c.focus(); return; }
+        if (!c) { say("No encuentro el código en lo que has pegado. Copia otra vez el enlace entero."); f.c.focus(); return; }
+        busy(true); say("Comprobando el grupo…");
+        let ok = null;
+        try { await ensureAuth(); ok = await groupExists(c); } catch (er) { ok = null; }
+        busy(false);
+        if (ok === null) { say("Sin conexión. Hace falta cobertura para entrar en un grupo. Prueba otra vez."); return; }
+        if (!ok) { say("No hay ningún grupo con ese código. Revisa el enlace o pide que te lo envíen otra vez."); f.c.focus(); return; }
+        code = c; fromLink = false; finish();
+      });
+      const nb = el.querySelector("[data-new]");
+      if (nb) nb.addEventListener("click", async () => {
+        if (!nameOk()) return;
+        busy(true); say("Creando el grupo…");
+        try { await ensureAuth(); } catch (er) { busy(false); say("Sin conexión. Hace falta cobertura para crear el grupo."); return; }
+        code = newCode(); creating = true; fromLink = false; finish();
       });
     });
   }
@@ -98,6 +134,17 @@
     return authP;
   }
 
+  // ¿Existe el grupo? true / false / null (no se ha podido saber: sin red). Los grupos de antes del
+  // cambio no tienen documento propio, pero sí perfiles.
+  async function groupExists(c) {
+    const g = fs.collection("grupos").doc(c);
+    const s = got(await within(g.get({ source: "server" }), 8000));
+    if (!s) return null;
+    if (s.exists) return true;
+    const p = got(await within(g.collection("perfiles").limit(1).get({ source: "server" }), 8000));
+    return p ? !p.empty : null;
+  }
+
   let ready = null;
   function goOut(aviso) {
     LS.del("pistea.grupo");
@@ -105,6 +152,14 @@
     try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
     // Un momento para que las escrituras pendientes queden guardadas en el móvil antes de recargar.
     setTimeout(() => location.reload(), 400);
+  }
+  // Enlace que no lleva a ningún grupo: si ya tenías uno, sigues en él.
+  function badLink() {
+    if (fromLink && savedCode) {
+      LS.set("pistea.aviso", "Ese enlace no lleva a ningún grupo. Sigues en tu grupo de siempre.");
+      try { history.replaceState(null, "", location.pathname + location.search + "#g=" + savedCode); } catch (e) {}
+      setTimeout(() => location.reload(), 50);
+    } else goOut("Ese enlace no lleva a ningún grupo. Pega el código correcto o crea un grupo nuevo.");
   }
   function boot() {
     if (ready) return ready;
@@ -115,16 +170,34 @@
       const group = fs.collection("grupos").doc(code);
       const kicked = () => goOut("Te han quitado de ese grupo. Puedes crear uno nuevo o entrar en otro con su código.");
 
-      // ¿Me han quitado? ¿Quién creó el grupo? Las dos lecturas a la vez y como mucho 2,5 s.
-      const [out, g] = (await Promise.all([within(group.collection("fuera").doc(uid).get(), 2500), within(group.get(), 2500)])).map(got);
-      if (out && out.exists) { kicked(); return new Promise(() => {}); }
-
-      // Si el grupo aún no tiene creador, lo es quien entra primero. Las escrituras no se esperan:
-      // sin cobertura se quedan en cola y se envían solas.
+      // ¿Me han quitado? ¿Quién creó el grupo? Las dos lecturas a la vez y como mucho 2,5 s
+      // (las escrituras nunca se esperan).
       let owner = null;
-      if (g && g.exists) owner = g.data().owner;
-      else if (g && !g.metadata.fromCache) { owner = uid; group.set({ owner: uid, at: Date.now() }).catch(() => {}); }
-      group.collection("perfiles").doc(uid).set({ name: myName, at: Date.now() }).catch(() => {});
+      if (creating) {
+        // Grupo nuevo: documento del grupo y perfil juntos. No se espera: sin cobertura se envía después.
+        creating = false; owner = uid;
+        const b = fs.batch();
+        b.set(group, { owner: uid, at: Date.now() });
+        b.set(group.collection("perfiles").doc(uid), { name: myName, at: Date.now() });
+        b.commit().catch(() => {});
+      } else {
+        // Si la red no contesta a tiempo, lo que haya en la copia del móvil.
+        const read = async ref => got(await within(ref.get(), 2500)) || got(await within(ref.get({ source: "cache" }), 1000));
+        const [out, g] = await Promise.all([read(group.collection("fuera").doc(uid)), read(group)]);
+        if (out && out.exists) { kicked(); return new Promise(() => {}); }
+        if (g && g.exists) owner = g.data().owner;
+        else if (g && !g.metadata.fromCache) {
+          // El servidor dice que no hay documento de grupo: o es un grupo de antes (sin creador)
+          // o el enlace no lleva a ningún grupo.
+          if (await groupExists(code) === false) { badLink(); return new Promise(() => {}); }
+          // Grupo de antes: el primero que entra pasa a ser el creador. Las escrituras no se esperan.
+          owner = uid;
+          group.set({ owner: uid, at: Date.now() }).catch(() => group.get().then(s => { if (s.exists && window.PISTEA_GROUP) window.PISTEA_GROUP.isOwner = s.data().owner === uid; }, () => {}));
+        }
+        group.collection("perfiles").doc(uid).set({ name: myName, at: Date.now() }).catch(() => {});
+      }
+      // A partir de aquí este es tu grupo, también al abrir la app sin enlace.
+      LS.set("pistea.grupo", code); fromLink = false;
 
       // Si me quitan mientras tengo la app abierta, salgo en el momento.
       group.collection("fuera").doc(uid).onSnapshot(s => { if (s.exists) kicked(); }, () => {});
