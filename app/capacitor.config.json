@@ -1,0 +1,11 @@
+{
+  "appId": "com.pistea.app",
+  "appName": "Pistea",
+  "webDir": "www",
+  "backgroundColor": "#0A1620",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#0A1620",
+    "overrideUserAgent": "Mozilla/5.0 (PisteaApp; iOS) AppleWebKit/605.1.15 (KHTML, like Gecko) PisteaNative/1.0"
+  }
+}
