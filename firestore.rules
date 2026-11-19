@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Todo vive bajo grupos/{código}. El código del grupo (10 caracteres al azar) hace de llave:
+    // solo quien lo conoce puede leer o escribir, y nadie puede listar los grupos.
+    match /grupos/{g}/perfiles/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /grupos/{g}/aqui/{uid} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+                   && request.resource.data.uid == uid;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /grupos/{g}/pistas/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
+  }
+}

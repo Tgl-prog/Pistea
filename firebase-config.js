@@ -1,0 +1,11 @@
+/* Configuración de Firebase para Pistea.
+ * Estos valores no son secretos: la seguridad la dan las reglas de firestore.rules.
+ */
+window.PISTEA_FIREBASE = {
+  apiKey: "AIzaSyDIKhknu_nWMjFPoxwtdASuBSbikHIZT54",
+  authDomain: "pistea-94bf0.firebaseapp.com",
+  projectId: "pistea-94bf0",
+  storageBucket: "pistea-94bf0.firebasestorage.app",
+  messagingSenderId: "113462040978",
+  appId: "1:113462040978:web:ea25bc8e2a6ea72462094b"
+};
