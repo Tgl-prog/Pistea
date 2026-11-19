@@ -458,8 +458,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 
   /* ================= Estado ================= */
   const S = { pistas: new Map(), aqui: new Map(), perfiles: new Map(), quedada: new Map(), avisos: new Map(), mensajes: new Map() };
-  const PEND = {};       /* colecciones con escrituras sin confirmar (sin cobertura) */
-  let pendSince = 0;
+  const PEND = {};       /* colección → desde cuándo tiene escrituras sin confirmar (0 = nada pendiente) */
   let confirmAct = null, confirmT = 0;
   let db = null, U = null, me = null, mode = "loading", canWrite = true, stale = false;
   const names = {}, pendingNames = new Set(), fresh = new Set();
@@ -649,8 +648,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (mode === "live") guard(() => db.collection(col).doc(id).delete());
     return Promise.resolve(true);
   }
-  /* Hay algo sin enviar desde hace más de 3 s (con buena cobertura se confirma en milisegundos) */
-  const pendingLong = () => !!pendSince && Date.now() - pendSince > 3000;
+  /* Algo lleva más de 3 s sin enviarse (con buena cobertura se confirma en menos de un segundo) */
+  const pendingLong = col => (col ? [PEND[col]] : Object.values(PEND)).some(t => t && Date.now() - t > 3000);
   const sentMsg = ok => offline ? "Guardado. Se enviará al grupo en cuanto haya cobertura." : ok;
   function ensureNames() {
     if (mode !== "live" || !U) return;
@@ -669,10 +668,9 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       S[col] = new Map(snap.docs.map(d => [d.id, d.data()]));
       if (!snap.metadata.fromCache) fresh.add(col);
       if (fresh.size >= COLS.length) stale = false;
-      const wasPend = Object.values(PEND).some(Boolean);
-      PEND[col] = !!(snap.metadata && snap.metadata.hasPendingWrites);
-      const isPend = Object.values(PEND).some(Boolean);
-      if (isPend && !wasPend) { pendSince = Date.now(); setTimeout(schedule, 3100); } else if (!isPend) pendSince = 0;
+      const was = PEND[col];
+      PEND[col] = snap.metadata && snap.metadata.hasPendingWrites ? (was || Date.now()) : 0;
+      if (PEND[col] && !was) setTimeout(schedule, 3100);
       if (col === "aqui") clearOldDay(snap.metadata.fromCache);
       if (col === "perfiles") S.perfiles.forEach((v, id) => { if (v && v.name) names[id] = v.name; });
       ensureNames(); schedule();
@@ -1814,7 +1812,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const meetCard = mt ? (() => { const et = meetEtas(mt).filter(e => e.t != null).slice(0, 4);
       return `<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Quedada${mt.hora ? " a las " + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}${et.length ? " · " + et.map(e => esc(e.p.uid === me ? "Tú" : who(e.p.uid)) + " " + etaTxt(e.t)).join(", ") : ""}</small></span><span class="chev" aria-hidden="true">›</span></button>`; })() : "";
     const speek = meetCard + `
-      <div class="me-line">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small>${LIVE.on ? `<span class="live-dot"></span>En directo · ` : ""}${pendingLong() && PEND.aqui ? "pendiente de enviar" : esc(ago(mp.at))}</small></div>` : LIVE.on ? `<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small><span class="live-dot"></span>En directo</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}</div>
+      <div class="me-line">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small>${LIVE.on ? `<span class="live-dot"></span>En directo · ` : ""}${pendingLong("aqui") ? "pendiente de enviar" : esc(ago(mp.at))}</small></div>` : LIVE.on ? `<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small><span class="live-dot"></span>En directo</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}</div>
       <div class="acts three">
         <button class="btn" data-act="mark">${mp ? "Estoy aquí" : "Marcar dónde estoy"}</button>
         <button class="btn dark" data-act="goto-list">Ir hasta…</button>
@@ -2600,6 +2598,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     COLS.forEach(col => subscribe(col, db.collection(col)));
     setTimeout(() => { if (fresh.size < COLS.length) { stale = true; schedule(); } }, 10000);
     setInterval(() => ui(), 60000);
+    if (window.PISTEA_GROUP && window.PISTEA_GROUP.aviso) toast(window.PISTEA_GROUP.aviso);
     if (liveSaved() && window.PISTEA_GROUP && !LIVE.on) liveStart();   // si lo dejaste activado, sigue al volver a abrir
     schedule();
   }

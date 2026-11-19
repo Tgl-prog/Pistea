@@ -164,8 +164,12 @@
   function boot() {
     if (ready) return ready;
     ready = (async () => {
+      let aviso = null;
       if (!code || !myName) await askJoin();
-      else { try { history.replaceState(null, "", location.pathname + location.search + "#g=" + code); } catch (e) {} }
+      else {
+        try { history.replaceState(null, "", location.pathname + location.search + "#g=" + code); } catch (e) {}
+        aviso = LS.get("pistea.aviso"); LS.del("pistea.aviso");   // sin pantalla de entrada: la app lo enseña
+      }
       const uid = (await ensureAuth()).uid;
       const group = fs.collection("grupos").doc(code);
       const kicked = () => goOut("Te han quitado de ese grupo. Puedes crear uno nuevo o entrar en otro con su código.");
@@ -207,6 +211,7 @@
         code,
         link: base + "#g=" + code,
         isOwner: owner === uid,
+        aviso,
         leave() {
           // Sin esperar a la red: se borra al recuperar cobertura.
           ["aqui", "perfiles", "mensajes"].forEach(c => group.collection(c).doc(uid).delete().catch(() => {}));

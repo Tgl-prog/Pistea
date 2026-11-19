@@ -22,9 +22,9 @@ Todo es gratis para un grupo de amigos. No hace falta tarjeta.
 
 ## 3. Probar con el grupo
 
-1. Abre la app. La primera vez pide tu nombre y crea un grupo nuevo.
+1. Abre la app. La primera vez pide tu nombre: pulsa «Crear un grupo nuevo».
 2. En el panel principal, "Invitar al grupo" comparte un enlace con el código del grupo.
-3. Cada amigo abre el enlace, pone su nombre y ya aparece en el mapa.
+3. Cada amigo abre el enlace, pone su nombre y ya aparece en el mapa. Si ya tenía Pistea en la pantalla de inicio del iPhone, que la abra y pegue el enlace o el código (en el panel, «Copiar código»).
 4. "Estoy aquí" y luego "Usar mi ubicación" marca tu posición real con el GPS.
 
 ## Notas
@@ -32,3 +32,5 @@ Todo es gratis para un grupo de amigos. No hace falta tarjeta.
 - El código del grupo va en el enlace (`#g=...`). Quien lo tiene entra en el grupo, así que compártelo solo con tus amigos.
 - Si alguien borra los datos del navegador, entra de nuevo con el mismo enlace.
 - Antes de subir, abre la app una vez con wifi para que el mapa quede guardado en el móvil.
+- Cada vez que publiques cambios, sube `VERSION` en `sw.js` (por ejemplo `pistea-v7`). Así los móviles descargan la versión nueva entera.
+- Si cambias `firestore.rules`, pégalas otra vez en la pestaña Reglas de Firestore y pulsa Publicar.
