@@ -97,6 +97,12 @@
       if (watcher !== "cancel") { BG.removeWatcher({ id: watcher }); watcher = null; }
     },
     openSettings: function () { return BG.openSettings(); },
+    /* Leer una web de otro dominio (estado oficial de pistas). Solo se puede desde la app: el navegador lo bloquea. */
+    get: function (url) {
+      return Http.request({ url: url, method: "GET", responseType: "text", connectTimeout: 15000, readTimeout: 20000,
+        headers: { "Accept": "text/html", "Accept-Language": "fr-FR,fr;q=0.9", "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1" } })
+        .then(function (r) { if (r.status >= 300) throw new Error("http " + r.status); return typeof r.data === "string" ? r.data : JSON.stringify(r.data); });
+    },
     /* En segundo plano, escribir por HTTP nativo. Delante, la app usa el SDK de siempre. */
     background: function () { return document.hidden; },
     send: restSet

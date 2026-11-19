@@ -283,6 +283,10 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .meethora b { display: block; font: 600 24px/1 var(--mono); color: var(--sol); }
 .meethora small { display: block; margin-top: 4px; font-size: 12px; color: var(--tx-2); }
 .title.md { font-size: 20px; line-height: 1.2; }
+.ofiline { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; color: var(--tx-2); }
+.ofiline i { width: 10px; height: 10px; border-radius: 50%; background: #37B24D; }
+.ofiline.c { color: #FF8A80; font-weight: 600; }
+.ofiline.c i { background: #FF4D4F; }
 .helpacts { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
 .helpacts a.btn { text-decoration: none; color: #FF8A80; font-weight: 700; }
 .chiprow { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
@@ -613,7 +617,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     for (let i = 0; i < M.n; i++) { if (!ROUTABLE[i]) continue; const d = (NX[i] - x) ** 2 + (NY[i] - y) ** 2; if (d < bd) { bd = d; best = i; } }
     return best;
   }
-  function route(src, dst, noBlack) {
+  function route(src, dst, noBlack, ofiClosedSet) {
     const n = M.n, dist = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), pe = new Array(n), pc = new Float64Array(n);
     avisos();   /* lo cerrado no se usa; los remontes con cola suman 10 min */
     const heap = [[0, src]]; dist[src] = 0;
@@ -623,7 +627,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       const [d, u] = pop(); if (d > dist[u]) continue; if (u === dst) break;
       for (const e of ADJ[u]) {
         if (noBlack && e[3] === 0 && (F[e[2]].d === "n" || F[e[2]].d === "i")) continue;
-        if (e[2] >= 0 && AVX.closed.has(e[2])) continue;
+        if (e[2] >= 0 && (AVX.closed.has(e[2]) || (ofiClosedSet && ofiClosedSet.has(e[2])))) continue;
         const c = e[1] + ((e[3] === 1 || e[3] === 3) && AVX.cola.has(e[2]) ? COLA_S : 0), nd = d + c;
         if (nd < dist[e[0]]) { dist[e[0]] = nd; prev[e[0]] = u; pe[e[0]] = e; pc[e[0]] = c; push([nd, e[0]]); }
       }
@@ -809,6 +813,90 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     avCache.forEach(a => fisOfRef(a.ref).forEach(fi => { if (a.tipo === "cerrado") AVX.closed.add(fi); else if (a.tipo === "cola" && F[fi].k === "L") AVX.cola.add(fi); }));
     return avCache;
   }
+  /* ================= Estado oficial de pistas y remontes =================
+     Se lee la web de Les 3 Vallées (una página por valle) y se cruza por nombre con el mapa.
+     Solo en la app nativa: el navegador no deja leer otra web. Si no se puede leer, si es viejo
+     o si con lo abierto no hay camino, la ruta es la de siempre. Courchevel aún no publica ahí. */
+  const OFI_URL = "https://www.les3vallees.com/fr/live/ouverture-des-pistes-et-remontees/";
+  const OFI_VALLES = { "val-thorens": ["Val Thorens", "Orelle"], "les-menuires": ["Les Menuires", "Saint-Martin-de-Belleville"], "meribel": ["Méribel", "Méribel-Mottaret", "Brides-les-Bains"] };
+  const OFI_TTL = 15 * 60e3, OFI_MAX_AGE = 3 * 3600e3;
+  const OFI_STOP = new Set("bd boulevard piste la le les de du des l d verte bleue rouge noire vert bleu noir tsd ts tc tk tph telesiege telecabine teleski telepherique funitel tapis".split(" "));
+  const canon = s => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\(.*?\)/g, "").replace(/\s*-\s*\d+\s*$/, "").split(/[^a-z0-9]+/).filter(w => w && !OFI_STOP.has(w)).join("");
+  const OFI = { at: 0, items: [], matched: false, loading: false, closed: new Set(), closedT: 0, open: new Set() };
+  try { const o = JSON.parse(localStorage.getItem("pistea.ofi") || "null"); if (o && o.at && Array.isArray(o.items)) { OFI.at = o.at; OFI.items = o.items; } } catch (e) {}
+  const parisMin = () => { try { const [h, m] = new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date()).split(":").map(Number); return h * 60 + m; } catch (e) { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); } };
+  const ofiFresh = () => OFI.items.length > 0 && Date.now() - OFI.at < OFI_MAX_AGE && new Date(OFI.at).toDateString() === new Date().toDateString();
+  function ofiParse(html, v) {
+    const doc = new DOMParser().parseFromString(html, "text/html"), out = [];
+    doc.querySelectorAll(".prl__state-track-item").forEach(el => {
+      const nm = el.querySelector(".prl__state-track-label-container span"), tg = el.querySelector(".tag");
+      if (!nm || !tg) return;
+      const cl = tg.className, st = /tag--success/.test(cl) ? "o" : /tag--warning/.test(cl) ? "p" : /tag--(error|disabled)/.test(cl) ? "c" : "";
+      if (!st) return;
+      const sch = (el.querySelector(".prl__state-track-label-schedule") || {}).textContent || "";
+      const m = sch.match(/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/);
+      out.push({ v, k: el.querySelector(".prl__state-track-label circle") ? "R" : "L", n: canon(nm.textContent), st, h: m ? [+m[1] * 60 + +m[2], +m[3] * 60 + +m[4]] : null });
+    });
+    return out;
+  }
+  function ofiValle(f) {
+    if (f.ofiV !== undefined) return f.ofiV;
+    const i = f.ns[f.ns.length >> 1]; let best = null, bd = Infinity;
+    (M.places || []).forEach(([name, x, y]) => { const d = (x - NX[i]) ** 2 + (y - NY[i]) ** 2; if (d < bd) { bd = d; best = name; } });
+    return (f.ofiV = Object.keys(OFI_VALLES).find(v => OFI_VALLES[v].includes(best)) || null);
+  }
+  function ofiMatch() {
+    if (!M.ok || OFI.matched) return;
+    const idx = new Map();
+    OFI.items.forEach(it => { if (!it.n) return; const k = it.k + "|" + it.n; if (!idx.has(k)) idx.set(k, []); idx.get(k).push(it); });
+    const keys = [...idx.keys()];
+    F.forEach(f => {
+      f.ofi = null; if (!f.name) return;
+      let c = [];
+      [f.name, ...f.name.split(/[,;\/]/)].forEach(q => { const k = f.k + "|" + canon(q); if (idx.has(k)) c = c.concat(idx.get(k)); });
+      if (!c.length) {                                   // «Goitschel» ↔ «Bd Goitschel», solo si el parecido es único
+        const n = canon(f.name), hits = n.length >= 5 ? keys.filter(k => k[0] === f.k && k.length >= 7 && (k.slice(2).includes(n) || n.includes(k.slice(2)))) : [];
+        if (hits.length === 1) c = idx.get(hits[0]);
+      }
+      if (!c.length) return;
+      const v = ofiValle(f), same = c.filter(it => it.v === v);
+      f.ofi = same.length ? same : c;
+    });
+    OFI.matched = true; OFI.closedT = 0;
+  }
+  /* Lo cerrado ahora: solo si TODAS sus entradas oficiales dicen cerrado o fuera de horario. Ante la duda, abierto. */
+  function ofiClosed() {
+    if (!ofiFresh() || !M.ok) return null;
+    ofiMatch();
+    const now = Date.now(); if (now - OFI.closedT < 60e3) return OFI.closed;
+    const t = parisMin(), up = it => it.st !== "c" && (!it.h || (t >= it.h[0] && t <= it.h[1]));
+    OFI.closed = new Set(); OFI.open = new Set();
+    F.forEach(f => { if (!f.ofi) return; if (f.ofi.some(up)) OFI.open.add(f.fi); else OFI.closed.add(f.fi); });
+    OFI.closedT = now;
+    return OFI.closed;
+  }
+  async function ofiRefresh(force) {
+    const N = window.PisteaNative;
+    if (!N || !N.get || OFI.loading || (!force && Date.now() - OFI.at < OFI_TTL)) return;
+    OFI.loading = true;
+    try {
+      const pages = await Promise.all(Object.keys(OFI_VALLES).map(v => N.get(OFI_URL + v).then(h => ofiParse(h, v))));
+      const items = pages.flat();
+      if (items.length < 50) throw new Error("formato");   // la web ha cambiado: mejor ruta normal que datos raros
+      OFI.items = items; OFI.at = Date.now(); OFI.matched = false; OFI.closedT = 0;
+      try { localStorage.setItem("pistea.ofi", JSON.stringify({ at: OFI.at, items })); } catch (e) {}
+      if (rt) recalc(false); else ui();
+    } catch (e) { /* sin cobertura o web cambiada: se queda lo último que hubiera */ }
+    OFI.loading = false;
+  }
+  /* Ruta con lo abierto; si así no hay camino o no hay datos, la de siempre. */
+  function routeBest(src, dst, noBlack) {
+    const cl = ofiClosed();
+    if (cl && cl.size) { const r = route(src, dst, noBlack, cl); if (r) { r.ofi = "ok"; return r; } const r2 = route(src, dst, noBlack); if (r2) r2.ofi = "none"; return r2; }
+    const r = route(src, dst, noBlack); if (r) r.ofi = cl ? "ok" : "off"; return r;
+  }
+  const agoMin = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? "ahora" : m < 60 ? "hace " + m + " min" : "hace " + Math.round(m / 60) + " h"; };
+
   /* Punto de encuentro: uno por grupo (quedada/actual) */
   let mtCache = null, mtKey = null, mtT = 0;
   function meet() {
@@ -830,7 +918,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     return etaVal = ps.map(p => {
       if (p.near < 0 || mt.near < 0) return { p, t: null };
       if (p.near === mt.near) return { p, t: 0 };
-      const r = route(p.near, mt.near, false); return { p, t: r ? r.time : null };
+      const r = routeBest(p.near, mt.near, false); return { p, t: r ? r.time : null };
     }).sort((a, b) => (a.t == null ? 1e9 : a.t) - (b.t == null ? 1e9 : b.t));
   }
   const etaTxt = t => t == null ? "sin ruta" : t < 60 ? "ya está" : fmtMin(t);
@@ -1601,7 +1689,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   }
 
   /* ================= Ruta ================= */
-  function startRoute(to) { marking = false; diario = false; rt = { to, noBlack: rt ? rt.noBlack : false, res: null, cur: 0 }; setSnap("peek"); recalc(true); }
+  function startRoute(to) { ofiRefresh(); marking = false; diario = false; rt = { to, noBlack: rt ? rt.noBlack : false, res: null, cur: 0 }; setSnap("peek"); recalc(true); }
   function recalc(fit) {
     if (!rt) return;
     const mp = myPos(); rt.err = null;
@@ -1611,7 +1699,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     let dst = rt.to.node;
     if (rt.to.uid) { const fp = positions().find(p => p.uid === rt.to.uid); if (!fp) { rt.err = "nofriend"; ui(); return; } if (fp.near < 0) { rt.err = "far"; ui(); return; } dst = fp.near; }
     if (dst === mp.near) { rt.err = "same"; ui(); return; }
-    rt.res = route(mp.near, dst, rt.noBlack);
+    rt.res = routeBest(mp.near, dst, rt.noBlack);
     if (!rt.res) rt.err = "noroute";
     if (fit || !old) rt.cur = 0; else if (rt.res) rt.cur = Math.min(rt.cur, rt.res.steps.length);
     ui();
@@ -1935,7 +2023,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         <div class="title-wrap">${plate(g.k, g.d)}<div><small class="kicker">${esc(kind)}</small><h2 class="title">${esc(g.name || (isL ? "Remonte sin nombre" : "Pista sin nombre"))}</h2></div></div>
         <button class="x" data-act="close-sel" aria-label="Cerrar">×</button>
       </div>
-      <p class="facts">${facts.filter(Boolean).map(esc).join(" · ")}</p>${avs.map(a => `
+      <p class="facts">${facts.filter(Boolean).map(esc).join(" · ")}</p>${(cl => { if (!cl) return ""; const o = g.fis.some(fi => OFI.open.has(fi)), c = !o && g.fis.some(fi => cl.has(fi)); return o || c ? `<p class="ofiline ${c ? "c" : "o"}"><i></i>${c ? (isL ? "Cerrado" : "Cerrada") : (isL ? "Abierto" : "Abierta")} según Les 3 Vallées · ${esc(agoMin(OFI.at))}</p>` : ""; })(ofiClosed())}${avs.map(a => `
       <div class="avcard"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><small>${a.uid === me ? "Lo avisaste tú" : "Lo avisó " + esc(who(a.uid))} · ${esc(ago(a.at))}</small></div>`).join("")}
       <div class="acts ${tipoT && g.name ? "three" : "two"}">
         <button class="btn" data-act="here">Estoy aquí</button>
@@ -2079,6 +2167,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (fp && !isLive(fp) && Date.now() - fp.at > OLD_ROUTE_MS) warns.push(`La posición de ${esc(toName)} es de ${esc(ago(fp.at))}. Puede que ya no esté ahí.`);
     if (fp && fp.node < 0) warns.push(`${esc(toName)} está fuera de pistas. La ruta llega al punto de pistas más cercano.`);
     if (mp && mp.node < 0) warns.push(`Estás fuera de pistas. La ruta sale del punto de pistas más cercano.`);
+    if (r.ofi === "none") warns.push(`Con lo que está abierto ahora no hay camino. Te enseño la ruta normal: comprueba en pistas qué está cerrado.`);
     const speek = head(sub) + warns.map(w => `<p class="warnline"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD23F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${w}</span></p>`).join("") + card;
     const smore = `
       ${profileSvg()}
@@ -2087,6 +2176,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       <ol class="steps">${r.steps.map((st, k) => { const si = stepInfo(st); return `<li class="${k === i ? "cur" : k < i ? "past" : ""}"><button data-act="step-go" data-i="${k}"><span class="ic ${si.cls}" style="--c:${si.c || "transparent"}">${si.ic}</span><span><b>${esc(si.t1)}</b><small>${esc(si.t2)}</small></span></button></li>`; }).join("")}</ol>
       <button class="btn ghost wide" data-act="route-all">Ver la ruta entera</button>
       ${AVX.closed.size ? `<p class="quiet">La ruta evita lo que el grupo ha marcado como cerrado.</p>` : ""}
+      ${r.ofi === "ok" ? `<p class="quiet">Ruta con lo que está abierto según Les 3 Vallées (${esc(agoMin(OFI.at))}). Courchevel aún no está incluido.</p>` : ""}
       <p class="quiet">Tiempo aproximado, con unos 2 min de espera por remonte${AVX.cola.size ? " y 10 más donde avisan de cola" : ""}. Comprobad en la estación qué está abierto.</p>`;
     return { speek, smore };
   }
@@ -2673,6 +2763,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       for (let i = 0; i < M.n; i++) NH[i] = (NZ[i] > 0 ? NZ[i] : groundZ(NX[i], NY[i])) * EXAG + 4;
       POLY3 = M.polys.map(p => { const out = []; for (let i = 0; i < p.flat.length; i += 2) out.push(p.flat[i], p.flat[i + 1], groundZ(p.flat[i], p.flat[i + 1]) * EXAG + 2); return { d: p.d, pts: out }; });
       M.ok = true; RUNG = null; buildPeaks();
+      ofiRefresh(); setInterval(() => { if (!document.hidden) ofiRefresh(); }, 60e3);
       const l = $("#mload"); if (l) l.remove();
       sizeCanvas(); initGL(); layoutSheet(); camUpdate(); overview(0);
       schedule();
