@@ -4,47 +4,132 @@ service cloud.firestore {
 
     // Todo vive bajo grupos/{código}. El código del grupo (10 caracteres al azar) hace de llave:
     // solo quien lo conoce puede leer o escribir, y nadie puede listar los grupos.
+    // Cada escritura se valida: solo los campos que usa la app, con tipos, tamaños y rangos,
+    // para que nadie pueda llenar la base de datos (y gastar la cuota gratuita) con basura.
 
     function signedIn() { return request.auth != null; }
     function grupo(g) { return /databases/$(database)/documents/grupos/$(g); }
     function esCreador(g) { return get(grupo(g)).data.owner == request.auth.uid; }
     // A quien han quitado del grupo ya no puede leer ni escribir en él (con ese mismo usuario).
     function noExpulsado(g) { return !exists(/databases/$(database)/documents/grupos/$(g)/fuera/$(request.auth.uid)); }
+    function soyYo(uid) { return request.auth.uid == uid; }
 
-    // El documento del grupo guarda quién lo creó. Se puede leer (get) pero no listar,
-    // se crea una sola vez con tu propio uid como creador y no se puede cambiar.
+    function ahora() { return request.time.toMillis(); }
+    function texto(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
+    function lat(v) { return v is number && v >= -90 && v <= 90; }
+    function lon(v) { return v is number && v >= -180 && v <= 180; }
+    function campos(d, obligatorios, permitidos) { return d.keys().hasAll(obligatorios) && d.keys().hasOnly(permitidos); }
+
+    // El documento del grupo guarda quién lo creó. Se puede leer (get) pero no listar, se crea una
+    // sola vez con tu propio uid como creador y no se puede cambiar. Solo con códigos de 10 letras
+    // o cifras (los que genera la app). Excepción para los grupos de antes, que no tenían documento:
+    // lo puede crear quien ya tenía perfil en el grupo.
     match /grupos/{g} {
       allow get: if signedIn();
-      allow create: if signedIn() && request.resource.data.owner == request.auth.uid;
+      allow create: if signedIn()
+        && campos(request.resource.data, ['owner'], ['owner', 'at'])
+        && request.resource.data.owner == request.auth.uid
+        && (!('at' in request.resource.data) || request.resource.data.at is number)
+        && (g.matches('^[a-z0-9]{10}$') || exists(/databases/$(database)/documents/grupos/$(g)/perfiles/$(request.auth.uid)));
       allow update, delete: if false;
     }
 
+    // Perfil: el nombre con el que te ven. Para crearlo, el grupo tiene que existir
+    // (existsAfter: vale también si se crea en el mismo lote que el grupo).
+    function perfilOk(d) {
+      return campos(d, ['name'], ['name', 'at']) && texto(d.name, 1, 40)
+        && (!('at' in d) || d.at is number);
+    }
     match /grupos/{g}/perfiles/{uid} {
       allow read: if signedIn() && noExpulsado(g);
-      allow write: if signedIn() && request.auth.uid == uid && noExpulsado(g);
-      // El creador puede borrar el perfil de alguien al quitarlo del grupo.
-      allow delete: if signedIn() && esCreador(g) && request.auth.uid != uid;
+      allow create: if signedIn() && soyYo(uid) && noExpulsado(g) && perfilOk(request.resource.data) && existsAfter(grupo(g));
+      allow update: if signedIn() && soyYo(uid) && noExpulsado(g) && perfilOk(request.resource.data);
+      // Tu perfil lo borras tú (salir del grupo); el creador puede borrar el de otro al quitarlo.
+      allow delete: if signedIn() && ((soyYo(uid) && noExpulsado(g)) || (!soyYo(uid) && esCreador(g)));
     }
 
+    // Posición de cada uno (en: descripción; live: compartiendo en directo).
+    function posicionOk(d, uid) {
+      return campos(d, ['uid', 'lat', 'lon', 'at'], ['uid', 'lat', 'lon', 'at', 'en', 'live'])
+        && d.uid == uid && lat(d.lat) && lon(d.lon) && d.at is number
+        && (!('en' in d) || texto(d.en, 0, 120))
+        && (!('live' in d) || d.live is bool);
+    }
     match /grupos/{g}/aqui/{uid} {
       allow read: if signedIn() && noExpulsado(g);
-      allow create, update: if signedIn() && request.auth.uid == uid
-                   && request.resource.data.uid == uid && noExpulsado(g);
-      allow delete: if signedIn() && (request.auth.uid == uid || esCreador(g));
+      allow create, update: if signedIn() && soyYo(uid) && noExpulsado(g) && posicionOk(request.resource.data, uid);
+      allow delete: if signedIn() && (soyYo(uid) || esCreador(g));
     }
 
+    // Diario: pistas hechas.
+    function pistaOk(d) {
+      return campos(d, ['uid', 'nombre'], ['uid', 'nombre', 'tipo', 'at', 'day'])
+        && d.uid == request.auth.uid && texto(d.nombre, 1, 100)
+        && (!('tipo' in d) || d.tipo in ['verde', 'azul', 'roja', 'negra'])
+        && (!('at' in d) || d.at is number)
+        && (!('day' in d) || (d.day is string && d.day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')));
+    }
     match /grupos/{g}/pistas/{id} {
       allow read: if signedIn() && noExpulsado(g);
-      allow create: if signedIn() && request.resource.data.uid == request.auth.uid && noExpulsado(g);
+      allow create: if signedIn() && noExpulsado(g) && pistaOk(request.resource.data);
       allow delete: if signedIn() && resource.data.uid == request.auth.uid;
       allow update: if false;
+    }
+
+    // Punto de encuentro: uno por grupo (quedada/actual). Caduca (exp, en ms) como mucho a las 16 h.
+    // Lo cambia o lo quita quien lo puso, el creador del grupo o cualquiera si ya caducó.
+    function quedadaOk(d) {
+      return campos(d, ['uid', 'lat', 'lon', 'en', 'at', 'exp'], ['uid', 'lat', 'lon', 'en', 'hora', 'at', 'exp'])
+        && d.uid == request.auth.uid && lat(d.lat) && lon(d.lon) && texto(d.en, 1, 120)
+        && d.at is number && d.exp is number && d.exp <= ahora() + 16 * 3600000
+        && (!('hora' in d) || (d.hora is string && d.hora.matches('^[0-2][0-9]:[0-5][0-9]$')));
+    }
+    function puedeCambiarQuedada(g) {
+      return resource.data.uid == request.auth.uid || !(resource.data.exp is number) || resource.data.exp < ahora() || esCreador(g);
+    }
+    match /grupos/{g}/quedada/{id} {
+      allow read: if signedIn() && noExpulsado(g);
+      allow create: if signedIn() && id == 'actual' && noExpulsado(g) && quedadaOk(request.resource.data);
+      allow update: if signedIn() && noExpulsado(g) && quedadaOk(request.resource.data) && puedeCambiarQuedada(g);
+      allow delete: if signedIn() && noExpulsado(g) && puedeCambiarQuedada(g);
+    }
+
+    // Avisos en pistas y remontes (cerrado, cola, hielo, niebla). Duran 2 h (con margen por si el
+    // reloj del móvil va adelantado). No se editan; los borra quien los puso o el creador.
+    function avisoOk(d) {
+      return campos(d, ['uid', 'tipo', 'ref', 'lat', 'lon', 'at', 'exp'], ['uid', 'tipo', 'ref', 'nombre', 'lat', 'lon', 'at', 'exp'])
+        && d.uid == request.auth.uid && d.tipo in ['cerrado', 'cola', 'hielo', 'niebla']
+        && texto(d.ref, 1, 200) && (!('nombre' in d) || texto(d.nombre, 0, 60))
+        && lat(d.lat) && lon(d.lon) && d.at is number
+        && d.exp is number && d.exp <= ahora() + 9000000;
+    }
+    match /grupos/{g}/avisos/{id} {
+      allow read: if signedIn() && noExpulsado(g);
+      allow create: if signedIn() && noExpulsado(g) && avisoOk(request.resource.data);
+      allow update: if false;
+      allow delete: if signedIn() && (resource.data.uid == request.auth.uid || esCreador(g));
+    }
+
+    // Mensajes de un toque: uno por persona (el último), con su posición si la tiene.
+    function mensajeOk(d, uid) {
+      return campos(d, ['uid', 'tipo', 'at'], ['uid', 'tipo', 'lat', 'lon', 'en', 'at'])
+        && d.uid == uid && d.tipo in ['espero', 'bar', 'ayuda'] && d.at is number
+        && (!('lat' in d) || lat(d.lat)) && (!('lon' in d) || lon(d.lon))
+        && (!('en' in d) || texto(d.en, 0, 120));
+    }
+    match /grupos/{g}/mensajes/{uid} {
+      allow read: if signedIn() && noExpulsado(g);
+      allow create, update: if signedIn() && soyYo(uid) && noExpulsado(g) && mensajeOk(request.resource.data, uid);
+      allow delete: if signedIn() && (soyYo(uid) || esCreador(g));
     }
 
     // Lista de quitados: cada uno puede ver su propia entrada (la app la vigila para salir al momento),
     // y solo el creador puede añadir a otros.
     match /grupos/{g}/fuera/{uid} {
-      allow get: if signedIn() && (request.auth.uid == uid || esCreador(g));
-      allow create: if signedIn() && esCreador(g) && request.auth.uid != uid;
+      allow get: if signedIn() && (soyYo(uid) || esCreador(g));
+      allow create: if signedIn() && esCreador(g) && !soyYo(uid)
+        && campos(request.resource.data, ['by'], ['at', 'by']) && request.resource.data.by == request.auth.uid
+        && (!('at' in request.resource.data) || request.resource.data.at is number);
       allow update, delete: if false;
     }
   }

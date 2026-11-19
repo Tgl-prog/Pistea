@@ -1953,7 +1953,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const now = Date.now(); let tH = now;
     if (h) { const [hh, mm] = h.split(":").map(Number), t = new Date(); t.setHours(hh, mm, 0, 0); tH = t.getTime(); if (tH < now - 3600e3) tH += 864e5; }
     const [lon, lat] = toLL(NX[d.node], NY[d.node]);
-    const data = { uid: me, lat: +lat.toFixed(6), lon: +lon.toFixed(6), en: d.en.slice(0, 100), at: now, exp: Math.min(now + 15 * 3600e3, Math.max(tH, now) + 2 * 3600e3) };
+    const data = { uid: me, lat: +lat.toFixed(6), lon: +lon.toFixed(6), en: d.en.slice(0, 120), at: now, exp: Math.min(now + 15 * 3600e3, Math.max(tH, now) + 2 * 3600e3) };
     if (h) data.hora = h;
     put("quedada", "actual", data).then(ok => { if (!ok) return; sel = null; personSheet = null; meetSheet = true; setSnap("peek"); centerOn(NX[d.node], NY[d.node], 0.2); toast(sentMsg("Quedada " + (h ? "a las " + h + ", " : "") + d.en)); ui(); });
   }
@@ -2056,7 +2056,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       </div>
       ${items.length ? `<button class="btn ghost wide" data-act="card">Tarjeta para compartir</button>` : ""}
       <h3 class="sec">Apuntar una pista</h3>
-      <div class="addbox"><input type="search" id="dq" placeholder="Escribe el nombre, ej.: Combe de Caron" autocomplete="off" enterkeyhint="done" value="${esc(dq)}"></div>
+      <div class="addbox"><input type="search" id="dq" maxlength="80" placeholder="Escribe el nombre, ej.: Combe de Caron" autocomplete="off" enterkeyhint="done" value="${esc(dq)}"></div>
       <ul class="sugg" id="sugg">${sugg}</ul>
       ${days.length ? days.map(d => {
         const runs = items.filter(p => p.day === d);
