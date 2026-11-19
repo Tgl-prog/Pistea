@@ -8,9 +8,9 @@
  * aunque se olvide subir VERSION, y con mala señal la app abre igual desde la copia. Si la red llega
  * tarde, la respuesta se guarda igualmente para la próxima vez.
  */
-const VERSION = "pistea-v6";
+const VERSION = "pistea-v7";
 const CORE = [
-  "./", "index.html", "manifest.webmanifest", "backend.js", "firebase-config.js",
+  "./", "index.html", "manifest.webmanifest", "backend.js", "native.js", "firebase-config.js",
   "mapdata.json", "dem.json", "relief.jpg",
   "three.min.js", "LineSegmentsGeometry.js", "LineMaterial.js", "LineSegments2.js",
   "firebase-app-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js",

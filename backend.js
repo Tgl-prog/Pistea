@@ -51,17 +51,24 @@
       const el = document.createElement("div");
       el.className = "join";
       el.innerHTML = `
+        <div class="join-brand"><svg width="72" height="72" viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" rx="228" fill="#0A1620"/><g transform="translate(141 130) scale(2.9)"><path d="M128 226 C114 204 54 166 54 102 A74 74 0 1 1 202 102 C202 166 142 204 128 226 Z" fill="#5BE7F2"/><rect x="72" y="72" width="112" height="60" rx="30" fill="#0A1620"/><path d="M92 120 L113 98 L124 109 L141 90 L164 120" fill="none" stroke="#5BE7F2" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/></g></svg><b>Pistea</b><span>El mapa del grupo en la montaña</span></div>
         <form class="join-card glass" autocomplete="off" novalidate>
           <h2>Entra en tu grupo</h2>
           <p class="join-note" role="status" hidden></p>
           <p>Tus amigos te verán con este nombre.</p>
           <label>Tu nombre<input name="n" maxlength="24" value="${myName.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" autocapitalize="words" enterkeyhint="next"></label>
-          ${code ? "" : `<label>Enlace o código del grupo<input name="c" maxlength="400" placeholder="Pega el enlace o el código" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go"></label>`}
+          ${code ? "" : `<label>Enlace o código del grupo<span class="join-row"><input name="c" maxlength="400" placeholder="Pega el enlace o el código" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go">${navigator.clipboard && navigator.clipboard.readText ? `<button class="btn dark" type="button" data-paste>Pegar</button>` : ""}</span><small>Pídeselo a quien creó el grupo.</small></label>`}
           <button class="btn wide" type="submit">Entrar</button>
-          ${code ? "" : `<button class="btn ghost wide" type="button" data-new>Crear un grupo nuevo</button>`}
+          ${code ? "" : `<div class="join-or">o</div><button class="btn ghost wide" type="button" data-new>Crear un grupo nuevo</button>`}
         </form>`;
       const st = document.createElement("style");
-      st.textContent = `.join{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:rgba(10,22,32,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+      st.textContent = `.join{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:16px;overflow-y:auto;background:rgba(10,22,32,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+      .join-brand{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+      .join-brand b{font:700 28px/1.1 var(--font);letter-spacing:-.01em;margin-top:4px}
+      .join-brand span{font-size:15px;color:var(--tx-2)}
+      .join-row{display:flex;gap:8px}.join-row input{flex:1;min-width:0}.join-row .btn{min-height:52px;padding:0 16px}
+      .join-card label small{font:400 13px/16px var(--font);color:var(--tx-2)}
+      .join-or{display:flex;align-items:center;gap:10px;color:var(--tx-2);font-size:13px}.join-or::before,.join-or::after{content:"";flex:1;height:1px;background:var(--hair-2)}
       .join-card{width:min(100%,380px);border-radius:var(--r-lg,28px);padding:24px 20px 20px;display:grid;gap:14px;background:var(--glass-2)}
       .join-card h2{margin:0;font:700 22px/26px var(--font);letter-spacing:-.02em}
       .join-card p{margin:-8px 0 0;color:var(--tx-2);font-size:14px}
@@ -100,6 +107,8 @@
         if (!ok) { say("No hay ningún grupo con ese código. Revisa el enlace o pide que te lo envíen otra vez."); f.c.focus(); return; }
         code = c; fromLink = false; finish();
       });
+      const pb = el.querySelector("[data-paste]");
+      if (pb) pb.addEventListener("click", async () => { try { const t = await navigator.clipboard.readText(); if (t) { f.c.value = t.trim(); say(""); } } catch (er) { f.c.focus(); } });
       const nb = el.querySelector("[data-new]");
       if (nb) nb.addEventListener("click", async () => {
         if (!nameOk()) return;

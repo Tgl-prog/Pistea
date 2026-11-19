@@ -113,7 +113,7 @@ service cloud.firestore {
     // Mensajes de un toque: uno por persona (el último), con su posición si la tiene.
     function mensajeOk(d, uid) {
       return campos(d, ['uid', 'tipo', 'at'], ['uid', 'tipo', 'lat', 'lon', 'en', 'at'])
-        && d.uid == uid && d.tipo in ['espero', 'bar', 'ayuda'] && d.at is number
+        && d.uid == uid && d.tipo in ['espero', 'bar', 'ayuda', 'voy'] && d.at is number
         && (!('lat' in d) || lat(d.lat)) && (!('lon' in d) || lon(d.lon))
         && (!('en' in d) || texto(d.en, 0, 120));
     }
