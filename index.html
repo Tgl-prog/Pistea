@@ -226,6 +226,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .spec dd { margin: 6px 0 0; font: 500 17px/1 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
 
 /* Ruta */
+.warnline { margin: -4px 0 0; padding: 10px 12px; border-radius: 14px; font-size: 14px; line-height: 1.3; color: var(--tx); background: rgba(255,210,63,.13); border: 1px solid rgba(255,210,63,.35); }
 .stepcard { display: flex; gap: 14px; align-items: center; border-radius: var(--r-md); padding: 14px; background: var(--acc-dim); border: 1px solid rgba(91,231,242,.35); }
 .stepcard b { display: block; font: 600 21px/1.15 var(--font); letter-spacing: -.015em; }
 .stepcard small { color: var(--tx-2); font-size: 14px; display: block; margin-top: 4px; }
@@ -597,20 +598,35 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       PEND[col] = !!(snap.metadata && snap.metadata.hasPendingWrites);
       const isPend = Object.values(PEND).some(Boolean);
       if (isPend && !wasPend) { pendSince = Date.now(); setTimeout(schedule, 3100); } else if (!isPend) pendSince = 0;
+      if (col === "aqui") clearOldDay(snap.metadata.fromCache);
       if (col === "perfiles") S.perfiles.forEach((v, id) => { if (v && v.name) names[id] = v.name; });
       ensureNames(); schedule();
     }, () => { fresh.add(col); schedule(); });
   }
 
-  /* Posiciones del grupo */
-  let posCache = null, posKey = null;
+  /* Posiciones del grupo. Por privacidad, las de los demás con más de 12 h no se muestran (la última
+     suele ser el alojamiento). Fuera de pistas (más de 400 m) se guarda igual; para las rutas se usa
+     el punto de pistas más cercano (near). */
+  const HIDE_MS = 12 * 3600e3, OLD_ROUTE_MS = 30 * 60000, GPS_MAX_ACC = 100;
+  let posCache = null, posKey = null, posT = 0;
   function positions() {
     if (!M.ok) return [];
-    if (posKey === S.aqui && posCache) return posCache;
-    posKey = S.aqui;
-    return posCache = list("aqui").filter(p => typeof p.lon === "number" && typeof p.lat === "number").map(p => {
-      const [x, y] = toXY(p.lon, p.lat); return Object.assign({}, p, { x, y, node: nearestNode(x, y, 400) });
+    const now = Date.now();
+    if (posKey === S.aqui && posCache && now - posT < 60000) return posCache;
+    posKey = S.aqui; posT = now;
+    return posCache = list("aqui").filter(p => typeof p.lon === "number" && typeof p.lat === "number" && (p.uid === me || now - p.at < HIDE_MS)).map(p => {
+      const [x, y] = toXY(p.lon, p.lat), node = nearestNode(x, y, 400);
+      return Object.assign({}, p, { x, y, node, near: node >= 0 ? node : nearestNode(x, y, 3000) });
     }).sort((a, b) => (a.uid === me ? -1 : b.uid === me ? 1 : b.at - a.at));
+  }
+  /* Tu posición del día anterior se borra la primera vez que abres la app en un día nuevo */
+  let dayChecked = false;
+  function clearOldDay(fromCache) {
+    if (dayChecked || !me || mode !== "live") return;
+    const mine = S.aqui.get(me);
+    if (!mine) { if (!fromCache) dayChecked = true; return; }
+    dayChecked = true;
+    if (new Date(mine.at).toLocaleDateString("sv-SE") !== today()) del("aqui", me);
   }
   function myPos() { return positions().find(p => p.uid === me) || null; }
   function setMyPos(node, en) {
@@ -619,6 +635,13 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (LIVE.on) liveStop(true);   // si te marcas a mano, manda la marca, no el GPS
     const data = { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en, at: Date.now() };
     return put("aqui", me, data).then(ok => { if (ok) toast(sentMsg("Listo. El grupo te ve " + en)); return ok; });
+  }
+  /* Fuera de pistas: «fuera de pistas, cerca de Val Thorens» (pueblo o cima más cercanos) */
+  function describeOff(x, y) {
+    let best = null, bd = 6000;
+    M.places.forEach(p => { const d = Math.hypot(p[1] - x, p[2] - y); if (d < bd) { bd = d; best = p[0]; } });
+    PEAKS.forEach(p => { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p.name; } });
+    return "fuera de pistas" + (best ? ", cerca de " + best : "");
   }
   function describeNode(node, fi) {
     let f = fi != null ? F[fi] : null;
@@ -1346,11 +1369,12 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (!rt) return;
     const mp = myPos(); rt.err = null;
     const old = rt.res; rt.res = null;
-    if (!mp || mp.node < 0) { rt.err = "nopos"; ui(); return; }
+    if (!mp) { rt.err = "nopos"; ui(); return; }
+    if (mp.near < 0) { rt.err = "mefar"; ui(); return; }
     let dst = rt.to.node;
-    if (rt.to.uid) { const fp = positions().find(p => p.uid === rt.to.uid); if (!fp || fp.node < 0) { rt.err = "nofriend"; ui(); return; } dst = fp.node; }
-    if (dst === mp.node) { rt.err = "same"; ui(); return; }
-    rt.res = route(mp.node, dst, rt.noBlack);
+    if (rt.to.uid) { const fp = positions().find(p => p.uid === rt.to.uid); if (!fp) { rt.err = "nofriend"; ui(); return; } if (fp.near < 0) { rt.err = "far"; ui(); return; } dst = fp.near; }
+    if (dst === mp.near) { rt.err = "same"; ui(); return; }
+    rt.res = route(mp.near, dst, rt.noBlack);
     if (!rt.res) rt.err = "noroute";
     if (fit || !old) rt.cur = 0; else if (rt.res) rt.cur = Math.min(rt.cur, rt.res.steps.length);
     ui();
@@ -1711,6 +1735,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const tog = `<button class="toggle" data-act="noblack" aria-pressed="${rt.noBlack}"><span class="sw2"></span><span>Sin negras ni itinerarios</span></button>`;
     if (rt.err === "nopos") return { speek: head() + `<p class="facts">Primero marca dónde estás, así sé desde dónde calcular.</p><div class="acts one"><button class="btn" data-act="mark">Marcar dónde estoy</button></div>`, smore: "" };
     if (rt.err === "nofriend") return { speek: head() + `<p class="facts">${esc(toName)} todavía no ha marcado dónde está.</p>`, smore: "" };
+    if (rt.err === "far") return { speek: head() + `<p class="facts">${esc(toName)} está lejos de las pistas y no encuentro cómo llegar.</p>`, smore: "" };
+    if (rt.err === "mefar") return { speek: head() + `<p class="facts">Estás lejos de las pistas. Acércate o marca dónde estás.</p><div class="acts one"><button class="btn" data-act="mark">Marcar dónde estoy</button></div>`, smore: "" };
     if (rt.err === "same") return { speek: head() + `<p class="facts">Estáis en el mismo punto.</p>`, smore: "" };
     if (rt.err === "noroute") return { speek: head() + `<p class="facts">No encuentro un camino por pistas y remontes${rt.noBlack ? " sin negras." : "."}</p><div class="acts one">${tog}</div>`, smore: "" };
     if (!rt.res) return { speek: head() + `<p class="facts">Calculando…</p>`, smore: "" };
@@ -1727,7 +1753,13 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       card = `<div class="stepcard"><span class="ic big ${si.cls}" style="--c:${si.c || "transparent"}">${si.ic}</span><div><small class="kicker">Paso ${i + 1} de ${N}</small><b>${esc(si.t1)}</b><small>${esc(si.t2)}</small></div></div>
         <div class="acts nav"><button class="btn ghost" data-act="step-prev" ${i === 0 ? "disabled" : ""} aria-label="Paso anterior">‹</button><button class="btn" data-act="step-next">${i === N - 1 ? "Llegué" : "Siguiente ›"}</button></div>`;
     }
-    const speek = head(sub) + card;
+    /* Avisos dentro de la ruta: posición antigua del amigo y gente fuera de pistas */
+    const fp = rt.to.uid ? positions().find(p => p.uid === rt.to.uid) : null, mp = myPos();
+    const warns = [];
+    if (fp && !isLive(fp) && Date.now() - fp.at > OLD_ROUTE_MS) warns.push(`La posición de ${esc(toName)} es de ${esc(ago(fp.at))}. Puede que ya no esté ahí.`);
+    if (fp && fp.node < 0) warns.push(`${esc(toName)} está fuera de pistas. La ruta llega al punto de pistas más cercano.`);
+    if (mp && mp.node < 0) warns.push(`Estás fuera de pistas. La ruta sale del punto de pistas más cercano.`);
+    const speek = head(sub) + warns.map(w => `<p class="warnline">${w}</p>`).join("") + card;
     const smore = `
       ${profileSvg()}
       <div class="acts one">${tog}</div>
@@ -1909,15 +1941,18 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   }
 
   /* ================= Acciones ================= */
-  /* GPS: tu posición real, sobre la pista más cercana (hasta 400 m) */
+  /* GPS: tu posición real. Cerca de una pista se describe con la pista; más lejos (restaurante,
+     pueblo) se guarda igual como «fuera de pistas». Las lecturas con más de 100 m de error se ignoran. */
   function gpsHere() {
     if (!navigator.geolocation) { toast("Este móvil no da la ubicación. Márcalo a mano en el mapa."); return; }
     toast("Buscando tu ubicación…");
     navigator.geolocation.getCurrentPosition(pos => {
-      const lon = pos.coords.longitude, lat = pos.coords.latitude, [x, y] = toXY(lon, lat), node = nearestNode(x, y, 400);
-      if (node < 0) { toast("Estás lejos de las pistas. Márcalo a mano en el mapa."); return; }
+      const c = pos.coords;
+      if (c.accuracy && c.accuracy > GPS_MAX_ACC) { toast("El GPS va mal ahora (±" + Math.round(c.accuracy) + " m). Prueba en un momento o márcalo a mano."); return; }
+      const lon = c.longitude, lat = c.latitude, [x, y] = toXY(lon, lat), node = nearestNode(x, y, 400);
       marking = false;
-      const en = describeNode(node);
+      const en = node >= 0 ? describeNode(node) : describeOff(x, y);
+      if (LIVE.on) liveStop(true);
       put("aqui", me, { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en, at: Date.now() })
         .then(ok => { if (ok) toast(sentMsg("Listo. El grupo te ve " + en)); if (rt) recalc(true); ui(); });
       ui();
@@ -1928,8 +1963,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
      Para no gastar batería ni escrituras, solo se envía si te has movido 40 m (como mucho cada 20 s)
      o, si estás parado, cada 2 min para que el grupo vea que sigues ahí.
      iPhone y Android cortan el GPS de las webs en segundo plano: al volver a la app se reanuda solo. */
-  const LIVE = { on: false, watch: null, last: null, off: false };
-  const LIVE_MIN_MS = 20000, LIVE_BEAT_MS = 120000, LIVE_MOVE_M = 40, LIVE_MAX_ACC = 80, LIVE_FRESH_MS = 3 * 60000;
+  const LIVE = { on: false, watch: null, last: null };
+  const LIVE_MIN_MS = 20000, LIVE_BEAT_MS = 120000, LIVE_MOVE_M = 40, LIVE_MAX_ACC = GPS_MAX_ACC, LIVE_FRESH_MS = 3 * 60000;
   const isLive = p => !!(p && p.live && Date.now() - p.at < LIVE_FRESH_MS);
   function liveSaved() { try { return localStorage.getItem("pistea.live") === "1"; } catch (e) { return false; } }
   function liveSave(v) { try { localStorage.setItem("pistea.live", v ? "1" : "0"); } catch (e) {} }
@@ -1941,12 +1976,10 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const l = LIVE.last, moved = l ? Math.hypot(x - l.x, y - l.y) : Infinity, dt = l ? now - l.t : Infinity;
     if (!(dt >= LIVE_BEAT_MS || (moved >= LIVE_MOVE_M && dt >= LIVE_MIN_MS))) return;
     if (!M.ok) return;                                              // el mapa aún está cargando
-    const node = nearestNode(x, y, 400);
-    if (node < 0) { if (!LIVE.off) { LIVE.off = true; toast("Estás lejos de las pistas. Te seguimos en cuanto vuelvas."); } return; }
-    LIVE.off = false;
+    const node = nearestNode(x, y, 400);                            // lejos de las pistas también se envía
     LIVE.last = { x, y, t: now };
     // Sin await: si no hay cobertura, Firestore lo guarda y lo envía al recuperarla.
-    put("aqui", me, { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en: describeNode(node), at: now, live: true });
+    put("aqui", me, { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en: node >= 0 ? describeNode(node) : describeOff(x, y), at: now, live: true });
   }
   function liveWatch() {
     if (LIVE.watch != null || !LIVE.on || document.hidden || !navigator.geolocation) return;
@@ -1958,7 +1991,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   function liveStart() {
     if (!navigator.geolocation) { toast("Este móvil no da la ubicación."); return; }
     if (!window.PISTEA_GROUP) return;
-    LIVE.on = true; LIVE.last = null; LIVE.off = false; liveSave(true);
+    LIVE.on = true; LIVE.last = null; liveSave(true);
     liveWatch(); toast("En directo. El grupo te sigue mientras tengas Pistea abierta."); ui();
   }
   function liveStop(quiet) {
@@ -2204,7 +2237,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     schedule();
   }
   let queued = false;
-  function schedule() { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; if (rt && rt.to.uid) { const fp = positions().find(p => p.uid === rt.to.uid), mp = myPos(); const sig = (fp ? fp.node : -1) + ":" + (mp ? mp.node : -1); if (rt.sig !== undefined && sig !== rt.sig) { rt.sig = sig; recalc(false); return; } rt.sig = sig; } ui(); }); }
+  function schedule() { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; if (rt && rt.to.uid) { const fp = positions().find(p => p.uid === rt.to.uid), mp = myPos(); const sig = (fp ? fp.near : -1) + ":" + (mp ? mp.near : -1); if (rt.sig !== undefined && sig !== rt.sig) { rt.sig = sig; recalc(false); return; } rt.sig = sig; } ui(); }); }
   let mapReady;
   async function init() {
     sheetDrag();
