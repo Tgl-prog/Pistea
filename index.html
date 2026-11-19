@@ -181,6 +181,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 @keyframes livepulse { 0% { box-shadow: 0 0 0 0 rgba(255,77,79,.6); } 100% { box-shadow: 0 0 0 7px rgba(255,77,79,0); } }
 @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
 .livebtn { margin-top: 8px; width: 100%; }
+.toggle.wake { margin-top: -4px; }
+.toggle small { display: block; color: var(--tx-2); font-size: 13px; line-height: 1.25; margin-top: 2px; }
 .dot-off { width: 34px; height: 34px; border-radius: 50%; border: 2px dashed var(--hair-2); flex: 0 0 auto; }
 .av { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: var(--c); color: #0A1620; display: grid; place-items: center; font: 700 14px/1 var(--font); }
 .person.old .av { background: var(--raised); color: var(--tx-2); box-shadow: 0 0 0 2px var(--sol); }
@@ -1632,7 +1634,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         <button class="btn dark" data-act="goto-list">Ir hasta…</button>
         <button class="btn ghost" data-act="diario">Diario</button>
       </div>${navigator.geolocation && window.PISTEA_GROUP ? `
-      <button class="btn wide ${LIVE.on ? "ghost on" : "dark"} livebtn" data-act="live">${LIVE.on ? `<span class="live-dot"></span>En directo · Parar` : "Compartir en directo"}</button>` : ""}`;
+      <button class="btn wide ${LIVE.on ? "ghost on" : "dark"} livebtn" data-act="live">${LIVE.on ? `<span class="live-dot"></span>En directo · Parar` : "Compartir en directo"}</button>` : ""}${LIVE.on && WAKE.ok ? `
+      <button class="toggle wake" data-act="wake" aria-pressed="${WAKE.want}"><span class="sw2"></span><span>Pantalla encendida<small>Sigue enviando con el móvil en el bolsillo. Gasta más batería.</small></span></button>` : ""}`;
     const people = others.length ? `<ul class="people">${others.map(p => `
         <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}">
           <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(p.en || "")} · ${esc(isLive(p) ? "en directo" : ago(p.at))}</small></span></button>
@@ -1992,20 +1995,37 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (!navigator.geolocation) { toast("Este móvil no da la ubicación."); return; }
     if (!window.PISTEA_GROUP) return;
     LIVE.on = true; LIVE.last = null; liveSave(true);
-    liveWatch(); toast("En directo. El grupo te sigue mientras tengas Pistea abierta."); ui();
+    liveWatch(); wakeOn(); toast("En directo. El grupo te sigue mientras tengas Pistea abierta."); ui();
   }
   function liveStop(quiet) {
     const was = LIVE.on;
-    LIVE.on = false; liveUnwatch(); liveSave(false);
+    LIVE.on = false; liveUnwatch(); liveSave(false); wakeOff();
     // Deja tu última posición, pero sin la marca de "en directo".
     const mp = was && me ? S.aqui.get(me) : null;
     if (mp && mp.live) put("aqui", me, Object.assign({}, mp, { live: false }));
     if (!quiet) toast("Has dejado de compartir en directo. El grupo ve tu última posición.");
     ui();
   }
+  /* Pantalla encendida (Wake Lock) mientras estás en directo. Es la única forma de que el iPhone siga
+     enviando la posición con la app abierta en el bolsillo: si la pantalla se apaga, la web deja de
+     recibir el GPS. El sistema la suelta al ir a segundo plano; se vuelve a pedir al volver. */
+  const WAKE = { ok: "wakeLock" in navigator, want: false, lock: null };
+  try { WAKE.want = localStorage.getItem("pistea.pantalla") === "1"; } catch (e) {}
+  async function wakeOn() {
+    if (!WAKE.ok || !WAKE.want || !LIVE.on || document.hidden || WAKE.lock) return;
+    try { const l = await navigator.wakeLock.request("screen"); WAKE.lock = l; l.addEventListener("release", () => { if (WAKE.lock === l) WAKE.lock = null; }); }
+    catch (e) { WAKE.lock = null; }
+  }
+  function wakeOff() { const l = WAKE.lock; WAKE.lock = null; if (l) l.release().catch(() => {}); }
+  function wakeSet(v) {
+    WAKE.want = v; try { localStorage.setItem("pistea.pantalla", v ? "1" : "0"); } catch (e) {}
+    if (v) { wakeOn().then(() => toast(WAKE.lock ? "La pantalla se quedará encendida mientras estés en directo." : "Ahora no se ha podido dejar la pantalla encendida. Se reintenta al volver a la app.")); } else wakeOff();
+    ui();
+  }
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) { sizeCanvas(); drawSoon(); schedule(); }   // al volver del bolsillo el mapa podía quedar en blanco
     if (!LIVE.on) return;
+    if (!document.hidden) wakeOn();
     if (document.hidden) liveUnwatch();
     else { LIVE.last = LIVE.last && { x: LIVE.last.x, y: LIVE.last.y, t: 0 }; liveWatch(); }   // al volver, envía en la primera lectura buena
   });
@@ -2060,6 +2080,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       case "mark-cancel": marking = false; ui(); break;
       case "gps": gpsHere(); break;
       case "live": LIVE.on ? liveStop() : liveStart(); break;
+      case "wake": wakeSet(!WAKE.want); break;
       case "invite": inviteGroup(); break;
       case "copy-code": copyCode(); break;
       case "leave": {
