@@ -46,7 +46,7 @@
   // En iPhone, la app de la pantalla de inicio no comparte datos con Safari: al abrirla hay que
   // volver a entrar. Por eso se acepta pegar el enlace entero o el código.
   // Idioma de la landing: el del móvil, salvo que se haya elegido otro con ES/EN.
-  const LANG = LS.get("vallik.lang") || (/^es\b/i.test(navigator.language || "es") ? "es" : "en");
+  const LANG = window.VLANG || "es";
   const L = (es, en) => `<span lang="es">${es}</span><span lang="en">${en}</span>`;
   function askJoin() {
     const note = LS.get("pistea.aviso") || ""; LS.del("pistea.aviso");
@@ -133,7 +133,7 @@
       const busy = on => btns.forEach(b => { b.disabled = on; });
       say(note);
       (myName && f.c ? f.c : f.n).focus();
-      const nameOk = () => { myName = f.n.value.trim().slice(0, 24); if (!myName) { say("Escribe tu nombre."); f.n.focus(); } return !!myName; };
+      const nameOk = () => { myName = f.n.value.trim().slice(0, 24); if (!myName) { say((EN?"Type your name.":"Escribe tu nombre.")); f.n.focus(); } return !!myName; };
       const finish = () => {
         LS.set("pistea.nombre", myName);
         try { history.replaceState(null, "", location.pathname + location.search + "#g=" + code); } catch (e2) {}
@@ -144,14 +144,14 @@
         if (!nameOk()) return;
         if (code) { finish(); return; }                 // vino en el enlace: se comprueba al arrancar
         const raw = f.c.value.trim(), c = codeFromPaste(raw);
-        if (!raw) { say("Pega el enlace o el código que te han enviado. Si eres el primero, crea un grupo nuevo."); f.c.focus(); return; }
-        if (!c) { say("No encuentro el código en lo que has pegado. Copia otra vez el enlace entero."); f.c.focus(); return; }
-        busy(true); say("Comprobando el grupo…");
+        if (!raw) { say((EN?"Paste the link or code you were sent. If you're the first, create a new group.":"Pega el enlace o el código que te han enviado. Si eres el primero, crea un grupo nuevo.")); f.c.focus(); return; }
+        if (!c) { say((EN?"I can't find the code in what you pasted. Copy the whole link again.":"No encuentro el código en lo que has pegado. Copia otra vez el enlace entero.")); f.c.focus(); return; }
+        busy(true); say((EN?"Checking the group…":"Comprobando el grupo…"));
         let ok = null;
         try { await ensureAuth(); ok = await groupExists(c); } catch (er) { ok = null; }
         busy(false);
-        if (ok === null) { say("Sin conexión. Hace falta cobertura para entrar en un grupo. Prueba otra vez."); return; }
-        if (!ok) { say("No hay ningún grupo con ese código. Revisa el enlace o pide que te lo envíen otra vez."); f.c.focus(); return; }
+        if (ok === null) { say((EN?"No connection. You need signal to join a group. Try again.":"Sin conexión. Hace falta cobertura para entrar en un grupo. Prueba otra vez.")); return; }
+        if (!ok) { say((EN?"There's no group with that code. Check the link or ask for it again.":"No hay ningún grupo con ese código. Revisa el enlace o pide que te lo envíen otra vez.")); f.c.focus(); return; }
         code = c; fromLink = false; finish();
       });
       el.querySelectorAll("[data-login]").forEach(b => b.addEventListener("click", async () => {
@@ -161,13 +161,14 @@
           const box = el.querySelector("#lpauth"), nm = (u.displayName || "").split(" ")[0];
           if (nm && !f.n.value.trim()) f.n.value = nm.slice(0, 24);
           if (box) box.innerHTML = `<div class="lp-done">${k === "apple" ? A_ICON : G_ICON}<span><b>${L("Has entrado con","Signed in with")} ${k === "apple" ? "Apple" : "Google"}</b>${(u.email || "").replace(/</g, "&lt;")}</span></div>`;
-          say(code ? "Ya está. Revisa tu nombre y pulsa Entrar." : "Ya está. Ahora pega el enlace de tu grupo o crea uno nuevo.");
+          say(code ? (EN?"Done. Check your name and press Join.":"Ya está. Revisa tu nombre y pulsa Entrar.") : (EN?"Done. Now paste your group link or create a new one.":"Ya está. Ahora pega el enlace de tu grupo o crea uno nuevo."));
           (f.c || f.n).focus();
         } catch (er) { const t = loginErr(er); if (t) say(t); }
         busy(false);
       }));
       el.querySelectorAll(".lp-lang [data-lang]").forEach(b => b.addEventListener("click", () => {
-        const v = b.dataset.lang, root = el.querySelector(".lp"); root.dataset.lang = v; LS.set("vallik.lang", v);
+        const v = b.dataset.lang; if (v === LANG) return; LS.set("vallik.lang", v); location.reload(); return;
+        const root = el.querySelector(".lp"); root.dataset.lang = v;
         document.documentElement.lang = v;
         el.querySelectorAll("[data-ph-es]").forEach(i => { i.placeholder = i.dataset["ph" + (v === "en" ? "En" : "Es")]; });
       }));
@@ -177,8 +178,8 @@
       const nb = el.querySelector("[data-new]");
       if (nb) nb.addEventListener("click", async () => {
         if (!nameOk()) return;
-        busy(true); say("Creando el grupo…");
-        try { await ensureAuth(); } catch (er) { busy(false); say("Sin conexión. Hace falta cobertura para crear el grupo."); return; }
+        busy(true); say((EN?"Creating the group…":"Creando el grupo…"));
+        try { await ensureAuth(); } catch (er) { busy(false); say((EN?"No connection. You need signal to create the group.":"Sin conexión. Hace falta cobertura para crear el grupo.")); return; }
         code = newCode(); creating = true; fromLink = false; finish();
       });
     });
@@ -221,12 +222,12 @@
   function loginErr(e) {
     const c = (e && e.code) || "";
     if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return "";
-    if (c === "auth/operation-not-allowed") return "El acceso con esa cuenta aún no está activado. Entra con tu nombre de momento.";
-    if (c === "auth/unauthorized-domain") return "Falta autorizar esta dirección en Firebase. Entra con tu nombre de momento.";
-    if (c === "auth/popup-blocked") return "El navegador ha bloqueado la ventana. Toca otra vez el botón.";
-    if (c === "auth/network-request-failed") return "Sin conexión. Hace falta cobertura para entrar con tu cuenta.";
-    if (c === "auth/operation-not-supported-in-this-environment" || c === "auth/web-storage-unsupported") return "Aquí no se puede abrir la ventana de inicio de sesión. Abre vallik.app en Safari.";
-    return "No se ha podido entrar con la cuenta. Prueba otra vez o entra con tu nombre.";
+    if (c === "auth/operation-not-allowed") return (EN?"Signing in with that account isn't switched on yet. Use your name for now.":"El acceso con esa cuenta aún no está activado. Entra con tu nombre de momento.");
+    if (c === "auth/unauthorized-domain") return (EN?"This address still needs to be authorised in Firebase. Use your name for now.":"Falta autorizar esta dirección en Firebase. Entra con tu nombre de momento.");
+    if (c === "auth/popup-blocked") return (EN?"The browser blocked the window. Tap the button again.":"El navegador ha bloqueado la ventana. Toca otra vez el botón.");
+    if (c === "auth/network-request-failed") return (EN?"No connection. You need signal to sign in with your account.":"Sin conexión. Hace falta cobertura para entrar con tu cuenta.");
+    if (c === "auth/operation-not-supported-in-this-environment" || c === "auth/web-storage-unsupported") return (EN?"The sign-in window can't open here. Open vallik.app in Safari.":"Aquí no se puede abrir la ventana de inicio de sesión. Abre vallik.app en Safari.");
+    return (EN?"Couldn't sign in with that account. Try again or use your name.":"No se ha podido entrar con la cuenta. Prueba otra vez o entra con tu nombre.");
   }
   // allowSwitch: en la pantalla de entrada se puede pasar a una cuenta que ya existía; dentro de la app, no
   // (cambiaría el usuario y perderías el perfil de este grupo).
@@ -277,10 +278,10 @@
   // Enlace que no lleva a ningún grupo: si ya tenías uno, sigues en él.
   function badLink() {
     if (fromLink && savedCode) {
-      LS.set("pistea.aviso", "Ese enlace no lleva a ningún grupo. Sigues en tu grupo de siempre.");
+      LS.set("pistea.aviso", (EN?"That link doesn't lead to any group. You're still in your usual group.":"Ese enlace no lleva a ningún grupo. Sigues en tu grupo de siempre."));
       try { history.replaceState(null, "", location.pathname + location.search + "#g=" + savedCode); } catch (e) {}
       setTimeout(() => location.reload(), 50);
-    } else goOut("Ese enlace no lleva a ningún grupo. Pega el código correcto o crea un grupo nuevo.");
+    } else goOut((EN?"That link doesn't lead to any group. Paste the right code or create a new group.":"Ese enlace no lleva a ningún grupo. Pega el código correcto o crea un grupo nuevo."));
   }
   function boot() {
     if (ready) return ready;
@@ -293,7 +294,7 @@
       }
       const uid = (await ensureAuth()).uid;
       const group = fs.collection("grupos").doc(code);
-      const kicked = () => goOut("Te han quitado de ese grupo. Puedes crear uno nuevo o entrar en otro con su código.");
+      const kicked = () => goOut((EN?"You were removed from that group. You can create a new one or join another with its code.":"Te han quitado de ese grupo. Puedes crear uno nuevo o entrar en otro con su código."));
 
       // ¿Me han quitado? ¿Quién creó el grupo? Las dos lecturas a la vez y como mucho 2,5 s
       // (las escrituras nunca se esperan).
@@ -337,12 +338,12 @@
         canLogin,
         async signIn(k) {
           try { await login(k, false); return { ok: true }; }
-          catch (e) { return { ok: false, msg: e && e.code === "vallik/en-uso" ? "Esa cuenta ya se usa en otro móvil. Para usarla aquí, sal del grupo y entra con ella desde la pantalla de inicio." : loginErr(e) }; }
+          catch (e) { return { ok: false, msg: e && e.code === "vallik/en-uso" ? (EN?"That account is already used on another phone. To use it here, leave the group and sign in with it from the start screen.":"Esa cuenta ya se usa en otro móvil. Para usarla aquí, sal del grupo y entra con ella desde la pantalla de inicio.") : loginErr(e) }; }
         },
         leave() {
           // Sin esperar a la red: se borra al recuperar cobertura.
           ["aqui", "perfiles", "mensajes"].forEach(c => group.collection(c).doc(uid).delete().catch(() => {}));
-          goOut("Has salido del grupo.");
+          goOut((EN?"You've left the group.":"Has salido del grupo."));
         },
         kick(id, onErr) {
           if (!G.isOwner || id === uid) return false;

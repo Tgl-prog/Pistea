@@ -26,6 +26,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preload" href="Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<script>
+/* Idioma: el elegido con ES/EN o, si no, el del móvil. Todo lo que no sea español va en inglés. */
+var VLANG = (function () { try { var v = localStorage.getItem("vallik.lang"); if (v === "es" || v === "en") return v; } catch (e) {} return /^es\b/i.test(navigator.language || "es") ? "es" : "en"; })();
+var EN = VLANG === "en"; document.documentElement.lang = VLANG;
+</script>
 <script src="three.min.js"></script>
 <script src="LineSegmentsGeometry.js"></script>
 <script src="LineMaterial.js"></script>
@@ -503,6 +508,7 @@ body.has-dock #smore { padding-bottom: 20px; }
 .mcard img { width: 100%; height: auto; border-radius: 22px; box-shadow: 0 20px 50px rgba(0,0,0,.5); -webkit-touch-callout: default; user-select: auto; }
 .mcard p { margin: 0; font-size: 14px; color: var(--tx-2); }
 @media (min-width: 700px) { .sheet { left: 16px; right: auto; width: 400px; margin: 0; } .topbar { max-width: 432px; } }
+.langrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 4px;color:var(--tx-2);font-size:14px}.lp-seg{display:flex;padding:3px;border-radius:99px;background:rgba(255,255,255,.07)}.lp-seg button{all:unset;cursor:pointer;padding:7px 12px;border-radius:99px;font:600 13px/1 var(--font);color:var(--tx-2)}.lp-seg button.on{background:var(--tx);color:var(--bg)}
 </style>
 </head>
 <body>
@@ -543,47 +549,65 @@ body.has-dock #smore { padding-bottom: 20px; }
   <button data-act="diario" id="tab-day"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18l5-7 4 4 3-5 6 8z"/><circle cx="17" cy="6" r="2"/></svg>Mi día</button>
 </nav>
 <div class="toast" id="toast" role="status" hidden></div>
+<script>
+/* Textos fijos del HTML en inglés */
+if (EN) (function () {
+  var T = { "Cargando la montaña": "Loading the mountain", "Política de privacidad": "Privacy policy", "Condiciones del servicio": "Terms of service",
+    "Mapa": "Map", "Grupo": "Group", "Aquí": "Here", "Ir hasta": "Go to", "Mi día": "My day",
+    "Buscar o preguntar": "Search or ask", "Buscar en el mapa": "Search the map", "Preguntar a Peter": "Ask Peter", "Filtrar por color": "Filter by colour",
+    "Acercar": "Zoom in", "Alejar": "Zoom out", "Orientar al norte": "Face north", "Sol y sombra": "Sun and shade", "Cambiar entre 3D y plano": "Switch between 3D and flat",
+    "Ver todo el dominio": "See the whole ski area", "Centrar en mí": "Centre on me", "Panel": "Panel", "Subir o bajar el panel": "Raise or lower the panel",
+    "Navegación principal": "Main navigation", "Información legal": "Legal information", "Vallik: mapa en 3D de pistas y remontes de Les 3 Vallées": "Vallik: 3D map of the pistes and lifts of Les 3 Vallées" };
+  var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, k;
+  while ((n = w.nextNode())) { k = n.nodeValue.trim(); if (T[k]) n.nodeValue = n.nodeValue.replace(k, T[k]); }
+  document.querySelectorAll("[aria-label],[placeholder]").forEach(function (el) {
+    ["aria-label", "placeholder"].forEach(function (at) { var v = el.getAttribute(at); if (v && T[v]) el.setAttribute(at, T[v]); });
+  });
+  document.title = "Vallik · Your group's map at the resort";
+})();
+</script>
+
 <div id="modal" class="modal" hidden></div>
 <script>
 (function () {
   "use strict";
   /* ================= Utilidades ================= */
   const TIPOS = {
-    verde: { s: "Verde", p: "Verdes", c: "var(--verde)" },
-    azul: { s: "Azul", p: "Azules", c: "var(--azul)" },
-    roja: { s: "Roja", p: "Rojas", c: "var(--roja)" },
-    negra: { s: "Negra", p: "Negras", c: "var(--negra)" }
+    verde: { s: (EN?"Green":"Verde"), p: (EN?"Greens":"Verdes"), c: "var(--verde)" },
+    azul: { s: (EN?"Blue":"Azul"), p: (EN?"Blues":"Azules"), c: "var(--azul)" },
+    roja: { s: (EN?"Red":"Roja"), p: (EN?"Reds":"Rojas"), c: "var(--roja)" },
+    negra: { s: (EN?"Black":"Negra"), p: (EN?"Blacks":"Negras"), c: "var(--negra)" }
   };
   /* Dificultad en los datos del mapa: v a r n = colores, i = itinerario, e = enlace, s = sin color */
   const DIF = {
-    v: { s: "Verde", p: "Verdes", hex: "#2B8A3E", tipo: "verde" },
-    a: { s: "Azul", p: "Azules", hex: "#1864AB", tipo: "azul" },
-    r: { s: "Roja", p: "Rojas", hex: "#C92A2A", tipo: "roja" },
-    n: { s: "Negra", p: "Negras", hex: "#0B0F14", tipo: "negra" },
-    i: { s: "Itinerario", p: "Itinerarios", hex: "#A15C00" },
-    e: { s: "Enlace", p: "Enlaces", hex: "#7A8894" },
-    s: { s: "Sin color", p: "Sin color", hex: "#7A8894" }
+    v: { s: (EN?"Green":"Verde"), p: (EN?"Greens":"Verdes"), hex: "#2B8A3E", tipo: "verde" },
+    a: { s: (EN?"Blue":"Azul"), p: (EN?"Blues":"Azules"), hex: "#1864AB", tipo: "azul" },
+    r: { s: (EN?"Red":"Roja"), p: (EN?"Reds":"Rojas"), hex: "#C92A2A", tipo: "roja" },
+    n: { s: (EN?"Black":"Negra"), p: (EN?"Blacks":"Negras"), hex: "#0B0F14", tipo: "negra" },
+    i: { s: (EN?"Itinerary":"Itinerario"), p: (EN?"Itineraries":"Itinerarios"), hex: "#A15C00" },
+    e: { s: (EN?"Link":"Enlace"), p: (EN?"Links":"Enlaces"), hex: "#7A8894" },
+    s: { s: (EN?"No colour":"Sin color"), p: (EN?"No colour":"Sin color"), hex: "#7A8894" }
   };
   const LIFT = {
-    tsd: { s: "Telesilla", g: "el telesilla", spd: 4.5 },
-    tc: { s: "Telecabina", g: "la telecabina", spd: 5.5, down: true },
-    tph: { s: "Teleférico", g: "el teleférico", spd: 9, down: true },
-    fun: { s: "Funicular", g: "el funicular", spd: 8, down: true },
-    tk: { s: "Telesquí", g: "el telesquí", spd: 3.2 },
-    tapis: { s: "Cinta", g: "la cinta", spd: 1 }
+    tsd: { s: (EN?"Chairlift":"Telesilla"), g: (EN?"the chairlift":"el telesilla"), spd: 4.5 },
+    tc: { s: (EN?"Gondola":"Telecabina"), g: (EN?"the gondola":"la telecabina"), spd: 5.5, down: true },
+    tph: { s: (EN?"Cable car":"Teleférico"), g: (EN?"the cable car":"el teleférico"), spd: 9, down: true },
+    fun: { s: (EN?"Funicular":"Funicular"), g: (EN?"the funicular":"el funicular"), spd: 8, down: true },
+    tk: { s: (EN?"Drag lift":"Telesquí"), g: (EN?"the drag lift":"el telesquí"), spd: 3.2 },
+    tapis: { s: (EN?"Magic carpet":"Cinta"), g: (EN?"the magic carpet":"la cinta"), spd: 1 }
   };
   const PAL = ["#0C8599", "#D6336C", "#5C940D", "#862E9C", "#495057", "#1971C2", "#C2255C", "#2F9E44"];
   const COLS = ["pistas", "aqui", "perfiles", "quedada", "avisos", "mensajes"];
   /* Avisos tipo Waze en pistas y remontes. Caducan a las 2 h. L / R: para remontes / pistas */
   const AVISOS = {
-    cerrado: { s: "Cerrado", c: "#E03131", t: "#fff", L: 1, R: 1 },
-    cola: { s: "Cola", c: "#FFD23F", t: "#0E2A47", L: 1 },
-    hielo: { s: "Hielo", c: "#A5D8FF", t: "#0E2A47", R: 1 },
-    niebla: { s: "Niebla", c: "#CED4DA", t: "#0E2A47", L: 1, R: 1 }
+    cerrado: { s: (EN?"Closed":"Cerrado"), c: "#E03131", t: "#fff", L: 1, R: 1 },
+    cola: { s: (EN?"Queue":"Cola"), c: "#FFD23F", t: "#0E2A47", L: 1 },
+    hielo: { s: (EN?"Ice":"Hielo"), c: "#A5D8FF", t: "#0E2A47", R: 1 },
+    niebla: { s: (EN?"Fog":"Niebla"), c: "#CED4DA", t: "#0E2A47", L: 1, R: 1 }
   };
   const AVISO_MS = 2 * 3600e3, COLA_S = 600;
   /* Mensajes de un toque. Salen como aviso a los demás si son de hace menos de 10 min (ayuda: 30 min) */
-  const MSGS = { espero: "Os espero aquí", bar: "Bajo al bar", ayuda: "Necesito ayuda", voy: "Voy a ayudar" };
+  const MSGS = { espero: (EN?"I'm waiting here":"Os espero aquí"), bar: (EN?"Heading to the bar":"Bajo al bar"), ayuda: (EN?"I need help":"Necesito ayuda"), voy: (EN?"I'm coming to help":"Voy a ayudar") };
   const MSG_HOME = ["espero", "bar", "ayuda"];
   const MSG_IC = {
     espero: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`,
@@ -597,12 +621,12 @@ body.has-dock #smore { padding-bottom: 20px; }
   const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
   function today() { return new Date().toLocaleDateString("sv-SE"); }
   function shiftDay(d, n) { const x = new Date(d + "T12:00:00"); x.setDate(x.getDate() + n); return x.toLocaleDateString("sv-SE"); }
-  function fmtDay(d) { return new Date(d + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "short" }); }
-  function hhmm(t) { return new Date(t).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }); }
-  function ago(t) { const m = Math.round((Date.now() - t) / 60000); if (m < 1) return "ahora"; if (m < 60) return "hace " + m + " min"; const h = Math.floor(m / 60); if (h < 24) return "hace " + h + " h"; return "el " + fmtDay(new Date(t).toLocaleDateString("sv-SE")); }
+  function fmtDay(d) { return new Date(d + "T12:00:00").toLocaleDateString(EN ? "en-GB" : "es-ES", { weekday: "long", day: "numeric", month: "short" }); }
+  function hhmm(t) { return new Date(t).toLocaleTimeString(EN ? "en-GB" : "es-ES", { hour: "2-digit", minute: "2-digit" }); }
+  function ago(t) { const m = Math.round((Date.now() - t) / 60000); if (m < 1) return EN ? "now" : "ahora"; if (m < 60) return EN ? m + " min ago" : "hace " + m + " min"; const h = Math.floor(m / 60); if (h < 24) return EN ? h + " h ago" : "hace " + h + " h"; return (EN ? "on " : "el ") + fmtDay(new Date(t).toLocaleDateString("sv-SE")); }
   function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
-  const fmtNum = n => Math.round(n).toLocaleString("es-ES");
-  const fmtLen = m => m >= 1000 ? (m / 1000).toLocaleString("es-ES", { maximumFractionDigits: 1 }) + " km" : (Math.round(m / 10) * 10) + " m";
+  const fmtNum = n => Math.round(n).toLocaleString(EN ? "en-GB" : "es-ES");
+  const fmtLen = m => m >= 1000 ? (m / 1000).toLocaleString(EN ? "en-GB" : "es-ES", { maximumFractionDigits: 1 }) + " km" : (Math.round(m / 10) * 10) + " m";
   const cap = s => String(s || "").replace(/^./, m => m.toUpperCase());
   const fmtMin = s => { const m = Math.max(1, Math.round(s / 60)); return m < 60 ? m + " min" : Math.floor(m / 60) + " h " + String(m % 60).padStart(2, "0"); };
 
@@ -614,8 +638,8 @@ body.has-dock #smore { padding-bottom: 20px; }
   const names = {}, pendingNames = new Set(), fresh = new Set();
   let dragging = false;
 
-  function who(uid) { if (uid === me) return "Tú"; const n = names[uid]; return n ? n.split(" ")[0] : "Alguien"; }
-  function initial(uid) { const w = uid === me ? (names[uid] || "Tú") : who(uid); return (w || "?").trim().charAt(0).toUpperCase(); }
+  function who(uid) { if (uid === me) return (EN?"You":"Tú"); const n = names[uid]; return n ? n.split(" ")[0] : (EN?"Someone":"Alguien"); }
+  function initial(uid) { const w = uid === me ? (names[uid] || (EN?"You":"Tú")) : who(uid); return (w || "?").trim().charAt(0).toUpperCase(); }
   function colorOf(uid) {
     if (uid === me) return "#C8F03C";
     return "#F6F8FA";
@@ -771,19 +795,19 @@ body.has-dock #smore { padding-bottom: 20px; }
     try { await fn(); return true; }
     catch (e) {
       const code = e && e.code;
-      if (code === "invalid_argument") { canWrite = false; schedule(); toast("No tienes permiso para guardar. Pide acceso de editor."); }
-      else if (code === "permission-denied") toast("No se pudo guardar: no tienes permiso en este grupo.");
-      else if (code === "resource-exhausted" || code === "quota_exceeded") toast("El grupo ha llegado al límite gratis de hoy. Mañana vuelve a funcionar.");
-      else if (code === "unavailable") toast("Sin cobertura. Se enviará en cuanto haya.");
-      else if (code === "revoked" || code === "unauthenticated") toast("Se perdió el acceso a los datos del grupo.");
-      else toast("No se pudo guardar. Prueba otra vez.");
+      if (code === "invalid_argument") { canWrite = false; schedule(); toast((EN?"You don't have permission to save. Ask for editor access.":"No tienes permiso para guardar. Pide acceso de editor.")); }
+      else if (code === "permission-denied") toast((EN?"Couldn't save: you don't have permission in this group.":"No se pudo guardar: no tienes permiso en este grupo."));
+      else if (code === "resource-exhausted" || code === "quota_exceeded") toast((EN?"The group has hit today's free limit. It will work again tomorrow.":"El grupo ha llegado al límite gratis de hoy. Mañana vuelve a funcionar."));
+      else if (code === "unavailable") toast((EN?"No signal. It will be sent as soon as there is.":"Sin cobertura. Se enviará en cuanto haya."));
+      else if (code === "revoked" || code === "unauthenticated") toast((EN?"Access to the group data was lost.":"Se perdió el acceso a los datos del grupo."));
+      else toast((EN?"Couldn't save. Try again.":"No se pudo guardar. Prueba otra vez."));
       return false;
     }
   }
   function writable() {
     if (mode === "demo") return true;
-    if (mode !== "live") { toast("Todavía no estás conectado al grupo."); return false; }
-    if (!canWrite) { toast("Solo puedes mirar. Pide a quien creó la app acceso de editor."); return false; }
+    if (mode !== "live") { toast((EN?"You're not connected to the group yet.":"Todavía no estás conectado al grupo.")); return false; }
+    if (!canWrite) { toast((EN?"You can only look. Ask whoever made the app for editor access.":"Solo puedes mirar. Pide a quien creó la app acceso de editor.")); return false; }
     return true;
   }
   function put(col, id, data) {
@@ -800,7 +824,7 @@ body.has-dock #smore { padding-bottom: 20px; }
   }
   /* Algo lleva más de 3 s sin enviarse (con buena cobertura se confirma en menos de un segundo) */
   const pendingLong = col => (col ? [PEND[col]] : Object.values(PEND)).some(t => t && Date.now() - t > 3000);
-  const sentMsg = ok => offline ? "Guardado. Se enviará al grupo en cuanto haya cobertura." : ok;
+  const sentMsg = ok => offline ? (EN?"Saved. It will reach the group as soon as there is signal.":"Guardado. Se enviará al grupo en cuanto haya cobertura.") : ok;
   function ensureNames() {
     if (mode !== "live" || !U) return;
     const ids = new Set(); COLS.forEach(c => S[c].forEach(v => v.uid && ids.add(v.uid)));
@@ -857,25 +881,26 @@ body.has-dock #smore { padding-bottom: 20px; }
     const [lon, lat] = toLL(NX[node], NY[node]);
     if (LIVE.on) liveStop(true);   // si te marcas a mano, manda la marca, no el GPS
     const data = { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en, at: Date.now() };
-    return put("aqui", me, data).then(ok => { if (ok) toast(sentMsg("Listo. El grupo te ve " + en)); return ok; });
+    return put("aqui", me, data).then(ok => { if (ok) toast(sentMsg((EN?"Done. The group sees you ":"Listo. El grupo te ve ") + en)); return ok; });
   }
   /* Fuera de pistas: «fuera de pistas, cerca de Val Thorens» (pueblo o cima más cercanos) */
   function describeOff(x, y) {
     let best = null, bd = 6000;
     M.places.forEach(p => { const d = Math.hypot(p[1] - x, p[2] - y); if (d < bd) { bd = d; best = p[0]; } });
     PEAKS.forEach(p => { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p.name; } });
-    return "fuera de pistas" + (best ? ", cerca de " + best : "");
+    return (EN?"off piste":"fuera de pistas") + (best ? (EN?", near ":", cerca de ") + best : "");
   }
   function describeNode(node, fi) {
     let f = fi != null ? F[fi] : null;
     if (!f) { for (const ff of F) if (ff.ns.includes(node)) { f = ff; break; } }
-    if (!f) return "cerca de una pista";
+    if (!f) return (EN?"near a piste":"cerca de una pista");
     const nm = f.name || f.ref;
     if (f.k === "L") {
       const top = node === f.ns[f.ns.length - 1] || Math.abs(NZ[node] - f.zt) < Math.abs(NZ[node] - f.zb);
       const g = (LIFT[f.t] || LIFT.tsd).g.replace(/^el /, "del ").replace(/^la /, "de la ");
-      return (top ? "arriba " : "abajo ") + g + (nm ? " " + nm : "");
+      return (EN ? (top ? "at the top of " : "at the bottom of ") : (top ? "arriba " : "abajo ")) + g + (nm ? " " + nm : "");
     }
+    if (EN) return "on " + (nm ? (f.d === "i" ? "the itinerary " : "the " + DIF[f.d].s.toLowerCase() + " ") + nm : "a " + DIF[f.d].s.toLowerCase() + " piste");
     return "en " + (nm ? (f.d === "i" ? "el itinerario " : "la " + DIF[f.d].s.toLowerCase() + " ") + nm : "una pista " + DIF[f.d].s.toLowerCase());
   }
 
@@ -986,11 +1011,11 @@ body.has-dock #smore { padding-bottom: 20px; }
     if (cl && cl.size) { const r = route(src, dst, noBlack, cl); if (r) { r.ofi = "ok"; return r; } const r2 = route(src, dst, noBlack); if (r2) r2.ofi = "none"; return r2; }
     const r = route(src, dst, noBlack); if (r) r.ofi = cl ? "ok" : "off"; return r;
   }
-  const agoMin = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? "ahora" : m < 60 ? "hace " + m + " min" : "hace " + Math.round(m / 60) + " h"; };
+  const agoMin = t => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? (EN ? "now" : "ahora") : m < 60 ? (EN ? m + " min ago" : "hace " + m + " min") : (EN ? Math.round(m / 60) + " h ago" : "hace " + Math.round(m / 60) + " h"); };
 
   /* ================= Sitios: restaurantes y bares (OpenStreetMap) ================= */
-  const POI_CAT = { c: { s: "Comer", c: "#FFB347" }, b: { s: "Copas", c: "#B197FC" } };
-  const POI_AM = { restaurant: "Restaurante", fast_food: "Comida rápida", cafe: "Café", bar: "Bar", pub: "Pub", biergarten: "Terraza" };
+  const POI_CAT = { c: { s: (EN?"Food":"Comer"), c: "#FFB347" }, b: { s: (EN?"Drinks":"Copas"), c: "#B197FC" } };
+  const POI_AM = { restaurant: (EN?"Restaurant":"Restaurante"), fast_food: (EN?"Fast food":"Comida rápida"), cafe: (EN?"Café":"Café"), bar: (EN?"Bar":"Bar"), pub: (EN?"Pub":"Pub"), biergarten: (EN?"Terrace":"Terraza") };
   let POIS = [], poiSheet = null, POI_SCREEN = [];
   function loadPois() {
     return fetch("pois.json").then(r => r.ok ? r.json() : null).then(D => {
@@ -1000,7 +1025,7 @@ body.has-dock #smore { padding-bottom: 20px; }
   }
   const poiById = id => POIS.find(p => p.id === id);
   function poiNode(p) { if (p.node === undefined) p.node = M.ok ? nearestNode(p.x, p.y, 400) : -1; return p.node; }
-  const poiKind = p => POI_AM[p.am] || (p.cat === "b" ? "Bar" : "Restaurante");
+  const poiKind = p => POI_AM[p.am] || (p.cat === "b" ? (EN?"Bar":"Bar") : (EN?"Restaurant":"Restaurante"));
   const POI_ICON = { c: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>`,
     b: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B197FC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12l-6 8z"/><path d="M12 12v7M8 20h8"/></svg>` };
   /* Tiempos desde un punto a todos los nodos (una sola pasada): para «X min de ti» y para Peter */
@@ -1029,7 +1054,7 @@ body.has-dock #smore { padding-bottom: 20px; }
   const PETER_URL = (window.PISTEA_PETER && window.PISTEA_PETER.url) || "";
   const PETER = { msgs: [], busy: false };
   try { const o = JSON.parse(sessionStorage.getItem("pistea.peter") || "null"); if (o && Array.isArray(o.msgs)) PETER.msgs = o.msgs.slice(-30); } catch (e) {}
-  const PETER_SUG = ["¿Dónde tomamos algo al sol?", "Ruta bonita para esta tarde", "Comer bien en Méribel", "Après-ski cerca"];
+  const PETER_SUG = [(EN?"Where can we get a drink in the sun?":"¿Dónde tomamos algo al sol?"), (EN?"A nice route for this afternoon":"Ruta bonita para esta tarde"), (EN?"Where to eat well in Méribel":"Comer bien en Méribel"), (EN?"Après-ski nearby":"Après-ski cerca")];
   const PETER_AV = `<svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#C8F03C"/><ellipse cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0E2A47"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0E2A47"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0E2A47" stroke-width="1.8" stroke-linecap="round"/></svg>`;
   function peterSave() { try { sessionStorage.setItem("pistea.peter", JSON.stringify({ msgs: PETER.msgs.slice(-30) })); } catch (e) {} }
   /* Lo que Peter necesita saber: dónde estás, la hora, qué hay cerca y qué está cerrado. Nada de nombres del grupo. */
@@ -1043,10 +1068,11 @@ body.has-dock #smore { padding-bottom: 20px; }
     const cerrados = cl ? [...new Set([...cl].map(fi => F[fi].g ? F[fi].g.name : F[fi].name).filter(Boolean))].slice(0, 80) : null;
     const mt = meet();
     return {
+      idioma: EN ? "en" : "es",
       hora: new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Paris", weekday: "long", hour: "2-digit", minute: "2-digit" }).format(new Date()),
-      donde: mp ? (mp.en || "en el mapa") : "sin posición marcada",
+      donde: mp ? (mp.en || (EN?"on the map":"en el mapa")) : (EN?"no position marked":"sin posición marcada"),
       sitios_cerca: near.length ? near : far,
-      estado_oficial: cl ? { actualizado: agoMin(OFI.at), cerrados } : "sin datos (la web oficial solo se lee desde la app)",
+      estado_oficial: cl ? { actualizado: agoMin(OFI.at), cerrados } : (EN?"no data (the official site can only be read from the app)":"sin datos (la web oficial solo se lee desde la app)"),
       quedada: mt ? { donde: mt.en, hora: mt.hora || null } : null,
       avisos_del_grupo: avisos().slice(0, 15).map(a => ({ tipo: a.tipo, donde: a.ref }))
     };
@@ -1066,7 +1092,7 @@ body.has-dock #smore { padding-bottom: 20px; }
       if (!res.ok || !j.text) throw new Error(j.error || ("http " + res.status));
       PETER.msgs.push({ r: "a", t: String(j.text).slice(0, 4000) });
     } catch (e) {
-      PETER.msgs.push({ r: "a", err: 1, t: e.message === "nourl" ? "Todavía no estoy conectado. Falta poner mi clave en el servidor." : navigator.onLine === false ? "Sin cobertura no puedo pensar. Prueba cuando tengas señal." : "Ahora mismo no puedo responder. Prueba en un rato." });
+      PETER.msgs.push({ r: "a", err: 1, t: e.message === "nourl" ? (EN?"I'm not connected yet. My key still needs to be added on the server.":"Todavía no estoy conectado. Falta poner mi clave en el servidor.") : navigator.onLine === false ? (EN?"I can't think without signal. Try again when you have coverage.":"Sin cobertura no puedo pensar. Prueba cuando tengas señal.") : (EN?"I can't answer right now. Try again in a bit.":"Ahora mismo no puedo responder. Prueba en un rato.") });
     }
     PETER.busy = false; peterSave(); peterRender(true);
   }
@@ -1081,15 +1107,15 @@ body.has-dock #smore { padding-bottom: 20px; }
     });
     const seen = new Set();
     return `<div class="msg a${m.err ? " err" : ""}">${txt.trim()}</div>` + cards.filter(c => { const k = c.p ? c.p.id : c.g.key; if (seen.has(k)) return false; seen.add(k); return true; }).map(c => {
-      if (c.p) { const p = c.p, mm = minsTo(poiNode(p)); return `<div class="pcard" style="--c:${POI_CAT[p.cat].c}66"><span class="ic">${POI_ICON[p.cat]}</span><div><b>${esc(p.name)}</b><small>${esc(POI_CAT[p.cat].s)}${p.z ? " · " + fmtNum(p.z) + " m" : ""}${mm ? " · " + mm + " min de ti" : ""}</small></div><button class="btn" data-act="poi-go" data-id="${esc(p.id)}">Ir</button></div>`; }
-      const g = c.g; return `<div class="pcard"><span class="ic">${plate(g.k, g.d)}</span><div><b>${esc(g.name)}</b><small>${g.k === "L" ? (LIFT[g.t] || LIFT.tsd).s : DIF[g.d].s}</small></div><button class="btn" data-act="res-g" data-i="${GROUPS.indexOf(g)}">Ver</button></div>`;
+      if (c.p) { const p = c.p, mm = minsTo(poiNode(p)); return `<div class="pcard" style="--c:${POI_CAT[p.cat].c}66"><span class="ic">${POI_ICON[p.cat]}</span><div><b>${esc(p.name)}</b><small>${esc(POI_CAT[p.cat].s)}${p.z ? " · " + fmtNum(p.z) + " m" : ""}${mm ? " · " + mm + (EN?" min from you":" min de ti") : ""}</small></div><button class="btn" data-act="poi-go" data-id="${esc(p.id)}">${EN ? "Go" : "Ir"}</button></div>`; }
+      const g = c.g; return `<div class="pcard"><span class="ic">${plate(g.k, g.d)}</span><div><b>${esc(g.name)}</b><small>${g.k === "L" ? (LIFT[g.t] || LIFT.tsd).s : DIF[g.d].s}</small></div><button class="btn" data-act="res-g" data-i="${GROUPS.indexOf(g)}${EN?`">View</button></div>`:`">Ver</button></div>`}`;
     }).join("");
   }
   function peterRender(scroll) {
     const el = $("#peter"); if (!el || el.hidden) return;
     const log = el.querySelector(".plog");
-    log.innerHTML = (PETER.msgs.length ? "" : `<div class="msg a">Hola, soy Peter. Te digo dónde comer, dónde tomar algo y qué rutas hacer por Les 3 Vallées, contando con dónde estás y lo que está abierto.</div>`)
-      + PETER.msgs.map(peterMsgHtml).join("") + (PETER.busy ? `<div class="msg a typing">Peter está pensando…</div>` : "");
+    log.innerHTML = (PETER.msgs.length ? "" : `${EN?`<div class="msg a">Hi, I'm Peter. I'll tell you where to eat, where to grab a drink and which routes to ski around Les 3 Vallées, based on where you are and what's open.</div>`:`<div class="msg a">Hola, soy Peter. Te digo dónde comer, dónde tomar algo y qué rutas hacer por Les 3 Vallées, contando con dónde estás y lo que está abierto.</div>`}`)
+      + PETER.msgs.map(peterMsgHtml).join("") + (PETER.busy ? `${EN?`<div class="msg a typing">Peter is thinking…</div>`:`<div class="msg a typing">Peter está pensando…</div>`}` : "");
     el.querySelector(".psug").hidden = PETER.msgs.length > 2;
     el.querySelector("form .btn").disabled = PETER.busy;
     if (scroll) log.scrollTop = log.scrollHeight;
@@ -1099,11 +1125,15 @@ body.has-dock #smore { padding-bottom: 20px; }
     if (!el) {
       el = document.createElement("div"); el.id = "peter"; el.className = "peter";
       el.innerHTML = `<div class="pbox" role="dialog" aria-labelledby="peter-t">
-        <div class="phead"><span class="pav">${PETER_AV}</span><div><h2 id="peter-t">Peter</h2><small>Tu guía de Les 3 Vallées</small></div><button class="x" data-act="peter-close" aria-label="Cerrar">×</button></div>
+        <div class="phead"><span class="pav">${PETER_AV}${EN?`</span><div><h2 id="peter-t">Peter</h2><small>Your Les 3 Vallées guide</small></div><button class="x" data-act="peter-close" aria-label="Close">×</button></div>
         <div class="plog" aria-live="polite"></div>
-        <div class="psug">${PETER_SUG.map(t => `<button class="btn ghost" data-act="peter-sug">${esc(t)}</button>`).join("")}</div>
+        <div class="psug">`:`</span><div><h2 id="peter-t">Peter</h2><small>Tu guía de Les 3 Vallées</small></div><button class="x" data-act="peter-close" aria-label="Cerrar">×</button></div>
+        <div class="plog" aria-live="polite"></div>
+        <div class="psug">`}${PETER_SUG.map(t => `<button class="btn ghost" data-act="peter-sug">${esc(t)}</button>`).join("")}${EN?`</div>
+        <form><input name="t" placeholder="Ask Peter…" autocomplete="off" enterkeyhint="send" aria-label="Write to Peter" maxlength="600"><button class="btn" type="submit" aria-label="Send"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+      </div>`:`</div>
         <form><input name="t" placeholder="Pregúntale a Peter…" autocomplete="off" enterkeyhint="send" aria-label="Escribe a Peter" maxlength="600"><button class="btn" type="submit" aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
-      </div>`;
+      </div>`}`;
       document.body.appendChild(el);
       el.querySelector("form").addEventListener("submit", ev => { ev.preventDefault(); const i = ev.target.t; const v = i.value; i.value = ""; peterAsk(v); });
       el.addEventListener("click", ev => { if (ev.target === el) peterClose(); });
@@ -1117,7 +1147,7 @@ body.has-dock #smore { padding-bottom: 20px; }
     let seen = false; try { seen = localStorage.getItem("pistea.peterhi") === "1"; } catch (e) {}
     if (seen || $("#peterhi")) return;
     const b = document.createElement("button"); b.id = "peterhi"; b.className = "peterhi"; b.dataset.act = "peter";
-    b.innerHTML = `<b>Hola, soy Peter</b>Pregúntame dónde comer, dónde tomar algo o qué ruta hacer por Les 3 Vallées.`;
+    b.innerHTML = `${EN?`<b>Hi, I'm Peter</b>Ask me where to eat, where to grab a drink or which route to ski around Les 3 Vallées.`:`<b>Hola, soy Peter</b>Pregúntame dónde comer, dónde tomar algo o qué ruta hacer por Les 3 Vallées.`}`;
     const tb = $("#topbar"); b.style.top = ((tb ? tb.offsetTop + tb.offsetHeight : topInset() + 60) + 6) + "px"; document.body.appendChild(b);
     setTimeout(() => { b.remove(); try { localStorage.setItem("pistea.peterhi", "1"); } catch (e) {} }, 9000);
   }
@@ -1146,7 +1176,7 @@ body.has-dock #smore { padding-bottom: 20px; }
       const r = routeBest(p.near, mt.near, false); return { p, t: r ? r.time : null };
     }).sort((a, b) => (a.t == null ? 1e9 : a.t) - (b.t == null ? 1e9 : b.t));
   }
-  const etaTxt = t => t == null ? "sin ruta" : t < 60 ? "ya está" : fmtMin(t);
+  const etaTxt = t => t == null ? (EN?"no route":"sin ruta") : t < 60 ? (EN?"you're there":"ya está") : fmtMin(t);
   function canEditMeet(mt) { const G = window.PISTEA_GROUP; return !mt || mt.uid === me || mode === "demo" || !!(G && G.isOwner); }
   /* Avisos nuevos de los demás (mensajes y quedada) que salen arriba */
   const SEEN = new Set((() => { try { return JSON.parse(localStorage.getItem("pistea.vistos") || "[]"); } catch (e) { return []; } })());
@@ -1164,10 +1194,10 @@ body.has-dock #smore { padding-bottom: 20px; }
     return out.sort((a, b) => (b.help ? 1 : 0) - (a.help ? 1 : 0) || (b.m || b.q).at - (a.m || a.q).at).slice(0, 2);
   }
   function bannerHtml(b) {
-    const x = `<button class="x" data-act="banner-x" data-k="${esc(b.k)}" aria-label="Cerrar aviso">×</button>`;
-    if (b.q) return `<div class="banner" role="status"><span class="flag" aria-hidden="true"></span><div><b>${esc(who(b.q.uid))} propone quedar${b.q.hora ? " a las " + esc(b.q.hora) : ""}</b><small>${esc(cap(b.q.en))}</small></div><button class="btn go" data-act="banner-meet" data-k="${esc(b.k)}">Ver</button>${x}</div>`;
+    const x = `<button class="x" data-act="banner-x" data-k="${esc(b.k)}${EN?`" aria-label="Close alert">×</button>`:`" aria-label="Cerrar aviso">×</button>`}`;
+    if (b.q) return `<div class="banner" role="status"><span class="flag" aria-hidden="true"></span><div><b>${esc(who(b.q.uid))}${EN?` suggests meeting up`:` propone quedar`}${b.q.hora ? (EN?" at ":" a las ") + esc(b.q.hora) : ""}</b><small>${esc(cap(b.q.en))}</small></div><button class="btn go" data-act="banner-meet" data-k="${esc(b.k)}${EN?`">View</button>`:`">Ver</button>`}${x}</div>`;
     const m = b.m;
-    return `<div class="banner${b.help ? " help" : ""}" role="${b.help ? "alert" : "status"}">${av(m.uid)}<div><b>${esc(who(m.uid))}${b.help ? " necesita ayuda" : ": «" + esc(MSGS[m.tipo]) + "»"}</b><small>${m.en ? esc(m.en) + " · " : ""}${esc(ago(m.at))}</small></div>${b.help || m.tipo === "espero" ? `<button class="btn go" data-act="banner-go" data-uid="${esc(m.uid)}" data-k="${esc(b.k)}">Ir</button>` : ""}${x}</div>`;
+    return `<div class="banner${b.help ? " help" : ""}" role="${b.help ? "alert" : "status"}">${av(m.uid)}<div><b>${esc(who(m.uid))}${b.help ? (EN?" needs help":" necesita ayuda") : ": «" + esc(MSGS[m.tipo]) + "»"}</b><small>${m.en ? esc(m.en) + " · " : ""}${esc(ago(m.at))}</small></div>${b.help || m.tipo === "espero" ? `<button class="btn go" data-act="banner-go" data-uid="${esc(m.uid)}" data-k="${esc(b.k)}">${EN ? "Go" : "Ir"}</button>` : ""}${x}</div>`;
   }
   const msgOf = uid => { const m = S.mensajes.get(uid); return m && MSGS[m.tipo] && Date.now() - m.at < HIDE_MS ? m : null; };
 
@@ -1802,7 +1832,7 @@ body.has-dock #smore { padding-bottom: 20px; }
       ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X, Y - 36); ctx.lineCap = "round"; ctx.lineWidth = 5; ctx.strokeStyle = "#fff"; ctx.stroke(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#0E2A47"; ctx.stroke();
       ctx.beginPath(); ctx.moveTo(X + 1, Y - 36); ctx.lineTo(X + 26, Y - 36); ctx.lineTo(X + 19, Y - 28.5); ctx.lineTo(X + 26, Y - 21); ctx.lineTo(X + 1, Y - 21); ctx.closePath();
       ctx.fillStyle = "#FFD23F"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#0E2A47"; ctx.stroke();
-      const t = mt.hora || "Quedada"; ctx.font = `700 13px "Geist", sans-serif`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      const t = mt.hora || (EN?"Meet-up":"Quedada"); ctx.font = `700 13px "Geist", sans-serif`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
       ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X + 30, Y - 28.5); ctx.fillStyle = "#0E2A47"; ctx.fillText(t, X + 30, Y - 28.5);
     }
 
@@ -1822,7 +1852,7 @@ body.has-dock #smore { padding-bottom: 20px; }
       ctx.beginPath(); ctx.arc(X, Y - 24, 14.5, 0, 7); ctx.fillStyle = "#fff"; ctx.fill();
       ctx.beginPath(); ctx.arc(X, Y - 24, 12.5, 0, 7); ctx.fillStyle = c; ctx.fill();
       ctx.font = `600 16px "Geist", sans-serif`; ctx.fillStyle = "#0E2A47"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(p.uid === me ? "Tú" : initial(p.uid), X, Y - 23);
+      ctx.fillText(p.uid === me ? (EN?"You":"Tú") : initial(p.uid), X, Y - 23);
       if (p.uid !== me) {
         ctx.font = `600 13px "Geist", sans-serif`; const t = who(p.uid);
         ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X, Y + 9); ctx.fillStyle = "#0E2A47"; ctx.fillText(t, X, Y + 9);
@@ -1909,7 +1939,7 @@ body.has-dock #smore { padding-bottom: 20px; }
       const p = pick(X, Y);
       let node = p && p.f ? p.node : -1;
       if (node < 0) { const g = ground(X, Y); if (g) node = nearestNode(g.x, g.y, 40 / V.s); }
-      if (node < 0 || node == null) { toast("Toca sobre una pista o un remonte."); return; }
+      if (node < 0 || node == null) { toast((EN?"Tap a piste or a lift.":"Toca sobre una pista o un remonte.")); return; }
       marking = false;
       setMyPos(node, describeNode(node, p && p.f ? p.f.fi : null)).then(() => { if (rt) recalc(true); });
       updateMapUI(); return;
@@ -2068,11 +2098,11 @@ body.has-dock #smore { padding-bottom: 20px; }
       GL.mesh.material = GL.flatMat; r.shadowMap.enabled = false; GL.light.visible = false; GL.amb.visible = false; GL.flatMat.needsUpdate = true;
     }
   }
-  const DIRS = ["el norte", "el noreste", "el este", "el sureste", "el sur", "el suroeste", "el oeste", "el noroeste"];
+  const DIRS = [(EN?"the north":"el norte"), (EN?"the north-east":"el noreste"), (EN?"the east":"el este"), (EN?"the south-east":"el sureste"), (EN?"the south":"el sur"), (EN?"the south-west":"el suroeste"), (EN?"the west":"el oeste"), (EN?"the north-west":"el noroeste")];
   function sunInfo() {
     if (!SUN) return "";
-    if (SUN.el <= 0.01) return "El sol está bajo el horizonte a esa hora.";
-    return `Sol a ${Math.round(SUN.el * 180 / Math.PI)}° sobre el horizonte, desde ${DIRS[Math.round(SUN.az / (Math.PI / 4)) % 8]}`;
+    if (SUN.el <= 0.01) return (EN?"The sun is below the horizon at that time.":"El sol está bajo el horizonte a esa hora.");
+    return `${EN?`Sun at `:`Sol a `}${Math.round(SUN.el * 180 / Math.PI)}${EN?`° above the horizon, from `:`° sobre el horizonte, desde `}${DIRS[Math.round(SUN.az / (Math.PI / 4)) % 8]}`;
   }
   const hm = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
   function sunListHtml() {
@@ -2080,16 +2110,22 @@ body.has-dock #smore { padding-bottom: 20px; }
     const sunny = runs.filter(g => g.sun >= 0.6).sort((a, b) => b.len - a.len);
     const pct = runs.length ? Math.round(sunny.length / runs.length * 100) : 0;
     const zoneStat = ZONES.map(z => { const c = zoneCenter(z); if (!c) return ""; const rs = runs.filter(g => { const f = F[g.fis[0]]; return Math.hypot((f.bb[0] + f.bb[2]) / 2 - c.x, (f.bb[1] + f.bb[3]) / 2 - c.y) < 5000; }); const p = rs.length ? Math.round(rs.filter(g => g.sun >= 0.6).length / rs.length * 100) : 0; return `<li><span>${esc(z.n)}</span><i style="width:${p}%"></i><b>${p}%</b></li>`; }).join("");
-    return `<p class="quiet" id="sunsum"><b>${pct}%</b> de las pistas con nombre están al sol a las ${hm(sunMin)}.</p>
-      <h3 class="sec">Sol por zona</h3><ul class="zonesun">${zoneStat}</ul>
+    return `<p class="quiet" id="sunsum"><b>${pct}${EN?`%</b> of named pistes are in the sun at `:`%</b> de las pistas con nombre están al sol a las `}${hm(sunMin)}${EN?`.</p>
+      <h3 class="sec">Sun by area</h3><ul class="zonesun">`:`.</p>
+      <h3 class="sec">Sol por zona</h3><ul class="zonesun">`}${zoneStat}${EN?`</ul>
+      <h3 class="sec">Pistes in the sun</h3>
+      <ul class="sunlist">`:`</ul>
       <h3 class="sec">Pistas al sol</h3>
-      <ul class="sunlist">${sunny.slice(0, 40).map(g => `<li><button data-act="res-g" data-i="${GROUPS.indexOf(g)}">${plate("R", g.d)}<span><b>${esc(g.name)}</b><small>${fmtLen(g.len)} · ${Math.round(g.sun * 100)}% al sol</small></span></button></li>`).join("") || `<li class="quiet">Ninguna a esa hora.</li>`}</ul>`;
+      <ul class="sunlist">`}${sunny.slice(0, 40).map(g => `<li><button data-act="res-g" data-i="${GROUPS.indexOf(g)}">${plate("R", g.d)}<span><b>${esc(g.name)}</b><small>${fmtLen(g.len)} · ${Math.round(g.sun * 100)}${EN?`% in the sun</small></span></button></li>`:`% al sol</small></span></button></li>`}`).join("") || `${EN?`<li class="quiet">None at that time.</li>`:`<li class="quiet">Ninguna a esa hora.</li>`}`}</ul>`;
   }
   function sunHtml() {
-    const speek = `
-      <div class="headrow"><div><small class="kicker">Sol y sombra</small><h2 class="title" id="suntime">${hm(sunMin)}</h2><small class="sub" id="suninfo">${esc(sunInfo())}</small></div><button class="x" data-act="sun-close" aria-label="Cerrar sol y sombra">×</button></div>
-      <input type="range" class="range" id="sunrange" min="480" max="1080" step="15" value="${sunMin}" aria-label="Hora del día">
-      <div class="rangelbl"><span>08:00</span><button class="link" data-act="sun-now">Ahora</button><span>18:00</span></div>`;
+    const speek = `${EN?`
+      <div class="headrow"><div><small class="kicker">Sun and shade</small><h2 class="title" id="suntime">`:`
+      <div class="headrow"><div><small class="kicker">Sol y sombra</small><h2 class="title" id="suntime">`}${hm(sunMin)}</h2><small class="sub" id="suninfo">${esc(sunInfo())}${EN?`</small></div><button class="x" data-act="sun-close" aria-label="Close sun and shade">×</button></div>
+      <input type="range" class="range" id="sunrange" min="480" max="1080" step="15" value="`:`</small></div><button class="x" data-act="sun-close" aria-label="Cerrar sol y sombra">×</button></div>
+      <input type="range" class="range" id="sunrange" min="480" max="1080" step="15" value="`}${sunMin}${EN?`" aria-label="Time of day">
+      <div class="rangelbl"><span>08:00</span><button class="link" data-act="sun-now">Now</button><span>18:00</span></div>`:`" aria-label="Hora del día">
+      <div class="rangelbl"><span>08:00</span><button class="link" data-act="sun-now">Ahora</button><span>18:00</span></div>`}`;
     return { speek, smore: `<div id="sunmore">${sunListHtml()}</div>` };
   }
   function updateSunText() {
@@ -2121,17 +2157,18 @@ body.has-dock #smore { padding-bottom: 20px; }
       segs += `<polyline points="${ps.map(p => X(p.d).toFixed(1) + "," + Y(p.z).toFixed(1)).join(" ")}" fill="none" stroke="${col}" stroke-width="${k === rt.cur ? 4.5 : 2.5}" stroke-linecap="round" stroke-linejoin="round" opacity="${k === rt.cur || rt.cur >= rt.res.steps.length ? 1 : 0.55}"${dsh}/>`;
     });
     const area = `<polygon points="${X(0)},${H - 18} ${pts.map(p => X(p.d).toFixed(1) + "," + Y(p.z).toFixed(1)).join(" ")} ${X(dist)},${H - 18}" fill="rgba(255,255,255,.06)"/>`;
-    return `<figure class="profile"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Perfil de altitud de la ruta">${area}${segs}
+    return `<figure class="profile"><svg viewBox="0 0 ${W} ${H}${EN?`" role="img" aria-label="Route altitude profile">`:`" role="img" aria-label="Perfil de altitud de la ruta">`}${area}${segs}
       <text x="2" y="${Y(z1 - 40) + 4}" class="pt">${fmtNum(z1 - 40)}</text><text x="2" y="${Y(z0 + 40) + 4}" class="pt">${fmtNum(z0 + 40)}</text>
-      <text x="${W - 4}" y="${H - 3}" class="pt" text-anchor="end">${fmtLen(dist)}</text></svg>
-      <figcaption>Subes ${fmtNum(up)} m en remontes y bajas ${fmtNum(down)} m esquiando</figcaption></figure>`;
+      <text x="${W - 4}" y="${H - 3}" class="pt" text-anchor="end">${fmtLen(dist)}${EN?`</text></svg>
+      <figcaption>You ride up `:`</text></svg>
+      <figcaption>Subes `}${fmtNum(up)}${EN?` m on lifts and go down `:` m en remontes y bajas `}${fmtNum(down)} m esquiando</figcaption></figure>`;
   }
 
   /* --- Tarjeta del día --- */
   const LOGO_DARK = "data:image/svg+xml;base64," + "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MzkiIGhlaWdodD0iMTgxIiB2aWV3Qm94PSIwIDAgODM4LjcxIDE4MC44MCI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTQ0LjQwIC01LjAyKSBzY2FsZSgwLjgyMjIpIj48ZGVmcz48Y2xpcFBhdGggaWQ9InBjIj48cGF0aCBkPSJNMTI4IDIyNiBDMTE0IDIwNCA1NCAxNjYgNTQgMTAyIEE3NCA3NCAwIDEgMSAyMDIgMTAyIEMyMDIgMTY2IDE0MiAyMDQgMTI4IDIyNiBaIi8+PC9jbGlwUGF0aD48L2RlZnM+CjxwYXRoIGQ9Ik0xMjggMjI2IEMxMTQgMjA0IDU0IDE2NiA1NCAxMDIgQTc0IDc0IDAgMSAxIDIwMiAxMDIgQzIwMiAxNjYgMTQyIDIwNCAxMjggMjI2IFoiIGZpbGw9IiM1QkU3RjIiLz4KPHJlY3QgeD0iNDAiIHk9IjkzIiB3aWR0aD0iMTc2IiBoZWlnaHQ9IjE4IiBmaWxsPSIjMEExNjIwIiBjbGlwLXBhdGg9InVybCgjcGMpIi8+CjxyZWN0IHg9IjcyIiB5PSI3MiIgd2lkdGg9IjExMiIgaGVpZ2h0PSI2MCIgcng9IjMwIiBmaWxsPSIjMEExNjIwIi8+CjxwYXRoIGQ9Ik05MiAxMjAgTDExMyA5OCBMMTI0IDEwOSBMMTQxIDkwIEwxNjQgMTIwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1QkU3RjIiIHN0cm9rZS13aWR0aD0iOSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9nPjxwYXRoIGQ9Ik0xNzEuNzI4ODg4ODg4ODg4OSA0My4ySDIwNS4xMjg4ODg4ODg4ODg5TDIwNS41Mjg4ODg4ODg4ODg5IDU5LjBRMjEwLjEyODg4ODg4ODg4ODkgNTAuMiAyMTguMzI4ODg4ODg4ODg4OSA0NS41MDAwMDAwMDAwMDAwMVEyMjYuNTI4ODg4ODg4ODg4OSA0MC44MDAwMDAwMDAwMDAwMSAyMzcuMTI4ODg4ODg4ODg4OTIgNDAuODAwMDAwMDAwMDAwMDFRMjUxLjMyODg4ODg4ODg4ODkgNDAuODAwMDAwMDAwMDAwMDEgMjYxLjUyODg4ODg4ODg4ODkgNDguMDAwMDAwMDAwMDAwMDFRMjcxLjcyODg4ODg4ODg4ODkgNTUuMiAyNzYuOTI4ODg4ODg4ODg4OSA2OC4wUTI4Mi4xMjg4ODg4ODg4ODg5IDgwLjgwMDAwMDAwMDAwMDAxIDI4Mi4xMjg4ODg4ODg4ODg5IDk3LjBRMjgyLjEyODg4ODg4ODg4ODkgMTEzLjIwMDAwMDAwMDAwMDAyIDI3Ni44Mjg4ODg4ODg4ODg5IDEyNi4wMDAwMDAwMDAwMDAwMVEyNzEuNTI4ODg4ODg4ODg4OSAxMzguOCAyNjEuMzI4ODg4ODg4ODg4OSAxNDYuMFEyNTEuMTI4ODg4ODg4ODg4OTIgMTUzLjIwMDAwMDAwMDAwMDAyIDIzNi43Mjg4ODg4ODg4ODg5IDE1My4yMDAwMDAwMDAwMDAwMlEyMjYuOTI4ODg4ODg4ODg4OSAxNTMuMjAwMDAwMDAwMDAwMDIgMjE4LjgyODg4ODg4ODg4ODkgMTQ4LjVRMjEwLjcyODg4ODg4ODg4ODkgMTQzLjggMjA2LjEyODg4ODg4ODg4ODkgMTM1LjYwMDAwMDAwMDAwMDAyVjE4MC44SDE3MS43Mjg4ODg4ODg4ODg5Wk0yNDYuNzI4ODg4ODg4ODg4OSA5Ny4wUTI0Ni43Mjg4ODg4ODg4ODg5IDgyLjgwMDAwMDAwMDAwMDAxIDI0MS4yMjg4ODg4ODg4ODg5IDc0LjVRMjM1LjcyODg4ODg4ODg4ODkgNjYuMiAyMjYuMzI4ODg4ODg4ODg4OSA2Ni4yUTIxNi43Mjg4ODg4ODg4ODg5IDY2LjIgMjExLjQyODg4ODg4ODg4ODg4IDc0LjEwMDAwMDAwMDAwMDAxUTIwNi4xMjg4ODg4ODg4ODg5IDgyLjAwMDAwMDAwMDAwMDAxIDIwNi4xMjg4ODg4ODg4ODg5IDk3LjBRMjA2LjEyODg4ODg4ODg4ODkgMTEyLjAgMjExLjQyODg4ODg4ODg4ODg4IDExOS45UTIxNi43Mjg4ODg4ODg4ODg5IDEyNy44MDAwMDAwMDAwMDAwMSAyMjYuMzI4ODg4ODg4ODg4OSAxMjcuODAwMDAwMDAwMDAwMDFRMjM1LjcyODg4ODg4ODg4ODkgMTI3LjgwMDAwMDAwMDAwMDAxIDI0MS4yMjg4ODg4ODg4ODg5IDExOS41MDAwMDAwMDAwMDAwMVEyNDYuNzI4ODg4ODg4ODg4OSAxMTEuMjAwMDAwMDAwMDAwMDIgMjQ2LjcyODg4ODg4ODg4ODkgOTcuMFpNNDA1LjEwNzM0MTMzNTY5MzY2IDExNy4wIDQzOS43MDczNDEzMzU2OTM3IDExNS44MDAwMDAwMDAwMDAwMVE0NDEuMTA3MzQxMzM1NjkzNjYgMTIzLjAwMDAwMDAwMDAwMDAxIDQ0NS43MDczNDEzMzU2OTM2IDEyNi42MDAwMDAwMDAwMDAwMlE0NTAuMzA3MzQxMzM1NjkzNjUgMTMwLjIwMDAwMDAwMDAwMDAyIDQ1OC43MDczNDEzMzU2OTM3IDEzMC4yMDAwMDAwMDAwMDAwMlE0NzMuMzA3MzQxMzM1NjkzNjUgMTMwLjIwMDAwMDAwMDAwMDAyIDQ3My4zMDczNDEzMzU2OTM2NSAxMjEuMDAwMDAwMDAwMDAwMDFRNDczLjMwNzM0MTMzNTY5MzY1IDExNi4yMDAwMDAwMDAwMDAwMiA0NjkuNDA3MzQxMzM1NjkzNyAxMTMuNzAwMDAwMDAwMDAwMDJRNDY1LjUwNzM0MTMzNTY5MzcgMTExLjIwMDAwMDAwMDAwMDAyIDQ1My41MDczNDEzMzU2OTM3IDEwOS4yMDAwMDAwMDAwMDAwMlE0MzUuNzA3MzQxMzM1NjkzNyAxMDYuNCA0MjUuOTA3MzQxMzM1NjkzNyAxMDIuMzAwMDAwMDAwMDAwMDFRNDE2LjEwNzM0MTMzNTY5MzY2IDk4LjIwMDAwMDAwMDAwMDAyIDQxMS45MDczNDEzMzU2OTM3IDkyLjAwMDAwMDAwMDAwMDAxUTQwNy43MDczNDEzMzU2OTM3IDg1LjgwMDAwMDAwMDAwMDAxIDQwNy43MDczNDEzMzU2OTM3IDc1LjgwMDAwMDAwMDAwMDAxUTQwNy43MDczNDEzMzU2OTM3IDU5LjYwMDAwMDAwMDAwMDAxIDQyMC41MDczNDEzMzU2OTM3IDUwLjIwMDAwMDAwMDAwMDAxUTQzMy4zMDczNDEzMzU2OTM2NSA0MC44MDAwMDAwMDAwMDAwMSA0NTcuOTA3MzQxMzM1NjkzNyA0MC44MDAwMDAwMDAwMDAwMVE0ODAuOTA3MzQxMzM1NjkzNyA0MC44MDAwMDAwMDAwMDAwMSA0OTMuNjA3MzQxMzM1NjkzNjYgNTAuOTAwMDAwMDAwMDAwMDA2UTUwNi4zMDczNDEzMzU2OTM2NSA2MS4wIDUwOC4zMDczNDEzMzU2OTM2NSA3OC42MDAwMDAwMDAwMDAwMUw0NzQuMTA3MzQxMzM1NjkzNjYgNzkuODAwMDAwMDAwMDAwMDFRNDczLjEwNzM0MTMzNTY5MzY2IDcyLjIgNDY4LjgwNzM0MTMzNTY5MzY1IDY4LjBRNDY0LjUwNzM0MTMzNTY5MzcgNjMuODAwMDAwMDAwMDAwMDEgNDU3LjUwNzM0MTMzNTY5MzcgNjMuODAwMDAwMDAwMDAwMDFRNDUwLjcwNzM0MTMzNTY5MzcgNjMuODAwMDAwMDAwMDAwMDEgNDQ2LjkwNzM0MTMzNTY5MzcgNjYuNzAwMDAwMDAwMDAwMDJRNDQzLjEwNzM0MTMzNTY5MzY2IDY5LjYwMDAwMDAwMDAwMDAxIDQ0My4xMDczNDEzMzU2OTM2NiA3NC42MDAwMDAwMDAwMDAwMVE0NDMuMTA3MzQxMzM1NjkzNjYgNzkuODAwMDAwMDAwMDAwMDEgNDQ3LjAwNzM0MTMzNTY5MzcgODIuMzAwMDAwMDAwMDAwMDFRNDUwLjkwNzM0MTMzNTY5MzcgODQuODAwMDAwMDAwMDAwMDEgNDYxLjEwNzM0MTMzNTY5MzY2IDg2LjRRNDg2LjkwNzM0MTMzNTY5MzcgOTAuMCA0OTcuODA3MzQxMzM1NjkzNjUgOTcuOVE1MDguNzA3MzQxMzM1NjkzNyAxMDUuODAwMDAwMDAwMDAwMDEgNTA4LjcwNzM0MTMzNTY5MzcgMTIwLjIwMDAwMDAwMDAwMDAyUTUwOC43MDczNDEzMzU2OTM3IDEzNi4wIDQ5NS40MDczNDEzMzU2OTM3IDE0NC42MDAwMDAwMDAwMDAwMlE0ODIuMTA3MzQxMzM1NjkzNjYgMTUzLjIwMDAwMDAwMDAwMDAyIDQ1OC41MDczNDEzMzU2OTM3IDE1My4yMDAwMDAwMDAwMDAwMlE0MzMuMzA3MzQxMzM1NjkzNjUgMTUzLjIwMDAwMDAwMDAwMDAyIDQxOS44MDczNDEzMzU2OTM2NSAxNDMuM1E0MDYuMzA3MzQxMzM1NjkzNjUgMTMzLjQgNDA1LjEwNzM0MTMzNTY5MzY2IDExNy4wWk01MzYuMTA3MzQxMzM1NjkzNyAxMTYuODAwMDAwMDAwMDAwMDFWNjguMEg1MTguMzA3MzQxMzM1NjkzNlY0My4ySDUzNi4xMDczNDEzMzU2OTM3VjE4LjBINTcwLjUwNzM0MTMzNTY5MzdWNDMuMkg1OTguNzA3MzQxMzM1NjkzNlY2OC4wSDU3MC41MDczNDEzMzU2OTM3VjExMi40UTU3MC41MDczNDEzMzU2OTM3IDEyMC4wMDAwMDAwMDAwMDAwMSA1NzMuNzA3MzQxMzM1NjkzNiAxMjMuMDAwMDAwMDAwMDAwMDFRNTc2LjkwNzM0MTMzNTY5MzcgMTI2LjAwMDAwMDAwMDAwMDAxIDU4My45MDczNDEzMzU2OTM3IDEyNi4wMDAwMDAwMDAwMDAwMUg1OTguNzA3MzQxMzM1NjkzNlYxNTAuOEg1NjkuNzA3MzQxMzM1NjkzNlE1NTIuMzA3MzQxMzM1NjkzNiAxNTAuOCA1NDQuMjA3MzQxMzM1NjkzNiAxNDIuNjAwMDAwMDAwMDAwMDJRNTM2LjEwNzM0MTMzNTY5MzcgMTM0LjQgNTM2LjEwNzM0MTMzNTY5MzcgMTE2LjgwMDAwMDAwMDAwMDAxWk02MDYuMzA3MzQxMzM1NjkzOCA5Ny4wUTYwNi4zMDczNDEzMzU2OTM4IDgwLjIgNjEzLjIwNzM0MTMzNTY5MzcgNjcuNVE2MjAuMTA3MzQxMzM1NjkzNyA1NC44MDAwMDAwMDAwMDAwMSA2MzIuNzA3MzQxMzM1NjkzNyA0Ny44MDAwMDAwMDAwMDAwMVE2NDUuMzA3MzQxMzM1NjkzOCA0MC44MDAwMDAwMDAwMDAwMSA2NjIuMTA3MzQxMzM1NjkzNyA0MC44MDAwMDAwMDAwMDAwMVE2NzguNzA3MzQxMzM1NjkzNyA0MC44MDAwMDAwMDAwMDAwMSA2OTEuMDA3MzQxMzM1NjkzOCA0Ny45MDAwMDAwMDAwMDAwMDZRNzAzLjMwNzM0MTMzNTY5MzggNTUuMCA3MDkuOTA3MzQxMzM1NjkzNyA2OC4zMDAwMDAwMDAwMDAwMVE3MTYuNTA3MzQxMzM1NjkzNyA4MS42MDAwMDAwMDAwMDAwMSA3MTYuNTA3MzQxMzM1NjkzNyA5OS42MDAwMDAwMDAwMDAwMVYxMDYuMEg2NDEuNzA3MzQxMzM1NjkzN1E2NDIuMTA3MzQxMzM1NjkzNyAxMTcuMCA2NDcuNzA3MzQxMzM1NjkzNyAxMjIuNjAwMDAwMDAwMDAwMDFRNjUzLjMwNzM0MTMzNTY5MzggMTI4LjIwMDAwMDAwMDAwMDAyIDY2Mi45MDczNDEzMzU2OTM3IDEyOC4yMDAwMDAwMDAwMDAwMlE2NzcuMTA3MzQxMzM1NjkzNyAxMjguMjAwMDAwMDAwMDAwMDIgNjgwLjcwNzM0MTMzNTY5MzcgMTE2LjYwMDAwMDAwMDAwMDAxTDcxNS4xMDczNDEzMzU2OTM3IDExOC42MDAwMDAwMDAwMDAwMVE3MTAuNzA3MzQxMzM1NjkzNyAxMzUuMjAwMDAwMDAwMDAwMDIgNjk2LjcwNzM0MTMzNTY5MzcgMTQ0LjIwMDAwMDAwMDAwMDAyUTY4Mi43MDczNDEzMzU2OTM3IDE1My4yMDAwMDAwMDAwMDAwMiA2NjIuMzA3MzQxMzM1NjkzOCAxNTMuMjAwMDAwMDAwMDAwMDJRNjQ1LjUwNzM0MTMzNTY5MzcgMTUzLjIwMDAwMDAwMDAwMDAyIDYzMi44MDczNDEzMzU2OTM4IDE0Ni4yMDAwMDAwMDAwMDAwMlE2MjAuMTA3MzQxMzM1NjkzNyAxMzkuMjAwMDAwMDAwMDAwMDIgNjEzLjIwNzM0MTMzNTY5MzcgMTI2LjUwMDAwMDAwMDAwMDAxUTYwNi4zMDczNDEzMzU2OTM4IDExMy44MDAwMDAwMDAwMDAwMSA2MDYuMzA3MzQxMzM1NjkzOCA5Ny4wWk02NjIuMTA3MzQxMzM1NjkzNyA2NS4yUTY1My41MDczNDEzMzU2OTM3IDY1LjIgNjQ4LjAwNzM0MTMzNTY5MzcgNzAuODAwMDAwMDAwMDAwMDFRNjQyLjUwNzM0MTMzNTY5MzcgNzYuNCA2NDEuNzA3MzQxMzM1NjkzNyA4Ni40SDY4MS45MDczNDEzMzU2OTM3UTY4MS4zMDczNDEzMzU2OTM4IDc2LjAwMDAwMDAwMDAwMDAxIDY3Ni4xMDczNDEzMzU2OTM3IDcwLjYwMDAwMDAwMDAwMDAxUTY3MC45MDczNDEzMzU2OTM3IDY1LjIgNjYyLjEwNzM0MTMzNTY5MzcgNjUuMlpNNzI2LjEwNzM0MTMzNTY5MzcgMTIzLjgwMDAwMDAwMDAwMDAxUTcyNi4xMDczNDEzMzU2OTM3IDExMC4wIDczNS4wMDczNDEzMzU2OTM3IDEwMi4xMDAwMDAwMDAwMDAwMVE3NDMuOTA3MzQxMzM1NjkzNyA5NC4yMDAwMDAwMDAwMDAwMiA3NjIuMTA3MzQxMzM1NjkzNyA5MC40TDc5NS41MDczNDEzMzU2OTM3IDgzLjYwMDAwMDAwMDAwMDAxUTc5NS41MDczNDEzMzU2OTM3IDc0LjIgNzkxLjQwNzM0MTMzNTY5MzcgNjkuMzAwMDAwMDAwMDAwMDFRNzg3LjMwNzM0MTMzNTY5MzYgNjQuNCA3NzkuNTA3MzQxMzM1NjkzNyA2NC40UTc2NC41MDczNDEzMzU2OTM3IDY0LjQgNzYyLjEwNzM0MTMzNTY5MzcgNzguNjAwMDAwMDAwMDAwMDFMNzI3LjkwNzM0MTMzNTY5MzcgNzcuNFE3MzEuMTA3MzQxMzM1NjkzNyA1OS4wIDc0NC4zMDczNDEzMzU2OTM4IDQ5LjkwMDAwMDAwMDAwMDAwNlE3NTcuNTA3MzQxMzM1NjkzNyA0MC44MDAwMDAwMDAwMDAwMSA3NzkuNTA3MzQxMzM1NjkzNyA0MC44MDAwMDAwMDAwMDAwMVE4MjkuOTA3MzQxMzM1NjkzNyA0MC44MDAwMDAwMDAwMDAwMSA4MjkuOTA3MzQxMzM1NjkzNyA4Ni4yVjEyMC4yMDAwMDAwMDAwMDAwMlE4MjkuOTA3MzQxMzM1NjkzNyAxMjUuMDAwMDAwMDAwMDAwMDEgODMxLjQwNzM0MTMzNTY5MzcgMTI2LjcwMDAwMDAwMDAwMDAyUTgzMi45MDczNDEzMzU2OTM3IDEyOC40IDgzNi4xMDczNDEzMzU2OTM3IDEyOC40SDgzOC43MDczNDEzMzU2OTM2VjE1MC44UTgzNi41MDczNDEzMzU2OTM3IDE1MS40IDgzMy4xMDczNDEzMzU2OTM3IDE1MS44UTgyOS43MDczNDEzMzU2OTM2IDE1Mi4yMDAwMDAwMDAwMDAwMiA4MjYuNTA3MzQxMzM1NjkzNyAxNTIuMjAwMDAwMDAwMDAwMDJRODA1LjcwNzM0MTMzNTY5MzYgMTUyLjIwMDAwMDAwMDAwMDAyIDgwMS45MDczNDEzMzU2OTM3IDEzNC4yMDAwMDAwMDAwMDAwMlE3OTcuNTA3MzQxMzM1NjkzNyAxNDMuMjAwMDAwMDAwMDAwMDIgNzg4LjEwNzM0MTMzNTY5MzcgMTQ4LjIwMDAwMDAwMDAwMDAyUTc3OC43MDczNDEzMzU2OTM2IDE1My4yMDAwMDAwMDAwMDAwMiA3NjQuNTA3MzQxMzM1NjkzNyAxNTMuMjAwMDAwMDAwMDAwMDJRNzQ3LjEwNzM0MTMzNTY5MzcgMTUzLjIwMDAwMDAwMDAwMDAyIDczNi42MDczNDEzMzU2OTM3IDE0NS40MDAwMDAwMDAwMDAwM1E3MjYuMTA3MzQxMzM1NjkzNyAxMzcuNjAwMDAwMDAwMDAwMDIgNzI2LjEwNzM0MTMzNTY5MzcgMTIzLjgwMDAwMDAwMDAwMDAxWk03OTUuNTA3MzQxMzM1NjkzNyAxMDguMjAwMDAwMDAwMDAwMDJWMTAzLjgwMDAwMDAwMDAwMDAxTDc3NC41MDczNDEzMzU2OTM3IDEwOC42MDAwMDAwMDAwMDAwMVE3NjEuNTA3MzQxMzM1NjkzNyAxMTEuNCA3NjEuNTA3MzQxMzM1NjkzNyAxMjAuNjAwMDAwMDAwMDAwMDFRNzYxLjUwNzM0MTMzNTY5MzcgMTI1LjQgNzY0LjUwNzM0MTMzNTY5MzcgMTI4LjEwMDAwMDAwMDAwMDAyUTc2Ny41MDczNDEzMzU2OTM3IDEzMC44IDc3My4zMDczNDEzMzU2OTM2IDEzMC44UTc4My4zMDczNDEzMzU2OTM2IDEzMC44IDc4OS40MDczNDEzMzU2OTM3IDEyNC45UTc5NS41MDczNDEzMzU2OTM3IDExOS4wMDAwMDAwMDAwMDAwMSA3OTUuNTA3MzQxMzM1NjkzNyAxMDguMjAwMDAwMDAwMDAwMDJaIiBmaWxsPSIjRjRGN0Y4Ii8+PHBhdGggZD0iTTM2MC4yNSAxMzAuMTcgTDM2MS44NyAxMjkuOTUgTDM2My40NCAxMjkuNTMgTDM2NC45NSAxMjguOTEgTDM2Ny4wMyAxMjcuNjEgTDM2OC44MiAxMjUuOTQgTDM3MC44NyAxMjMuMDAgTDM3MS44MiAxMjEuODQgTDM3Mi45MiAxMjAuODEgTDM3NC4xNCAxMTkuOTMgTDM3NS40NyAxMTkuMjMgTDM3Ni44OCAxMTguNzAgTDM3OC4zNCAxMTguMzUgTDM3OS44NCAxMTguMjEgTDM4Mi4wOSAxMTguMzUgTDM4NC4yNiAxMTguOTQgTDM4Ni4yOSAxMTkuOTMgTDM4OC4wNyAxMjEuMzEgTDM4OS41NiAxMjMuMDAgTDM5MC42OSAxMjQuOTUgTDM5MS40MSAxMjcuMDkgTDM5MS43MSAxMjkuMzIgTDM5MS42NiAxMzAuODMgTDM5MS4yMiAxMzMuMDQgTDM5MC42OSAxMzQuNDUgTDM4OS45OCAxMzUuNzcgTDM4Ny44MiAxMzkuMDEgTDM4Ni4zNiAxNDAuODIgTDM4NC4yNiAxNDMuMDYgTDM4Mi41NSAxNDQuNjMgTDM3OC44NCAxNDcuNDIgTDM3NC43OSAxNDkuNzAgTDM3MC40OCAxNTEuNDMgTDM2Ni43MiAxNTIuNDQgTDM2NC40MyAxNTIuODQgTDM2Mi4xMyAxNTMuMDkgTDM1OS40MyAxNTMuMjAgTDMwMy4wMyAxNTMuMjAgTDMwMS41MyAxNTMuMTAgTDMwMC4wNSAxNTIuODEgTDI5Ny45NCAxNTIuMDEgTDI5Ni42NCAxNTEuMjYgTDI5NC45MCAxNDkuODMgTDI5My40NyAxNDguMDkgTDI5Mi43MSAxNDYuNzkgTDI5Mi4xNCAxNDUuNDAgTDI5MS43NSAxNDMuOTQgTDI5MS41MyAxNDEuNzAgTDI5MS43NSAxMzkuNDYgTDI5Mi40MCAxMzcuMzAgTDI5My40NyAxMzUuMzEgTDI5NC45MCAxMzMuNTcgTDI5Ni42NCAxMzIuMTQgTDI5OC42MyAxMzEuMDggTDMwMC43OSAxMzAuNDIgTDMwMy4wMyAxMzAuMjAgTDM2MC4yNSAxMzAuMTdaTTMxMS4wMyA0My4yMCBMMzQ1LjQzIDQzLjIwIEwzNDUuNDMgMTI0LjIwIEwzMTEuMDMgMTI0LjIwIEwzMTEuMDMgNDMuMjBaIiBmaWxsPSIjRjRGN0Y4Ii8+PGNpcmNsZSBjeD0iMzI4LjIzIiBjeT0iMTUuNjAiIHI9IjE1LjYwIiBmaWxsPSIjNUJFN0YyIi8+PC9zdmc+";
   async function dayCard() {
     const all = list("pistas"), items = diarioScope === "hoy" ? all.filter(p => p.day === today()) : all;
-    if (!items.length) { toast("Todavía no hay pistas para la tarjeta."); return; }
+    if (!items.length) { toast((EN?"No pistes for the card yet.":"Todavía no hay pistas para la tarjeta.")); return; }
     try { await document.fonts.ready; } catch (e) {}
     const st = stats(items), W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H;
     const g = c.getContext("2d");
@@ -2140,7 +2177,7 @@ body.has-dock #smore { padding-bottom: 20px; }
     g.textBaseline = "top";
     g.fillStyle = "#9AABB8"; g.font = '500 28px "Geist"'; g.textAlign = "right"; g.fillText("Les 3 Vallées", W - 72, 82); g.textAlign = "left";
     g.fillStyle = "#F4F7F8"; g.font = '700 76px "Geist"';
-    g.fillText((diarioScope === "hoy" ? fmtDay(today()) : "Todo el viaje").replace(/^./, c => c.toUpperCase()), 72, 156);
+    g.fillText((diarioScope === "hoy" ? fmtDay(today()) : (EN?"Whole trip":"Todo el viaje")).replace(/^./, c => c.toUpperCase()), 72, 156);
     /* mini mapa */
     const runs = new Set(); items.forEach(p => GROUPS.forEach(gr => { if (gr.k === "R" && gr.n === norm(p.nombre) && DIF[gr.d].tipo === p.tipo) gr.fis.forEach(fi => runs.add(fi)); }));
     let rb = [1e9, 1e9, -1e9, -1e9]; runs.forEach(fi => { const b = F[fi].bb; rb = [Math.min(rb[0], b[0]), Math.min(rb[1], b[1]), Math.max(rb[2], b[2]), Math.max(rb[3], b[3])]; });
@@ -2160,7 +2197,7 @@ body.has-dock #smore { padding-bottom: 20px; }
     g.textAlign = "left"; g.textBaseline = "top";
     g.restore();
     /* números */
-    const nums = [[st.n, st.n === 1 ? "pista" : "pistas"], [fmtNum(st.drop), "m de desnivel"], [st.km.toLocaleString("es-ES", { maximumFractionDigits: 1 }), "km bajados"]];
+    const nums = [[st.n, st.n === 1 ? (EN?"piste":"pista") : (EN?"pistes":"pistas")], [fmtNum(st.drop), (EN?"m vertical":"m de desnivel")], [st.km.toLocaleString(EN ? "en-GB" : "es-ES", { maximumFractionDigits: 1 }), EN ? "km skied" : "km bajados"]];
     nums.forEach(([v, l], i) => { const x = 72 + i * 320; g.fillStyle = i === 0 ? "#C8F03C" : "#F4F7F8"; g.font = '600 104px "Geist Mono"'; g.fillText(String(v), x, 880); g.fillStyle = "#A9BCD0"; g.font = '500 26px "Geist"'; g.fillText(l, x, 996); });
     const max = Math.max(1, ...Object.values(st.by));
     Object.entries(TIPOS).forEach(([key, t], i) => {
@@ -2172,7 +2209,7 @@ body.has-dock #smore { padding-bottom: 20px; }
     });
     g.fillStyle = "rgba(154,171,184,.7)"; g.font = '500 20px "Geist"'; g.fillText("Vallik · mapa © OpenStreetMap", 72, H - 58);
     const url = c.toDataURL("image/png");
-    $("#modal").innerHTML = `<div class="mcard"><img src="${url}" alt="Tarjeta con las pistas ${diarioScope === "hoy" ? "de hoy" : "del viaje"}"><p>Mantén pulsada la imagen para guardarla o compartirla.</p><button class="btn dark" data-act="modal-close">Cerrar</button></div>`;
+    $("#modal").innerHTML = `<div class="mcard"><img src="${url}${EN?`" alt="Card with the pistes `:`" alt="Tarjeta con las pistas `}${diarioScope === "hoy" ? (EN?"today":"de hoy") : (EN?"from the trip":"del viaje")}${EN?`"><p>Press and hold the image to save or share it.</p><button class="btn dark" data-act="modal-close">Close</button></div>`:`"><p>Mantén pulsada la imagen para guardarla o compartirla.</p><button class="btn dark" data-act="modal-close">Cerrar</button></div>`}`;
     $("#modal").hidden = false;
   }
 
@@ -2199,62 +2236,86 @@ body.has-dock #smore { padding-bottom: 20px; }
     if (kind === "L") return `<span class="plate lift" aria-hidden="true">▲</span>`;
     return `<span class="plate" style="--c:${DIF[d].hex}" aria-hidden="true"></span>`;
   }
-  const av = (uid, big) => `<span class="av${big ? " big" : ""}" style="--c:${colorOf(uid)}">${esc(uid === me ? "Tú" : initial(uid))}</span>`;
+  const av = (uid, big) => `<span class="av${big ? " big" : ""}" style="--c:${colorOf(uid)}">${esc(uid === me ? (EN?"You":"Tú") : initial(uid))}</span>`;
 
   /* ---------- Contenidos por modo ---------- */
   function homeHtml() {
     const mp = myPos(), ps = positions(), others = ps.filter(p => p.uid !== me);
     const hoy = stats(list("pistas").filter(p => p.day === today()));
-    if (mode === "nocon") return { speek: `
+    if (mode === "nocon") return { speek: `${EN?`
+      <div class="me-line"><span class="dot-off"></span><div><b>Not connected to the group</b><small>You need signal the first time you join.</small></div></div>
+      <div class="acts one"><button class="btn" data-act="retry">Retry</button></div>`:`
       <div class="me-line"><span class="dot-off"></span><div><b>Sin conexión con el grupo</b><small>La primera vez hace falta cobertura para entrar.</small></div></div>
-      <div class="acts one"><button class="btn" data-act="retry">Reintentar</button></div>`, smore: `<p class="quiet">El mapa y las rutas funcionan sin conexión. En cuanto haya cobertura entras en el grupo.</p>` };
+      <div class="acts one"><button class="btn" data-act="retry">Reintentar</button></div>`}`, smore: `${EN?`<p class="quiet">The map and routes work offline. You'll join the group as soon as there is signal.</p>`:`<p class="quiet">El mapa y las rutas funcionan sin conexión. En cuanto haya cobertura entras en el grupo.</p>`}` };
     const mt = meet();
     const meetCard = mt ? (() => { const et = meetEtas(mt).filter(e => e.t != null).slice(0, 4);
-      return `<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Quedada${mt.hora ? " a las " + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}${et.length ? " · " + et.map(e => esc(e.p.uid === me ? "Tú" : who(e.p.uid)) + " " + etaTxt(e.t)).join(", ") : ""}</small></span><span class="chev" aria-hidden="true">›</span></button>`; })() : "";
+      return `${EN?`<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Meet-up`:`<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Quedada`}${mt.hora ? (EN?" at ":" a las ") + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}${et.length ? " · " + et.map(e => esc(e.p.uid === me ? (EN?"You":"Tú") : who(e.p.uid)) + " " + etaTxt(e.t)).join(", ") : ""}</small></span><span class="chev" aria-hidden="true">›</span></button>`; })() : "";
     const speek = meetCard + `
-      <div class="me-line${LIVE.on ? " is-live" : ""}">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small${LIVE.on ? ` class="live"` : ""}>${LIVE.on ? `<span class="live-dot"></span>En directo · ` : ""}${pendingLong("aqui") ? "pendiente de enviar" : LIVE.on ? esc(ago(mp.at)) : "Marcado " + esc(ago(mp.at))}</small></div>` : LIVE.on ? `<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small class="live"><span class="live-dot"></span>En directo</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}${liveAvailable() ? `<button class="liveswitch" data-act="live" aria-pressed="${LIVE.on}" aria-label="Compartir en directo"><span class="sw2"></span>Directo</button>` : ""}</div>
+      <div class="me-line${LIVE.on ? " is-live" : ""}">${mp ? `${av(me)}${EN?`<div><b>You're `:`<div><b>Estás `}${esc(mp.en || (EN?"on the map":"en el mapa"))}</b><small${LIVE.on ? ` class="live"` : ""}>${LIVE.on ? `${EN?`<span class="live-dot"></span>Live · `:`<span class="live-dot"></span>En directo · `}` : ""}${pendingLong("aqui") ? (EN?"waiting to send":"pendiente de enviar") : LIVE.on ? esc(ago(mp.at)) : (EN?"Marked ":"Marcado ") + esc(ago(mp.at))}</small></div>` : LIVE.on ? `${EN?`<span class="dot-off"></span><div><b>Finding your location…</b><small class="live"><span class="live-dot"></span>Live</small></div>`:`<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small class="live"><span class="live-dot"></span>En directo</small></div>`}` : `${EN?`<span class="dot-off"></span><div><b>You haven't marked where you are</b><small>The group can't see you yet</small></div>`:`<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}`}${liveAvailable() ? `<button class="liveswitch" data-act="live" aria-pressed="${LIVE.on}${EN?`" aria-label="Share live"><span class="sw2"></span>Live</button>`:`" aria-label="Compartir en directo"><span class="sw2"></span>Directo</button>`}` : ""}</div>
 ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me), on = mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS;
-        return `<button class="btn wide sos${on ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${!!on}">${MSG_IC.ayuda}${on ? "Aviso de ayuda enviado · Quitar" : confirmAct === "msg:ayuda" ? "Toca otra vez para avisar al grupo" : "Tengo un problema"}</button>`; })() : ""}${LIVE.on && WAKE.ok && !NATIVE ? `
-      <button class="toggle wake" data-act="wake" aria-pressed="${WAKE.want}"><span class="sw2"></span><span>Pantalla encendida<small>Sigue enviando con el móvil en el bolsillo. Gasta más batería.</small></span></button>` : ""}`;
+        return `<button class="btn wide sos${on ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${!!on}">${MSG_IC.ayuda}${on ? (EN?"Help alert sent · Remove":"Aviso de ayuda enviado · Quitar") : confirmAct === "msg:ayuda" ? (EN?"Tap again to alert the group":"Toca otra vez para avisar al grupo") : (EN?"I have a problem":"Tengo un problema")}</button>`; })() : ""}${LIVE.on && WAKE.ok && !NATIVE ? `
+      <button class="toggle wake" data-act="wake" aria-pressed="${WAKE.want}${EN?`"><span class="sw2"></span><span>Keep screen on<small>Keeps sending with the phone in your pocket. Uses more battery.</small></span></button>`:`"><span class="sw2"></span><span>Pantalla encendida<small>Sigue enviando con el móvil en el bolsillo. Gasta más batería.</small></span></button>`}` : ""}`;
     const people = others.length ? `<ul class="people">${others.map(p => { const m = msgOf(p.uid), mNew = m && Date.now() - m.at < MSG_HELP_MS, help = mNew && m.tipo === "ayuda"; return `
         <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}${help ? " help" : ""}">
-          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b>${mNew ? `<small class="pmsg">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</small>` : ""}<small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(p.en || "")} · ${esc(isLive(p) ? "en directo" : ago(p.at))}</small></span></button>
-          <button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">Ir</button>
+          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b>${mNew ? `<small class="pmsg">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</small>` : ""}<small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(p.en || "")} · ${esc(isLive(p) ? (EN?"live":"en directo") : ago(p.at))}</small></span></button>
+          <button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">${EN ? "Go" : "Ir"}</button>
         </li>`; }).join("")}</ul>`
-      : `<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`;
+      : `${EN?`<p class="quiet">When someone in the group marks where they are, they'll show up here with a button to get to them.</p>`:`<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`}`;
     const G = window.PISTEA_GROUP;
-    const invite = G ? `<div class="codebox"><span><small>Código del grupo</small><b>${esc(G.code)}</b></span><button class="btn go" data-act="copy-code">Copiar código</button></div>
+    const invite = G ? `${EN?`<div class="codebox"><span><small>Group code</small><b>`:`<div class="codebox"><span><small>Código del grupo</small><b>`}${esc(G.code)}${EN?`</b></span><button class="btn go" data-act="copy-code">Copy code</button></div>
+      <p class="quiet">If you add Vallik to your iPhone home screen, paste this code when you open it.</p>
+      <button class="btn dark wide" data-act="invite">Invite to the group</button>
+      <button class="btn ghost wide danger" data-act="leave">`:`</b></span><button class="btn go" data-act="copy-code">Copiar código</button></div>
       <p class="quiet">Si añades Vallik a la pantalla de inicio del iPhone, al abrirla pega este código.</p>
       <button class="btn dark wide" data-act="invite">Invitar al grupo</button>
-      <button class="btn ghost wide danger" data-act="leave">${confirmAct === "leave" ? "Toca otra vez para salir" : "Salir del grupo"}</button>
-      ${G.isOwner ? `<p class="quiet">Creaste este grupo. Para quitar a alguien, toca su nombre.</p>` : ""}` : "";
+      <button class="btn ghost wide danger" data-act="leave">`}${confirmAct === "leave" ? (EN?"Tap again to leave":"Toca otra vez para salir") : (EN?"Leave the group":"Salir del grupo")}</button>
+      ${G.isOwner ? `${EN?`<p class="quiet">You created this group. To remove someone, tap their name.</p>`:`<p class="quiet">Creaste este grupo. Para quitar a alguien, toca su nombre.</p>`}` : ""}` : "";
     const myMsg = S.mensajes.get(me), myT = myMsg && Date.now() - myMsg.at < MSG_HELP_MS ? myMsg.tipo : null;
-    const msgs = mode === "live" || mode === "demo" ? `
+    const msgs = mode === "live" || mode === "demo" ? `${EN?`
+      <h3 class="sec">Alert the group</h3>
+      <div class="msgbtns">`:`
       <h3 class="sec">Avisar al grupo</h3>
-      <div class="msgbtns">${MSG_HOME.map(k => `<button class="btn ${k === "ayuda" ? "ghost danger" : "dark"}${myT === k ? " on" : ""}" data-act="msg" data-t="${k}" aria-pressed="${myT === k}">${MSG_IC[k]}${k === "ayuda" && confirmAct === "msg:ayuda" ? "Toca otra vez" : MSGS[k]}</button>`).join("")}</div>
-      ${myT ? `<p class="quiet">Enviaste «${esc(MSGS[myT])}» ${esc(ago(myMsg.at))}. Tócalo otra vez para quitarlo.</p>` : `<p class="quiet">Se envía con tu posición. Los demás lo ven al momento.</p>`}` : "";
+      <div class="msgbtns">`}${MSG_HOME.map(k => `<button class="btn ${k === "ayuda" ? "ghost danger" : "dark"}${myT === k ? " on" : ""}" data-act="msg" data-t="${k}" aria-pressed="${myT === k}">${MSG_IC[k]}${k === "ayuda" && confirmAct === "msg:ayuda" ? (EN?"Tap again":"Toca otra vez") : MSGS[k]}</button>`).join("")}</div>
+      ${myT ? `${EN?`<p class="quiet">You sent «`:`<p class="quiet">Enviaste «`}${esc(MSGS[myT])}» ${esc(ago(myMsg.at))}${EN?`. Tap it again to remove it.</p>`:`. Tócalo otra vez para quitarlo.</p>`}` : `${EN?`<p class="quiet">It's sent with your position. Everyone sees it straight away.</p>`:`<p class="quiet">Se envía con tu posición. Los demás lo ven al momento.</p>`}`}` : "";
     const avs = avisos();
-    const avList = avs.length ? `
+    const avList = avs.length ? `${EN?`
+      <h3 class="sec">Alerts on pistes and lifts</h3>
+      <ul class="avs">`:`
       <h3 class="sec">Avisos en pistas y remontes</h3>
-      <ul class="avs">${avs.map(a => `<li><button data-act="aviso-go" data-ref="${esc(a.ref)}"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><span><b>${esc(a.nombre || "Sin nombre")}</b><small>${esc(a.uid === me ? "Tú" : who(a.uid))} · ${esc(ago(a.at))} · hasta las ${hhmm(a.exp)}</small></span></button></li>`).join("")}</ul>` : "";
-    const smore = `
-      <h3 class="sec" id="grupo">Tu grupo${others.length ? ` <small>${others.length + 1} personas</small>` : ""}</h3>${people}${others.length ? `<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>` : ""}${msgs}${avList}
-      ${casaHtml()}
+      <ul class="avs">`}${avs.map(a => `<li><button data-act="aviso-go" data-ref="${esc(a.ref)}"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><span><b>${esc(a.nombre || (EN?"No name":"Sin nombre"))}</b><small>${esc(a.uid === me ? (EN?"You":"Tú") : who(a.uid))} · ${esc(ago(a.at))}${EN?` · until `:` · hasta las `}${hhmm(a.exp)}</small></span></button></li>`).join("")}</ul>` : "";
+    const smore = `${EN?`
+      <h3 class="sec" id="grupo">Your group`:`
+      <h3 class="sec" id="grupo">Tu grupo`}${others.length ? ` <small>${others.length + 1} ${EN ? "people" : "personas"}</small>` : ""}</h3>${people}${others.length ? `${EN?`<button class="btn ghost wide juntbtn" data-act="juntar">Where shall we meet?</button>`:`<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>`}` : ""}${msgs}${avList}
+      ${casaHtml()}${EN?`
+      <h3 class="sec">Go to area</h3>
+      <div class="zones">`:`
       <h3 class="sec">Ir a la zona</h3>
-      <div class="zones">${ZONES.map((z, i) => `<button data-act="zone" data-i="${i}">${esc(z.n)}</button>`).join("")}<button data-act="zfit">Las 3 Vallées</button></div>
-      <h3 class="sec">Invitar</h3>${invite}${accHtml()}
+      <div class="zones">`}${ZONES.map((z, i) => `<button data-act="zone" data-i="${i}">${esc(z.n)}</button>`).join("")}${EN?`<button data-act="zfit">All 3 Vallées</button></div>
+      <h3 class="sec">Invite</h3>`:`<button data-act="zfit">Las 3 Vallées</button></div>
+      <h3 class="sec">Invitar</h3>`}${invite}${accHtml()}${langHtml()}${EN?`
+      <h3 class="sec">Today</h3>
+      <button class="board mini" data-act="diario">
+        <span><b>`:`
       <h3 class="sec">Hoy</h3>
       <button class="board mini" data-act="diario">
-        <span><b>${hoy.n}</b><small>${hoy.n === 1 ? "pista" : "pistas"}</small></span>
-        <span><b>${fmtNum(hoy.drop)}</b><small>m de desnivel</small></span>
-        <span class="bars">${colorBars(hoy, true)}</span>
+        <span><b>`}${hoy.n}</b><small>${hoy.n === 1 ? (EN?"piste":"pista") : (EN?"pistes":"pistas")}</small></span>
+        <span><b>${fmtNum(hoy.drop)}${EN?`</b><small>m vertical</small></span>
+        <span class="bars">`:`</b><small>m de desnivel</small></span>
+        <span class="bars">`}${colorBars(hoy, true)}${EN?`</span>
+      </button>
+      <h3 class="sec">Legend</h3>
+      <ul class="legend">
+        <li>`:`</span>
       </button>
       <h3 class="sec">Leyenda</h3>
       <ul class="legend">
-        <li>${plate("R", "v")}Verde</li><li>${plate("R", "a")}Azul</li><li>${plate("R", "r")}Roja</li><li>${plate("R", "n")}Negra</li>
-        <li><span class="plate itin" aria-hidden="true"></span>Itinerario</li><li>${plate("L")}Remonte</li>
+        <li>`}${plate("R", "v")}${EN?`Green</li><li>`:`Verde</li><li>`}${plate("R", "a")}${EN?`Blue</li><li>`:`Azul</li><li>`}${plate("R", "r")}${EN?`Red</li><li>`:`Roja</li><li>`}${plate("R", "n")}${EN?`Black</li>
+        <li><span class="plate itin" aria-hidden="true"></span>Itinerary</li><li>`:`Negra</li>
+        <li><span class="plate itin" aria-hidden="true"></span>Itinerario</li><li>`}${plate("L")}${EN?`Lift</li>
       </ul>
-      <p class="quiet">Las flechas en las pistas marcan hacia dónde bajan. Dos dedos para girar e inclinar el mapa.</p>`;
+      <p class="quiet">Arrows on the pistes show which way they go down. Use two fingers to turn and tilt the map.</p>`:`Remonte</li>
+      </ul>
+      <p class="quiet">Las flechas en las pistas marcan hacia dónde bajan. Dos dedos para girar e inclinar el mapa.</p>`}`;
     return { speek, smore };
   }
   function colorBars(st, compact) {
@@ -2266,49 +2327,63 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const p = poiById(poiSheet); if (!p) { poiSheet = null; return homeHtml(); }
     const n = poiNode(p), mm = minsTo(n), near = n >= 0 ? describeNode(n) : "";
     const ph = p.info.phone ? String(p.info.phone).split(";")[0].trim() : "", web = p.info.website && /^https?:\/\//.test(p.info.website) ? p.info.website : "";
-    const speek = `<div class="headrow poisheet"><div class="title-wrap"><span class="poiic" style="--c:${POI_CAT[p.cat].c}">${POI_ICON[p.cat]}</span><div><small class="kicker">${esc(poiKind(p))}${p.z ? " · " + fmtNum(p.z) + " m" : ""}</small><h2 class="title md">${esc(p.name)}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
-      <p class="facts">${[near ? cap(near) : "", mm ? mm + " min de ti" : ""].filter(Boolean).map(esc).join(" · ")}</p>
-      <div class="acts two"><button class="btn" data-act="poi-go" data-id="${esc(p.id)}">Cómo llegar</button><button class="btn ghost meet-gold" data-act="poi-meet" data-id="${esc(p.id)}">Quedar aquí</button></div>`;
-    const smore = `<div class="poilinks">${ph ? `<a class="btn ghost" href="tel:${esc(ph.replace(/[^+\d]/g, ""))}">Llamar</a>` : ""}${web ? `<a class="btn ghost" href="${esc(web)}" target="_blank" rel="noopener">Web</a>` : ""}<button class="btn dark" data-act="peter-poi" data-id="${esc(p.id)}">Preguntar a Peter</button></div>
-      ${p.info.cuisine ? `<p class="facts">Cocina: ${esc(String(p.info.cuisine).replace(/_/g, " ").replace(/;/g, ", "))}</p>` : ""}
-      ${p.info.opening_hours ? `<p class="facts">Horario: ${esc(p.info.opening_hours)}</p>` : ""}
-      <p class="quiet">Datos de OpenStreetMap. El horario puede cambiar.</p>`;
+    const speek = `<div class="headrow poisheet"><div class="title-wrap"><span class="poiic" style="--c:${POI_CAT[p.cat].c}">${POI_ICON[p.cat]}</span><div><small class="kicker">${esc(poiKind(p))}${p.z ? " · " + fmtNum(p.z) + " m" : ""}</small><h2 class="title md">${esc(p.name)}${EN?`</h2></div></div><button class="x" data-act="close-sel" aria-label="Close">×</button></div>
+      <p class="facts">`:`</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
+      <p class="facts">`}${[near ? cap(near) : "", mm ? mm + (EN?" min from you":" min de ti") : ""].filter(Boolean).map(esc).join(" · ")}</p>
+      <div class="acts two"><button class="btn" data-act="poi-go" data-id="${esc(p.id)}${EN?`">Directions</button><button class="btn ghost meet-gold" data-act="poi-meet" data-id="`:`">Cómo llegar</button><button class="btn ghost meet-gold" data-act="poi-meet" data-id="`}${esc(p.id)}${EN?`">Meet here</button></div>`:`">Quedar aquí</button></div>`}`;
+    const smore = `<div class="poilinks">${ph ? `<a class="btn ghost" href="tel:${esc(ph.replace(/[^+\d]/g, ""))}${EN?`">Call</a>`:`">Llamar</a>`}` : ""}${web ? `<a class="btn ghost" href="${esc(web)}" target="_blank" rel="noopener">Web</a>` : ""}<button class="btn dark" data-act="peter-poi" data-id="${esc(p.id)}${EN?`">Ask Peter</button></div>
+      `:`">Preguntar a Peter</button></div>
+      `}${p.info.cuisine ? `${EN?`<p class="facts">Cuisine: `:`<p class="facts">Cocina: `}${esc(String(p.info.cuisine).replace(/_/g, " ").replace(/;/g, ", "))}</p>` : ""}
+      ${p.info.opening_hours ? `${EN?`<p class="facts">Hours: `:`<p class="facts">Horario: `}${esc(p.info.opening_hours)}</p>` : ""}${EN?`
+      <p class="quiet">Data from OpenStreetMap. Opening hours may change.</p>`:`
+      <p class="quiet">Datos de OpenStreetMap. El horario puede cambiar.</p>`}`;
     return { speek, smore };
   }
   function featHtml() {
     const g = sel.g, isL = g.k === "L";
     const L = isL ? (LIFT[g.t] || LIFT.tsd) : null, D = isL ? null : DIF[g.d];
-    const kind = isL ? L.s : g.d === "e" ? "Enlace" : g.d === "s" ? "Pista sin color" : g.d === "i" ? "Itinerario" : "Pista " + D.s.toLowerCase();
+    const kind = isL ? L.s : g.d === "e" ? (EN?"Link":"Enlace") : g.d === "s" ? (EN?"Piste with no colour":"Pista sin color") : g.d === "i" ? (EN?"Itinerary":"Itinerario") : (EN?"Piste ":"Pista ") + D.s.toLowerCase();
     const tipoT = !isL && D.tipo;
     const regs = tipoT && g.name ? list("pistas").filter(p => norm(p.nombre) === norm(g.name)) : [];
     const doneToday = regs.some(p => p.day === today() && p.uid === me);
     const ref = refOf(g), avs = avisos().filter(a => a.ref === ref), mineAv = new Set(avs.filter(a => a.uid === me).map(a => a.tipo));
     const facts = isL
-      ? [g.zb && g.zt ? `${fmtNum(g.zb)} → ${fmtNum(g.zt)} m` : "", g.dur ? fmtMin(g.dur) + " de subida" : "", fmtLen(g.len)]
-      : [fmtLen(g.len), g.zt - g.zb > 10 ? fmtNum(g.zt - g.zb) + " m de desnivel" : ""];
+      ? [g.zb && g.zt ? `${fmtNum(g.zb)} → ${fmtNum(g.zt)} m` : "", g.dur ? fmtMin(g.dur) + (EN?" up":" de subida") : "", fmtLen(g.len)]
+      : [fmtLen(g.len), g.zt - g.zb > 10 ? fmtNum(g.zt - g.zb) + (EN?" m vertical":" m de desnivel") : ""];
     const speek = `
       <div class="headrow">
-        <div class="title-wrap">${plate(g.k, g.d)}<div><small class="kicker">${esc(kind)}</small><h2 class="title">${esc(g.name || (isL ? "Remonte sin nombre" : "Pista sin nombre"))}</h2></div></div>
+        <div class="title-wrap">${plate(g.k, g.d)}<div><small class="kicker">${esc(kind)}</small><h2 class="title">${esc(g.name || (isL ? (EN?"Unnamed lift":"Remonte sin nombre") : (EN?"Unnamed piste":"Pista sin nombre")))}${EN?`</h2></div></div>
+        <button class="x" data-act="close-sel" aria-label="Close">×</button>
+      </div>
+      <p class="facts">`:`</h2></div></div>
         <button class="x" data-act="close-sel" aria-label="Cerrar">×</button>
       </div>
-      <p class="facts">${facts.filter(Boolean).map(esc).join(" · ")}</p>${(cl => { if (!cl) return ""; const o = g.fis.some(fi => OFI.open.has(fi)), c = !o && g.fis.some(fi => cl.has(fi)); return o || c ? `<p class="ofiline ${c ? "c" : "o"}"><i></i>${c ? (isL ? "Cerrado" : "Cerrada") : (isL ? "Abierto" : "Abierta")} según Les 3 Vallées · ${esc(agoMin(OFI.at))}</p>` : ""; })(ofiClosed())}${avs.map(a => `
-      <div class="avcard"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><small>${a.uid === me ? "Lo avisaste tú" : "Lo avisó " + esc(who(a.uid))} · ${esc(ago(a.at))}</small></div>`).join("")}
-      <div class="acts ${tipoT && g.name ? "three" : "two"}">
+      <p class="facts">`}${facts.filter(Boolean).map(esc).join(" · ")}</p>${(cl => { if (!cl) return ""; const o = g.fis.some(fi => OFI.open.has(fi)), c = !o && g.fis.some(fi => cl.has(fi)); return o || c ? `<p class="ofiline ${c ? "c" : "o"}"><i></i>${c ? (isL ? (EN?"Closed":"Cerrado") : (EN?"Closed":"Cerrada")) : (isL ? (EN?"Open":"Abierto") : (EN?"Open":"Abierta"))}${EN?` according to Les 3 Vallées · `:` según Les 3 Vallées · `}${esc(agoMin(OFI.at))}</p>` : ""; })(ofiClosed())}${avs.map(a => `
+      <div class="avcard"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><small>${a.uid === me ? (EN?"You reported it":"Lo avisaste tú") : (EN?"Reported by ":"Lo avisó ") + esc(who(a.uid))} · ${esc(ago(a.at))}</small></div>`).join("")}
+      <div class="acts ${tipoT && g.name ? "three" : "two"}${EN?`">
+        <button class="btn" data-act="here">I'm here</button>
+        <button class="btn dark" data-act="route-here">Directions</button>
+        `:`">
         <button class="btn" data-act="here">Estoy aquí</button>
         <button class="btn dark" data-act="route-here">Cómo llegar</button>
-        ${tipoT && g.name ? `<button class="btn ghost${doneToday ? " on" : ""}" data-act="sel-add">${doneToday ? "Hecha ✓" : "La hice"}</button>` : ""}
+        `}${tipoT && g.name ? `<button class="btn ghost${doneToday ? " on" : ""}" data-act="sel-add">${doneToday ? (EN?"Done ✓":"Hecha ✓") : (EN?"I did it":"La hice")}</button>` : ""}${EN?`
+      </div>
+      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Meet the group here</button>
+      <div role="group" aria-label="Alert the group"><span class="sublabel">Tell the group about `:`
       </div>
       <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Quedar aquí con el grupo</button>
-      <div role="group" aria-label="Avisar al grupo"><span class="sublabel">Avisar al grupo de ${isL ? "este remonte" : "esta pista"}</span>${(ks => `<div class="avgrid" style="grid-template-columns:repeat(${ks.length},minmax(0,1fr))">${ks.map(k => `<button data-act="aviso" data-t="${k}" aria-pressed="${mineAv.has(k)}"><i style="--c:${AVISOS[k].c}"></i>${AVISOS[k].s}</button>`).join("")}</div>`)(Object.keys(AVISOS).filter(k => AVISOS[k][g.k]))}<small class="avhint">Duran 2 horas. ${isL ? "Las rutas evitan lo cerrado y suman la cola." : "Las rutas evitan lo cerrado."}</small></div>`;
+      <div role="group" aria-label="Avisar al grupo"><span class="sublabel">Avisar al grupo de `}${isL ? (EN?"this lift":"este remonte") : (EN?"this piste":"esta pista")}</span>${(ks => `<div class="avgrid" style="grid-template-columns:repeat(${ks.length},minmax(0,1fr))">${ks.map(k => `<button data-act="aviso" data-t="${k}" aria-pressed="${mineAv.has(k)}"><i style="--c:${AVISOS[k].c}"></i>${AVISOS[k].s}</button>`).join("")}</div>`)(Object.keys(AVISOS).filter(k => AVISOS[k][g.k]))}${EN?`<small class="avhint">They last 2 hours. `:`<small class="avhint">Duran 2 horas. `}${isL ? (EN?"Routes avoid what's closed and add the queue.":"Las rutas evitan lo cerrado y suman la cola.") : (EN?"Routes avoid what's closed.":"Las rutas evitan lo cerrado.")}</small></div>`;
     const smore = `
       <dl class="spec">
-        ${isL ? `<div><dt>Salida</dt><dd>${g.zb ? fmtNum(g.zb) + " m" : "?"}</dd></div><div><dt>Llegada</dt><dd>${g.zt ? fmtNum(g.zt) + " m" : "?"}</dd></div><div><dt>Viaje</dt><dd>${g.dur ? fmtMin(g.dur) : "?"}</dd></div>`
-        : `<div><dt>Arriba</dt><dd>${g.zt ? fmtNum(g.zt) + " m" : "?"}</dd></div><div><dt>Abajo</dt><dd>${g.zb ? fmtNum(g.zb) + " m" : "?"}</dd></div><div><dt>Desnivel</dt><dd>${g.zt - g.zb > 0 ? fmtNum(g.zt - g.zb) + " m" : "?"}</dd></div>`}
-        <div><dt>Longitud</dt><dd>${fmtLen(g.len)}</dd></div>
+        ${isL ? `${EN?`<div><dt>Start</dt><dd>`:`<div><dt>Salida</dt><dd>`}${g.zb ? fmtNum(g.zb) + " m" : "?"}${EN?`</dd></div><div><dt>End</dt><dd>`:`</dd></div><div><dt>Llegada</dt><dd>`}${g.zt ? fmtNum(g.zt) + " m" : "?"}${EN?`</dd></div><div><dt>Ride</dt><dd>`:`</dd></div><div><dt>Viaje</dt><dd>`}${g.dur ? fmtMin(g.dur) : "?"}</dd></div>`
+        : `${EN?`<div><dt>Top</dt><dd>`:`<div><dt>Arriba</dt><dd>`}${g.zt ? fmtNum(g.zt) + " m" : "?"}${EN?`</dd></div><div><dt>Bottom</dt><dd>`:`</dd></div><div><dt>Abajo</dt><dd>`}${g.zb ? fmtNum(g.zb) + " m" : "?"}${EN?`</dd></div><div><dt>Vertical</dt><dd>`:`</dd></div><div><dt>Desnivel</dt><dd>`}${g.zt - g.zb > 0 ? fmtNum(g.zt - g.zb) + " m" : "?"}</dd></div>`}${EN?`
+        <div><dt>Length</dt><dd>`:`
+        <div><dt>Longitud</dt><dd>`}${fmtLen(g.len)}</dd></div>
       </dl>
-      ${tipoT && g.name ? `<h3 class="sec">En vuestro diario</h3>${regs.length ? `<p class="quiet">${regs.length === 1 ? "Una bajada" : regs.length + " bajadas"}: ${esc([...new Set(regs.map(p => who(p.uid)))].join(", "))}.</p>` : `<p class="quiet">Nadie la ha apuntado todavía.</p>`}` : ""}
-      <p class="quiet">${sel.node != null ? "Estoy aquí y Cómo llegar usan el punto que tocaste." : isL ? "Estoy aquí te pone arriba del remonte. Cómo llegar te lleva a la salida." : "Estoy aquí y Cómo llegar usan el inicio de la pista."}</p>
-      <p class="quiet">Los avisos (${Object.keys(AVISOS).filter(k => AVISOS[k][g.k]).map(k => AVISOS[k].s.toLowerCase()).join(", ")}) duran 2 h. ${isL ? "Las rutas evitan lo cerrado y suman 10 min si hay cola." : "Las rutas evitan lo cerrado."} Toca otra vez el tuyo para quitarlo.</p>`;
+      ${tipoT && g.name ? `${EN?`<h3 class="sec">In your group's log</h3>`:`<h3 class="sec">En vuestro diario</h3>`}${regs.length ? `<p class="quiet">${regs.length === 1 ? (EN?"One run":"Una bajada") : regs.length + (EN ? " runs" : " bajadas")}: ${esc([...new Set(regs.map(p => who(p.uid)))].join(", "))}.</p>` : `${EN?`<p class="quiet">Nobody has logged it yet.</p>`:`<p class="quiet">Nadie la ha apuntado todavía.</p>`}`}` : ""}
+      <p class="quiet">${sel.node != null ? (EN?"I'm here and Directions use the point you tapped.":"Estoy aquí y Cómo llegar usan el punto que tocaste.") : isL ? (EN?"I'm here puts you at the top of the lift. Directions take you to its bottom station.":"Estoy aquí te pone arriba del remonte. Cómo llegar te lleva a la salida.") : (EN?"I'm here and Directions use the start of the piste.":"Estoy aquí y Cómo llegar usan el inicio de la pista.")}${EN?`</p>
+      <p class="quiet">Alerts (`:`</p>
+      <p class="quiet">Los avisos (`}${Object.keys(AVISOS).filter(k => AVISOS[k][g.k]).map(k => AVISOS[k].s.toLowerCase()).join(", ")}) duran 2 h. ${isL ? (EN?"Routes avoid what's closed and add 10 min if there's a queue.":"Las rutas evitan lo cerrado y suman 10 min si hay cola.") : (EN?"Routes avoid what's closed.":"Las rutas evitan lo cerrado.")}${EN?` Tap yours again to remove it.</p>`:` Toca otra vez el tuyo para quitarlo.</p>`}`;
     return { speek, smore };
   }
 
@@ -2343,26 +2418,27 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const mp = myPos(), now = nowMin(); if (!mp || Date.now() - mp.at > 3 * 3600e3 || now < 9 * 60 || now > casaCierre + 30) return "";
     const pl = casaPlan(); if (!pl || pl.leave == null) return "";
     const left = pl.leave - now; if (left > 45) return "";
-    return `<button class="chip ${left <= 0 ? "bad" : "warn"}" data-act="casa-route">${left <= 0 ? "Puede que no llegues a " + esc(CASA.n) + " en remontes · ver ruta" : "Para volver a " + esc(CASA.n) + ", sal antes de las " + hm24(pl.leave)}</button>`;
+    return `<button class="chip ${left <= 0 ? "bad" : "warn"}" data-act="casa-route">${left <= 0 ? (EN?"You might not make it to ":"Puede que no llegues a ") + esc(CASA.n) + (EN?" on lifts · see route":" en remontes · ver ruta") : (EN?"To get back to ":"Para volver a ") + esc(CASA.n) + (EN?", leave before ":", sal antes de las ") + hm24(pl.leave)}</button>`;
   }
   function casaHtml() {
-    if (!CASA || casaPick) return `<h3 class="sec">Vuelta a casa</h3><p class="quiet">Dime dónde dormís y te aviso de cuándo salir para no quedarte en otro valle cuando cierren los remontes.</p>
-      <div class="zones">${(M.places || []).map((p, i) => `<button data-act="casa-set" data-i="${i}">${esc(p[0])}</button>`).join("")}</div>`;
+    if (!CASA || casaPick) return `${EN?`<h3 class="sec">Back home</h3><p class="quiet">Tell me where you're staying and I'll let you know when to leave so you're not stuck in another valley when the lifts close.</p>
+      <div class="zones">`:`<h3 class="sec">Vuelta a casa</h3><p class="quiet">Dime dónde dormís y te aviso de cuándo salir para no quedarte en otro valle cuando cierren los remontes.</p>
+      <div class="zones">`}${(M.places || []).map((p, i) => `<button data-act="casa-set" data-i="${i}">${esc(p[0])}</button>`).join("")}</div>`;
     const pl = casaPlan(), mp = myPos();
-    const txt = !mp ? "Marca dónde estás con el botón Aquí y te digo cuándo salir." : !pl ? "No encuentro un camino desde donde estás." : pl.leave == null ? `Llegas esquiando en unos ${pl.min} min.`
-      : `Sal antes de las <b>${hm24(pl.leave)}</b>. Tardas unos ${pl.min} min, con ${pl.lifts} ${pl.lifts === 1 ? "remonte" : "remontes"}${pl.crit ? `, y el que más aprieta es ${esc(pl.crit)}` : ""}.`;
-    const note = pl && pl.leave != null ? `<small>${pl.ofi ? "Con los horarios oficiales de hoy." : `Cuento con que los remontes cierran a las ${hm24(casaCierre)}. Ajusta la hora con la de tu estación.`}</small>` : "";
-    const cierre = pl && pl.ofi ? "" : `<div class="cierre"><span>Últimos remontes</span><button class="btn dark" data-act="casa-cierre" data-d="-15" aria-label="15 minutos antes">−15</button><b>${hm24(casaCierre)}</b><button class="btn dark" data-act="casa-cierre" data-d="15" aria-label="15 minutos después">+15</button></div>`;
-    return `<h3 class="sec">Vuelta a ${esc(CASA.n)}</h3><div class="casacard"><p>${txt}</p>${note}${cierre}<div class="acts two"><button class="btn" data-act="casa-route">Cómo volver</button><button class="btn ghost" data-act="casa-change">Cambiar</button></div></div>`;
+    const txt = !mp ? (EN?"Mark where you are with the Here button and I'll tell you when to leave.":"Marca dónde estás con el botón Aquí y te digo cuándo salir.") : !pl ? (EN?"I can't find a way from where you are.":"No encuentro un camino desde donde estás.") : pl.leave == null ? `${EN?`You can ski there in about `:`Llegas esquiando en unos `}${pl.min} min.`
+      : `${EN?`Leave before <b>`:`Sal antes de las <b>`}${hm24(pl.leave)}</b>. ${EN ? "It takes about " : "Tardas unos "}${pl.min}${EN?` min, with `:` min, con `}${pl.lifts} ${pl.lifts === 1 ? (EN?"lift":"remonte") : (EN?"lifts":"remontes")}${pl.crit ? `${EN?`, and the tightest one is `:`, y el que más aprieta es `}${esc(pl.crit)}` : ""}.`;
+    const note = pl && pl.leave != null ? `<small>${pl.ofi ? (EN?"Using today's official times.":"Con los horarios oficiales de hoy.") : `${EN?`I'm assuming the lifts close at `:`Cuento con que los remontes cierran a las `}${hm24(casaCierre)}${EN?`. Set the time to match your resort.`:`. Ajusta la hora con la de tu estación.`}`}</small>` : "";
+    const cierre = pl && pl.ofi ? "" : `${EN?`<div class="cierre"><span>Last lifts</span><button class="btn dark" data-act="casa-cierre" data-d="-15" aria-label="15 minutes earlier">−15</button><b>`:`<div class="cierre"><span>Últimos remontes</span><button class="btn dark" data-act="casa-cierre" data-d="-15" aria-label="15 minutos antes">−15</button><b>`}${hm24(casaCierre)}${EN?`</b><button class="btn dark" data-act="casa-cierre" data-d="15" aria-label="15 minutes later">+15</button></div>`:`</b><button class="btn dark" data-act="casa-cierre" data-d="15" aria-label="15 minutos después">+15</button></div>`}`;
+    return `${EN?`<h3 class="sec">Back to `:`<h3 class="sec">Vuelta a `}${esc(CASA.n)}</h3><div class="casacard"><p>${txt}</p>${note}${cierre}${EN?`<div class="acts two"><button class="btn" data-act="casa-route">How to get back</button><button class="btn ghost" data-act="casa-change">Change</button></div></div>`:`<div class="acts two"><button class="btn" data-act="casa-route">Cómo volver</button><button class="btn ghost" data-act="casa-change">Cambiar</button></div></div>`}`;
   }
 
   /* ================= ¿Dónde nos juntamos? El punto más justo para todos ================= */
   let juntar = null;
   function juntarCalc() {
     const ps = positions().filter(p => p.near >= 0 && Date.now() - p.at < 4 * 3600e3);
-    if (ps.length < 2) return { err: "Hace falta que al menos dos del grupo hayan marcado dónde están." };
+    if (ps.length < 2) return { err: (EN?"At least two people in the group need to have marked where they are.":"Hace falta que al menos dos del grupo hayan marcado dónde están.") };
     const ds = ps.map(p => { const d = distAll(p.near); return d ? Float64Array.from(d) : null; });
-    if (ds.some(d => !d)) return { err: "Todavía se está cargando el mapa. Prueba en un momento." };
+    if (ds.some(d => !d)) return { err: (EN?"The map is still loading. Try again in a moment.":"Todavía se está cargando el mapa. Prueba en un momento.") };
     const cands = new Map();
     F.forEach(f => { if (f.k === "L" && f.ns.length) [f.ns[0], f.ns[f.ns.length - 1]].forEach(n => { if (ROUTABLE[n] && !cands.has(n)) cands.set(n, null); }); });
     POIS.forEach(p => { const n = poiNode(p); if (n >= 0) cands.set(n, p); });
@@ -2373,47 +2449,56 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       const sc = w + sum * 0.05 - (poi ? 90 : 0);   // lo justo: que el que más tarda tarde lo menos posible; un bar suma
       if (!best || sc < best.sc) best = { n, poi, w, sc };
     });
-    if (!best) return { err: "No encuentro un punto al que podáis llegar todos." };
+    if (!best) return { err: (EN?"I can't find a spot you can all reach.":"No encuentro un punto al que podáis llegar todos.") };
     return { n: best.n, poi: best.poi, w: Math.max(1, Math.round(best.w / 60)), name: best.poi ? best.poi.name : cap(describeNode(best.n)), times: ps.map((p, i) => ({ uid: p.uid, m: Math.max(0, Math.round(ds[i][best.n] / 60)) })).sort((a, b) => b.m - a.m) };
   }
   function juntarHtml() {
     const j = juntar;
-    if (j.err) return { speek: `<div class="headrow"><div class="title-wrap"><div><small class="kicker">¿Dónde nos juntamos?</small><h2 class="title md">Aún no se puede</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div><p class="quiet">${esc(j.err)}</p>`, smore: "" };
-    const speek = `<div class="headrow"><div class="title-wrap"><div><small class="kicker">Lo más justo para todos</small><h2 class="title md">${esc(j.name)}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
-      <p class="facts">Llegáis todos en unos ${j.w} min.</p>
-      <div class="acts two"><button class="btn" data-act="juntar-meet">Proponer al grupo</button><button class="btn dark" data-act="juntar-go">Cómo llegar</button></div>`;
-    const smore = `<h3 class="sec">Lo que tarda cada uno</h3><ul class="junttimes">${j.times.map(t => `<li>${av(t.uid)}<span>${esc(t.uid === me ? "Tú" : who(t.uid))}</span><b>${t.m} min</b></li>`).join("")}</ul>
-      <p class="quiet">Elijo el sitio donde el que más tarda tarda lo menos posible, y si hay un bar o un restaurante a la misma distancia, mejor.</p>`;
+    if (j.err) return { speek: `${EN?`<div class="headrow"><div class="title-wrap"><div><small class="kicker">Where shall we meet?</small><h2 class="title md">Not possible yet</h2></div></div><button class="x" data-act="close-sel" aria-label="Close">×</button></div><p class="quiet">`:`<div class="headrow"><div class="title-wrap"><div><small class="kicker">¿Dónde nos juntamos?</small><h2 class="title md">Aún no se puede</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div><p class="quiet">`}${esc(j.err)}</p>`, smore: "" };
+    const speek = `${EN?`<div class="headrow"><div class="title-wrap"><div><small class="kicker">Fairest for everyone</small><h2 class="title md">`:`<div class="headrow"><div class="title-wrap"><div><small class="kicker">Lo más justo para todos</small><h2 class="title md">`}${esc(j.name)}${EN?`</h2></div></div><button class="x" data-act="close-sel" aria-label="Close">×</button></div>
+      <p class="facts">You all get there in about `:`</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
+      <p class="facts">Llegáis todos en unos `}${j.w}${EN?` min.</p>
+      <div class="acts two"><button class="btn" data-act="juntar-meet">Suggest to the group</button><button class="btn dark" data-act="juntar-go">Directions</button></div>`:` min.</p>
+      <div class="acts two"><button class="btn" data-act="juntar-meet">Proponer al grupo</button><button class="btn dark" data-act="juntar-go">Cómo llegar</button></div>`}`;
+    const smore = `${EN?`<h3 class="sec">How long each person takes</h3><ul class="junttimes">`:`<h3 class="sec">Lo que tarda cada uno</h3><ul class="junttimes">`}${j.times.map(t => `<li>${av(t.uid)}<span>${esc(t.uid === me ? (EN?"You":"Tú") : who(t.uid))}</span><b>${t.m} min</b></li>`).join("")}${EN?`</ul>
+      <p class="quiet">I pick the spot where the slowest person takes the least time, and a bar or restaurant at the same distance gets the edge.</p>`:`</ul>
+      <p class="quiet">Elijo el sitio donde el que más tarda tarda lo menos posible, y si hay un bar o un restaurante a la misma distancia, mejor.</p>`}`;
     return { speek, smore };
   }
 
   /* Cuenta: guardar el perfil con Google o Apple (mismo usuario, no se pierde nada) */
+  function langHtml() {
+    const b = (v, t) => `<button class="${VLANG === v ? "on" : ""}" data-act="lang" data-v="${v}" aria-pressed="${VLANG === v}">${t}</button>`;
+    return `<div class="langrow"><span>${EN ? "Language" : "Idioma"}</span><div class="lp-seg">${b("es", "Español")}${b("en", "English")}</div></div>`;
+  }
   function accHtml() {
     const G = window.PISTEA_GROUP; if (!G || !G.account) return "";
     const a = G.account(); if (!a) return "";
-    if (!a.anon) return `<h3 class="sec">Tu cuenta</h3><p class="quiet">Has entrado con ${esc(a.via || "tu cuenta")}${a.email ? " · " + esc(a.email) : ""}. Tu perfil te sigue si cambias de móvil.</p>`;
+    if (!a.anon) return `${EN?`<h3 class="sec">Your account</h3><p class="quiet">You're signed in with `:`<h3 class="sec">Tu cuenta</h3><p class="quiet">Has entrado con `}${esc(a.via || (EN?"your account":"tu cuenta"))}${a.email ? " · " + esc(a.email) : ""}${EN?`. Your profile follows you if you change phones.</p>`:`. Tu perfil te sigue si cambias de móvil.</p>`}`;
     const ks = ["google", "apple"].filter(k => G.canLogin(k)); if (!ks.length) return "";
-    return `<h3 class="sec">Guarda tu perfil</h3><p class="quiet">Ahora tu perfil vive solo en este móvil. Con una cuenta lo recuperas en cualquier otro, sin perder nada de lo de hoy. <a href="privacidad/" style="color:var(--acc)">Privacidad</a></p>
-      ${ks.map(k => `<button class="btn wide acc-btn ${k}" data-act="acc-link" data-k="${k}">Continuar con ${k === "google" ? "Google" : "Apple"}</button>`).join("")}`;
+    return `${EN?`<h3 class="sec">Save your profile</h3><p class="quiet">Right now your profile only lives on this phone. With an account you get it back on any other, without losing anything from today. <a href="privacidad/" style="color:var(--acc)">Privacy</a></p>
+      `:`<h3 class="sec">Guarda tu perfil</h3><p class="quiet">Ahora tu perfil vive solo en este móvil. Con una cuenta lo recuperas en cualquier otro, sin perder nada de lo de hoy. <a href="privacidad/" style="color:var(--acc)">Privacidad</a></p>
+      `}${ks.map(k => `<button class="btn wide acc-btn ${k}" data-act="acc-link" data-k="${k}${EN?`">Continue with `:`">Continuar con `}${k === "google" ? "Google" : "Apple"}</button>`).join("")}`;
   }
 
   /* «Ir hasta»: elegir destino. Amigos, la quedada, sitios cerca y la búsqueda. */
   function gotoHtml() {
     const mp = myPos(), others = positions().filter(p => p.uid !== me), mt = meet();
-    const speek = `<div class="headrow"><div class="title-wrap"><div><small class="kicker">Ir hasta</small><h2 class="title md">¿A dónde vas?</h2></div></div><button class="x" data-act="tab-map" aria-label="Cerrar">×</button></div>
-      <button class="btn dark wide" data-act="goto-search">Buscar una pista, un remonte o un sitio</button>`;
+    const speek = `${EN?`<div class="headrow"><div class="title-wrap"><div><small class="kicker">Go to</small><h2 class="title md">Where to?</h2></div></div><button class="x" data-act="tab-map" aria-label="Close">×</button></div>
+      <button class="btn dark wide" data-act="goto-search">Search for a piste, a lift or a place</button>`:`<div class="headrow"><div class="title-wrap"><div><small class="kicker">Ir hasta</small><h2 class="title md">¿A dónde vas?</h2></div></div><button class="x" data-act="tab-map" aria-label="Cerrar">×</button></div>
+      <button class="btn dark wide" data-act="goto-search">Buscar una pista, un remonte o un sitio</button>`}`;
     const others0 = positions().filter(p => p.uid !== me);
     let more = "";
-    if (!mp) more += `<p class="quiet">Marca primero dónde estás con el botón Aquí. Así se calcula la ruta desde tu sitio.</p>`;
-    if (others0.length) more += `<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>`;
-    if (CASA) { const n = casaNode(); if (n >= 0) more += `<h3 class="sec">Vuelta a casa</h3><ul class="people"><li class="person"><button class="pbtn" data-act="casa-route"><span><b>${esc(CASA.n)}</b><small>${(pl => pl && pl.leave != null ? "Sal antes de las " + hm24(pl.leave) : "Tu alojamiento")(casaPlan())}</small></span></button><button class="btn go" data-act="casa-route">Ir</button></li></ul>`; }
-    if (mt) more += `<h3 class="sec">Punto de encuentro</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Quedada${mt.hora ? " a las " + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}</small></span></button>`;
-    more += `<h3 class="sec">Tu grupo</h3>` + (others.length ? `<ul class="people">${others.map(p => `
-        <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}"><button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${esc(p.en || "")} · ${esc(ago(p.at))}</small></span></button><button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">Ir</button></li>`).join("")}</ul>`
-      : `<p class="quiet">Cuando alguien del grupo marque dónde está, podrás ir hasta él desde aquí.</p>`);
+    if (!mp) more += `${EN?`<p class="quiet">First mark where you are with the Here button, so the route starts from your spot.</p>`:`<p class="quiet">Marca primero dónde estás con el botón Aquí. Así se calcula la ruta desde tu sitio.</p>`}`;
+    if (others0.length) more += `${EN?`<button class="btn ghost wide juntbtn" data-act="juntar">Where shall we meet?</button>`:`<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>`}`;
+    if (CASA) { const n = casaNode(); if (n >= 0) more += `${EN?`<h3 class="sec">Back home</h3><ul class="people"><li class="person"><button class="pbtn" data-act="casa-route"><span><b>`:`<h3 class="sec">Vuelta a casa</h3><ul class="people"><li class="person"><button class="pbtn" data-act="casa-route"><span><b>`}${esc(CASA.n)}</b><small>${(pl => pl && pl.leave != null ? (EN?"Leave before ":"Sal antes de las ") + hm24(pl.leave) : (EN?"Where you're staying":"Tu alojamiento"))(casaPlan())}</small></span></button><button class="btn go" data-act="casa-route">${EN ? "Go" : "Ir"}</button></li></ul>`; }
+    if (mt) more += `${EN?`<h3 class="sec">Meeting point</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Meet-up`:`<h3 class="sec">Punto de encuentro</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Quedada`}${mt.hora ? (EN?" at ":" a las ") + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}</small></span></button>`;
+    more += `${EN?`<h3 class="sec">Your group</h3>`:`<h3 class="sec">Tu grupo</h3>`}` + (others.length ? `<ul class="people">${others.map(p => `
+        <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}"><button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${esc(p.en || "")} · ${esc(ago(p.at))}</small></span></button><button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">${EN ? "Go" : "Ir"}</button></li>`).join("")}</ul>`
+      : `${EN?`<p class="quiet">When someone in the group marks where they are, you can get to them from here.</p>`:`<p class="quiet">Cuando alguien del grupo marque dónde está, podrás ir hasta él desde aquí.</p>`}`);
     const near = mp ? POIS.map(p => ({ p, m: minsTo(poiNode(p)) })).filter(o => o.m != null).sort((a, b) => a.m - b.m).slice(0, 6) : [];
-    if (near.length) more += `<h3 class="sec">Para comer o tomar algo cerca</h3><ul class="people">${near.map(({ p, m }) => `
-        <li class="person"><button class="pbtn" data-act="res-poi" data-id="${esc(p.id)}"><span class="poiic" style="--c:${POI_CAT[p.cat].c};width:36px;height:36px;flex-basis:36px">${POI_ICON[p.cat]}</span><span><b>${esc(p.name)}</b><small>${esc(poiKind(p))} · ${m} min</small></span></button><button class="btn go" data-act="poi-go" data-id="${esc(p.id)}">Ir</button></li>`).join("")}</ul>`;
+    if (near.length) more += `${EN?`<h3 class="sec">Food and drinks nearby</h3><ul class="people">`:`<h3 class="sec">Para comer o tomar algo cerca</h3><ul class="people">`}${near.map(({ p, m }) => `
+        <li class="person"><button class="pbtn" data-act="res-poi" data-id="${esc(p.id)}"><span class="poiic" style="--c:${POI_CAT[p.cat].c};width:36px;height:36px;flex-basis:36px">${POI_ICON[p.cat]}</span><span><b>${esc(p.name)}</b><small>${esc(poiKind(p))} · ${m} min</small></span></button><button class="btn go" data-act="poi-go" data-id="${esc(p.id)}">${EN ? "Go" : "Ir"}</button></li>`).join("")}</ul>`;
     return { speek, smore: more };
   }
   function personHtml() {
@@ -2421,30 +2506,37 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     if (!p) { personSheet = null; return homeHtml(); }
     const mine = p.uid === me;
     const speek = `
-      <div class="headrow"><div class="title-wrap">${av(p.uid, true)}<div><small class="kicker">${isLive(p) ? `<span class="live-dot"></span>En directo` : esc(ago(p.at))}</small><h2 class="title">${esc(mine ? "Tú" : who(p.uid))}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
-      <p class="facts">${esc(p.en || "")}</p>${msgOf(p.uid) ? (m => `
+      <div class="headrow"><div class="title-wrap">${av(p.uid, true)}<div><small class="kicker">${isLive(p) ? `${EN?`<span class="live-dot"></span>Live`:`<span class="live-dot"></span>En directo`}` : esc(ago(p.at))}</small><h2 class="title">${esc(mine ? (EN?"You":"Tú") : who(p.uid))}${EN?`</h2></div></div><button class="x" data-act="close-sel" aria-label="Close">×</button></div>
+      <p class="facts">`:`</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
+      <p class="facts">`}${esc(p.en || "")}</p>${msgOf(p.uid) ? (m => `
       <p class="msgline${m.tipo === "ayuda" ? " help" : ""}">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</p>`)(msgOf(p.uid)) : ""}
-      ${!mine && msgOf(p.uid) && msgOf(p.uid).tipo === "ayuda" ? `<div class="helpacts"><button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}">Ir hasta ${esc(who(p.uid))}</button><a class="btn ghost danger" href="tel:112">Llamar al 112</a></div>
-      <button class="btn dark wide" data-act="msg" data-t="voy">Voy yo · avisar al grupo</button>` : `
-      <div class="acts two">${mine ? `<button class="btn" data-act="mark">Cambiar dónde estoy</button><button class="btn ghost" data-act="unmark">Quitar</button>` : `<button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}">Cómo llegar</button><button class="btn ghost" data-act="center-person" data-uid="${esc(p.uid)}">Centrar</button>`}</div>`}
-      ${!mine && window.PISTEA_GROUP && window.PISTEA_GROUP.isOwner ? `<button class="btn ghost wide danger" data-act="kick" data-uid="${esc(p.uid)}">${confirmAct === "kick:" + p.uid ? "Toca otra vez para quitar a " + esc(who(p.uid)) : "Quitar del grupo"}</button>` : ""}`;
-    return { speek, smore: Date.now() - p.at > 4 * 3600e3 ? `<p class="quiet">Esta posición tiene más de 4 horas. Puede que ya no esté ahí.</p>` : "" };
+      ${!mine && msgOf(p.uid) && msgOf(p.uid).tipo === "ayuda" ? `<div class="helpacts"><button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}${EN?`">Go to `:`">Ir hasta `}${esc(who(p.uid))}${EN?`</button><a class="btn ghost danger" href="tel:112">Call 112</a></div>
+      <button class="btn dark wide" data-act="msg" data-t="voy">I'll go · tell the group</button>`:`</button><a class="btn ghost danger" href="tel:112">Llamar al 112</a></div>
+      <button class="btn dark wide" data-act="msg" data-t="voy">Voy yo · avisar al grupo</button>`}` : `
+      <div class="acts two">${mine ? `${EN?`<button class="btn" data-act="mark">Change where I am</button><button class="btn ghost" data-act="unmark">Remove</button>`:`<button class="btn" data-act="mark">Cambiar dónde estoy</button><button class="btn ghost" data-act="unmark">Quitar</button>`}` : `<button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}${EN?`">Directions</button><button class="btn ghost" data-act="center-person" data-uid="`:`">Cómo llegar</button><button class="btn ghost" data-act="center-person" data-uid="`}${esc(p.uid)}${EN?`">Centre</button>`:`">Centrar</button>`}`}</div>`}
+      ${!mine && window.PISTEA_GROUP && window.PISTEA_GROUP.isOwner ? `<button class="btn ghost wide danger" data-act="kick" data-uid="${esc(p.uid)}">${confirmAct === "kick:" + p.uid ? (EN?"Tap again to remove ":"Toca otra vez para quitar a ") + esc(who(p.uid)) : (EN?"Remove from group":"Quitar del grupo")}</button>` : ""}`;
+    return { speek, smore: Date.now() - p.at > 4 * 3600e3 ? `${EN?`<p class="quiet">This position is more than 4 hours old. They may not be there any more.</p>`:`<p class="quiet">Esta posición tiene más de 4 horas. Puede que ya no esté ahí.</p>`}` : "" };
   }
 
   function meetHtml() {
     const mt = meet();
     if (!mt) { meetSheet = false; return homeHtml(); }
     const canDel = canEditMeet(mt), mine = mt.uid === me;
-    const speek = `
-      <div class="headrow"><div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Punto de encuentro · ${mine ? "lo pusiste tú" : "lo puso " + esc(who(mt.uid))}</small><h2 class="title md">${esc(cap(mt.en))}</h2></div></div>${mt.hora ? `<span class="meethora"><b>${esc(mt.hora)}</b><small>${esc(untilTxt(mt.hora))}</small></span>` : ""}<button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
-      <div class="acts ${canDel ? "two" : "one"}"><button class="btn" data-act="meet-route">Cómo llegar</button>${canDel ? `<button class="btn ghost danger" data-act="meet-del">Quitar quedada</button>` : ""}</div>`;
+    const speek = `${EN?`
+      <div class="headrow"><div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Meeting point · `:`
+      <div class="headrow"><div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Punto de encuentro · `}${mine ? (EN?"you set it":"lo pusiste tú") : (EN ? "set by " : "lo puso ") + esc(who(mt.uid))}</small><h2 class="title md">${esc(cap(mt.en))}</h2></div></div>${mt.hora ? `<span class="meethora"><b>${esc(mt.hora)}</b><small>${esc(untilTxt(mt.hora))}</small></span>` : ""}${EN?`<button class="x" data-act="close-sel" aria-label="Close">×</button></div>
+      <div class="acts `:`<button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
+      <div class="acts `}${canDel ? "two" : "one"}${EN?`"><button class="btn" data-act="meet-route">Directions</button>`:`"><button class="btn" data-act="meet-route">Cómo llegar</button>`}${canDel ? `${EN?`<button class="btn ghost danger" data-act="meet-del">Remove meet-up</button>`:`<button class="btn ghost danger" data-act="meet-del">Quitar quedada</button>`}` : ""}</div>`;
     const et = meetEtas(mt), hT = mt.hora ? (() => { const [h, m] = mt.hora.split(":").map(Number), d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); })() : null;
-    const smore = `
+    const smore = `${EN?`
+      <h3 class="sec">How far each person is</h3>
+      `:`
       <h3 class="sec">Cuánto le falta a cada uno</h3>
-      ${et.length ? `<ul class="people">${et.map(e => { const arr = e.t != null ? Date.now() + e.t * 1000 : null, late = hT && arr && arr > hT + 60000; return `
-        <li class="person"><button class="pbtn" data-act="person" data-uid="${esc(e.p.uid)}">${av(e.p.uid)}<span><b>${esc(e.p.uid === me ? "Tú" : who(e.p.uid))}</b><small>${esc(e.p.en || "")} · ${esc(ago(e.p.at))}</small></span></button>
-          <span class="eta${late ? " late" : ""}"><b>${etaTxt(e.t)}</b>${arr && e.t >= 60 ? `<small>${late ? "llega tarde, " : "llega "}${hhmm(arr)}</small>` : ""}</span></li>`; }).join("")}</ul>` : `<p class="quiet">Nadie ha marcado dónde está todavía.</p>`}
-      <p class="quiet">Tiempo aproximado por la ruta más rápida, con la espera de los remontes. Solo sale quien ha marcado dónde está.${canDel ? "" : " Solo quien la puso o quien creó el grupo puede quitarla."}</p>`;
+      `}${et.length ? `<ul class="people">${et.map(e => { const arr = e.t != null ? Date.now() + e.t * 1000 : null, late = hT && arr && arr > hT + 60000; return `
+        <li class="person"><button class="pbtn" data-act="person" data-uid="${esc(e.p.uid)}">${av(e.p.uid)}<span><b>${esc(e.p.uid === me ? (EN?"You":"Tú") : who(e.p.uid))}</b><small>${esc(e.p.en || "")} · ${esc(ago(e.p.at))}</small></span></button>
+          <span class="eta${late ? " late" : ""}"><b>${etaTxt(e.t)}</b>${arr && e.t >= 60 ? `<small>${late ? (EN?"late, ":"llega tarde, ") : (EN?"arrives ":"llega ")}${hhmm(arr)}</small>` : ""}</span></li>`; }).join("")}</ul>` : `${EN?`<p class="quiet">Nobody has marked where they are yet.</p>`:`<p class="quiet">Nadie ha marcado dónde está todavía.</p>`}`}${EN?`
+      <p class="quiet">Approximate time on the fastest route, including lift waits. Only people who have marked where they are show up.`:`
+      <p class="quiet">Tiempo aproximado por la ruta más rápida, con la espera de los remontes. Solo sale quien ha marcado dónde está.`}${canDel ? "" : (EN?" Only whoever set it or whoever created the group can remove it.":" Solo quien la puso o quien creó el grupo puede quitarla.")}</p>`;
     return { speek, smore };
   }
   const hm24 = m => hm(((m % 1440) + 1440) % 1440);
@@ -2452,8 +2544,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   function untilTxt(h) {
     const [hh, mm] = h.split(":").map(Number); let d = hh * 60 + mm - nowMin();
     if (d < -60) d += 1440;
-    if (d <= 0) return d > -15 ? "ahora" : "ya pasó";
-    return "en " + (d < 60 ? d + " min" : Math.floor(d / 60) + " h" + (d % 60 ? " " + String(d % 60).padStart(2, "0") : ""));
+    if (d <= 0) return d > -15 ? (EN ? "now" : "ahora") : (EN?"already passed":"ya pasó");
+    return (EN ? "in " : "en ") + (d < 60 ? d + " min" : Math.floor(d / 60) + " h" + (d % 60 ? " " + String(d % 60).padStart(2, "0") : ""));
   }
   function meetAsk(node, en) {
     meetDraft = { node, en, m: Math.ceil((nowMin() + 30) / 15) * 15 };
@@ -2462,14 +2554,21 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   function meetModal() {
     const d = meetDraft; if (!d) return;
     const h = hm24(d.m);
-    $("#modal").innerHTML = `<div class="mcard sheetcard" role="dialog" aria-label="Quedar aquí">
-      <div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Quedar aquí</small><h2 class="title md">${esc(cap(d.en))}</h2></div></div>
-      <div class="mtime"><button class="btn dark" data-act="meet-step" data-d="-15" aria-label="15 minutos antes">−15</button><div><output aria-live="polite">${h}</output><small>${esc(untilTxt(h))}</small></div><button class="btn dark" data-act="meet-step" data-d="15" aria-label="15 minutos después">+15</button></div>
+    $("#modal").innerHTML = `${EN?`<div class="mcard sheetcard" role="dialog" aria-label="Meet here">
+      <div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Meet here</small><h2 class="title md">`:`<div class="mcard sheetcard" role="dialog" aria-label="Quedar aquí">
+      <div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Quedar aquí</small><h2 class="title md">`}${esc(cap(d.en))}${EN?`</h2></div></div>
+      <div class="mtime"><button class="btn dark" data-act="meet-step" data-d="-15" aria-label="15 minutes earlier">−15</button><div><output aria-live="polite">`:`</h2></div></div>
+      <div class="mtime"><button class="btn dark" data-act="meet-step" data-d="-15" aria-label="15 minutos antes">−15</button><div><output aria-live="polite">`}${h}</output><small>${esc(untilTxt(h))}${EN?`</small></div><button class="btn dark" data-act="meet-step" data-d="15" aria-label="15 minutes later">+15</button></div>
+      <div class="mquick"><button class="btn ghost" data-act="meet-quick" data-m="30">In 30 min</button><button class="btn ghost" data-act="meet-quick" data-m="60">In 1 h</button><button class="btn ghost" data-act="meet-set" data-h="">No time</button></div>
+      <p class="quiet">The whole group gets it, with how long each person takes to get there.</p>
+      <button class="btn" data-act="meet-set" data-h="`:`</small></div><button class="btn dark" data-act="meet-step" data-d="15" aria-label="15 minutos después">+15</button></div>
       <div class="mquick"><button class="btn ghost" data-act="meet-quick" data-m="30">En 30 min</button><button class="btn ghost" data-act="meet-quick" data-m="60">En 1 h</button><button class="btn ghost" data-act="meet-set" data-h="">Sin hora</button></div>
       <p class="quiet">Le llega a todo el grupo con lo que tarda cada uno en llegar.</p>
-      <button class="btn" data-act="meet-set" data-h="${h}">Quedar a las ${h}</button>
+      <button class="btn" data-act="meet-set" data-h="`}${h}${EN?`">Meet at `:`">Quedar a las `}${h}${EN?`</button>
+      <button class="btn ghost" data-act="modal-close">Cancel</button>
+    </div>`:`</button>
       <button class="btn ghost" data-act="modal-close">Cancelar</button>
-    </div>`;
+    </div>`}`;
     $("#modal").hidden = false;
   }
   function meetSet(h) {
@@ -2481,27 +2580,27 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const [lon, lat] = toLL(NX[d.node], NY[d.node]);
     const data = { uid: me, lat: +lat.toFixed(6), lon: +lon.toFixed(6), en: d.en.slice(0, 120), at: now, exp: Math.min(now + 15 * 3600e3, Math.max(tH, now) + 2 * 3600e3) };
     if (h) data.hora = h;
-    put("quedada", "actual", data).then(ok => { if (!ok) return; sel = null; personSheet = null; meetSheet = true; setSnap("peek"); centerOn(NX[d.node], NY[d.node], 0.2); toast(sentMsg("Quedada " + (h ? "a las " + h + ", " : "") + d.en)); ui(); });
+    put("quedada", "actual", data).then(ok => { if (!ok) return; sel = null; personSheet = null; meetSheet = true; setSnap("peek"); centerOn(NX[d.node], NY[d.node], 0.2); toast(sentMsg((EN?"Meet-up ":"Quedada ") + (h ? (EN?"at ":"a las ") + h + ", " : "") + d.en)); ui(); });
   }
   function msgSend(t) {
     const mp = S.aqui.get(me), data = { uid: me, tipo: t, at: Date.now() };
     if (mp && typeof mp.lat === "number" && typeof mp.lon === "number") { data.lat = mp.lat; data.lon = mp.lon; if (mp.en) data.en = String(mp.en).slice(0, 120); }
     put("mensajes", me, data).then(ok => {
       if (!ok) return;
-      if (!data.lat && t !== "bar") { toast("Enviado. Buscando tu ubicación para que puedan llegar…"); setTimeout(gpsHere, 1200); }
-      else toast(sentMsg("Enviado al grupo: «" + MSGS[t] + "»"));
+      if (!data.lat && t !== "bar") { toast((EN?"Sent. Finding your location so they can reach you…":"Enviado. Buscando tu ubicación para que puedan llegar…")); setTimeout(gpsHere, 1200); }
+      else toast(sentMsg((EN?"Sent to the group: «":"Enviado al grupo: «") + MSGS[t] + "»"));
     });
   }
   function stepInfo(st) {
     const f = st.f;
-    if (st.ty === 2) return { cls: "walk", ic: "→", t1: "Camina unos " + fmtLen(st.m), t2: "A pie o empujando con los bastones" };
+    if (st.ty === 2) return { cls: "walk", ic: "→", t1: (EN?"Walk about ":"Camina unos ") + fmtLen(st.m), t2: (EN?"On foot or pushing with your poles":"A pie o empujando con los bastones") };
     if (st.ty === 1 || st.ty === 3) {
       const L = LIFT[f.t] || LIFT.tsd, nm = f.name || f.ref;
-      return { cls: "lift", ic: st.ty === 1 ? "▲" : "▼", t1: (st.ty === 1 ? "Sube en " : "Baja en ") + L.g + (nm ? " " + nm : ""), t2: fmtMin(st.t) + " con la espera" + ([...st.fis].some(fi => AVX.cola.has(fi)) ? " (avisan de cola)" : "") + (f.zt && f.zb ? " · llegas a " + fmtNum(st.ty === 1 ? f.zt : f.zb) + " m" : "") };
+      return { cls: "lift", ic: st.ty === 1 ? "▲" : "▼", t1: (st.ty === 1 ? (EN?"Ride up ":"Sube en ") : (EN?"Ride down ":"Baja en ")) + L.g + (nm ? " " + nm : ""), t2: fmtMin(st.t) + (EN?" including the wait":" con la espera") + ([...st.fis].some(fi => AVX.cola.has(fi)) ? (EN?" (queue reported)":" (avisan de cola)") : "") + (f.zt && f.zb ? (EN?" · you reach ":" · llegas a ") + fmtNum(st.ty === 1 ? f.zt : f.zb) + " m" : "") };
     }
     const nm = f.name || f.ref, D = DIF[f.d];
     const z0 = NZ[st.nodes[0]], z1 = NZ[st.nodes[st.nodes.length - 1]];
-    return { cls: "", c: D.hex, ic: "", t1: "Baja por " + (nm ? (f.d === "i" ? "el itinerario " : "la " + D.s.toLowerCase() + " ") + nm : "una pista " + D.s.toLowerCase()), t2: fmtLen(st.m) + (z0 > 0 && z1 > 0 && z0 - z1 > 20 ? " · " + fmtNum(z0 - z1) + " m de desnivel" : "") };
+    return { cls: "", c: D.hex, ic: "", t1: (EN ? "Ski down " + (nm ? (f.d === "i" ? "the itinerary " : "the " + D.s.toLowerCase() + " ") + nm : "a " + D.s.toLowerCase() + " piste") : "Baja por " + (nm ? (f.d === "i" ? "el itinerario " : "la " + D.s.toLowerCase() + " ") + nm : "una pista " + D.s.toLowerCase())), t2: fmtLen(st.m) + (z0 > 0 && z1 > 0 && z0 - z1 > 20 ? " · " + fmtNum(z0 - z1) + (EN?" m vertical":" m de desnivel") : "") };
   }
   function routeRuns() {
     if (!rt || !rt.res) return [];
@@ -2511,57 +2610,62 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   }
   function routeHtml() {
     const toName = rt.to.uid ? who(rt.to.uid) : rt.to.label;
-    const head = (sub) => `<div class="headrow"><div><small class="kicker">Cómo llegar ${rt.to.uid ? "hasta" : "a"}</small><h2 class="title">${esc(toName)}</h2>${sub ? `<small class="sub">${sub}</small>` : ""}</div><button class="x" data-act="route-close" aria-label="Cerrar ruta">×</button></div>`;
-    const tog = `<button class="toggle" data-act="noblack" aria-pressed="${rt.noBlack}"><span class="sw2"></span><span>Sin negras ni itinerarios</span></button>`;
-    if (rt.err === "nopos") return { speek: head() + `<p class="facts">Primero marca dónde estás, así sé desde dónde calcular.</p><div class="acts one"><button class="btn" data-act="mark">Marcar dónde estoy</button></div>`, smore: "" };
-    if (rt.err === "nofriend") return { speek: head() + `<p class="facts">${esc(toName)} todavía no ha marcado dónde está.</p>`, smore: "" };
-    if (rt.err === "far") return { speek: head() + `<p class="facts">${esc(toName)} está lejos de las pistas y no encuentro cómo llegar.</p>`, smore: "" };
-    if (rt.err === "mefar") return { speek: head() + `<p class="facts">Estás lejos de las pistas. Acércate o marca dónde estás.</p><div class="acts one"><button class="btn" data-act="mark">Marcar dónde estoy</button></div>`, smore: "" };
-    if (rt.err === "same") return { speek: head() + `<p class="facts">Estáis en el mismo punto.</p>`, smore: "" };
-    if (rt.err === "noroute") return { speek: head() + `<p class="facts">No encuentro un camino por pistas y remontes${rt.noBlack ? " sin negras." : "."}</p><div class="acts one">${tog}</div>`, smore: "" };
-    if (!rt.res) return { speek: head() + `<p class="facts">Calculando…</p>`, smore: "" };
+    const head = (sub) => `${EN?`<div class="headrow"><div><small class="kicker">Directions `:`<div class="headrow"><div><small class="kicker">Cómo llegar `}${rt.to.uid ? (EN?"to":"hasta") : "a"}</small><h2 class="title">${esc(toName)}</h2>${sub ? `<small class="sub">${sub}</small>` : ""}${EN?`</div><button class="x" data-act="route-close" aria-label="Close route">×</button></div>`:`</div><button class="x" data-act="route-close" aria-label="Cerrar ruta">×</button></div>`}`;
+    const tog = `<button class="toggle" data-act="noblack" aria-pressed="${rt.noBlack}${EN?`"><span class="sw2"></span><span>No blacks or itineraries</span></button>`:`"><span class="sw2"></span><span>Sin negras ni itinerarios</span></button>`}`;
+    if (rt.err === "nopos") return { speek: head() + `${EN?`<p class="facts">First mark where you are so I know where to start from.</p><div class="acts one"><button class="btn" data-act="mark">Mark where I am</button></div>`:`<p class="facts">Primero marca dónde estás, así sé desde dónde calcular.</p><div class="acts one"><button class="btn" data-act="mark">Marcar dónde estoy</button></div>`}`, smore: "" };
+    if (rt.err === "nofriend") return { speek: head() + `<p class="facts">${esc(toName)}${EN?` hasn't marked where they are yet.</p>`:` todavía no ha marcado dónde está.</p>`}`, smore: "" };
+    if (rt.err === "far") return { speek: head() + `<p class="facts">${esc(toName)}${EN?` is far from the pistes and I can't find a way there.</p>`:` está lejos de las pistas y no encuentro cómo llegar.</p>`}`, smore: "" };
+    if (rt.err === "mefar") return { speek: head() + `${EN?`<p class="facts">You're far from the pistes. Get closer or mark where you are.</p><div class="acts one"><button class="btn" data-act="mark">Mark where I am</button></div>`:`<p class="facts">Estás lejos de las pistas. Acércate o marca dónde estás.</p><div class="acts one"><button class="btn" data-act="mark">Marcar dónde estoy</button></div>`}`, smore: "" };
+    if (rt.err === "same") return { speek: head() + `${EN?`<p class="facts">You're in the same spot.</p>`:`<p class="facts">Estáis en el mismo punto.</p>`}`, smore: "" };
+    if (rt.err === "noroute") return { speek: head() + `${EN?`<p class="facts">I can't find a way over pistes and lifts`:`<p class="facts">No encuentro un camino por pistas y remontes`}${rt.noBlack ? (EN?" without blacks.":" sin negras.") : "."}</p><div class="acts one">${tog}</div>`, smore: "" };
+    if (!rt.res) return { speek: head() + `${EN?`<p class="facts">Working it out…</p>`:`<p class="facts">Calculando…</p>`}`, smore: "" };
     const r = rt.res, N = r.steps.length, i = rt.cur;
     const nL = r.steps.filter(s => s.ty === 1 || s.ty === 3).length;
-    const sub = `≈ ${fmtMin(r.time)} · ${nL} ${nL === 1 ? "remonte" : "remontes"}${rt.noBlack ? " · sin negras" : ""}`;
+    const sub = `≈ ${fmtMin(r.time)} · ${nL} ${nL === 1 ? (EN?"lift":"remonte") : (EN?"lifts":"remontes")}${rt.noBlack ? (EN?" · no blacks":" · sin negras") : ""}`;
     let card;
     if (i >= N) {
       const rr = routeRuns();
-      card = `<div class="stepcard done"><span class="ic big flag">✓</span><div><b>Llegaste${rt.to.uid ? " hasta " + esc(toName) : ""}</b><small>${rr.length ? "¿Apunto las pistas de esta ruta en el diario?" : "Fin de la ruta."}</small></div></div>
-        <div class="acts two">${rr.length ? `<button class="btn" data-act="route-log">Apuntar ${rr.length} ${rr.length === 1 ? "pista" : "pistas"}</button>` : ""}<button class="btn ghost" data-act="route-close">Cerrar</button></div>`;
+      card = `${EN?`<div class="stepcard done"><span class="ic big flag">✓</span><div><b>You're there`:`<div class="stepcard done"><span class="ic big flag">✓</span><div><b>Llegaste`}${rt.to.uid ? (EN?" to ":" hasta ") + esc(toName) : ""}</b><small>${rr.length ? (EN?"Log the pistes from this route in your day?":"¿Apunto las pistas de esta ruta en el diario?") : (EN?"End of route.":"Fin de la ruta.")}</small></div></div>
+        <div class="acts two">${rr.length ? `${EN?`<button class="btn" data-act="route-log">Log `:`<button class="btn" data-act="route-log">Apuntar `}${rr.length} ${rr.length === 1 ? (EN?"piste":"pista") : (EN?"pistes":"pistas")}</button>` : ""}${EN?`<button class="btn ghost" data-act="route-close">Close</button></div>`:`<button class="btn ghost" data-act="route-close">Cerrar</button></div>`}`;
     } else {
       const si = stepInfo(r.steps[i]);
-      card = `<div class="stepcard"><span class="ic big ${si.cls}" style="--c:${si.c || "transparent"}">${si.ic}</span><div><small class="kicker">Paso ${i + 1} de ${N}</small><b>${esc(si.t1)}</b><small>${esc(si.t2)}</small></div></div>
-        <div class="acts nav"><button class="btn ghost" data-act="step-prev" ${i === 0 ? "disabled" : ""} aria-label="Paso anterior">‹</button><button class="btn" data-act="step-next">${i === N - 1 ? "Llegué" : "Siguiente ›"}</button></div>`;
+      card = `<div class="stepcard"><span class="ic big ${si.cls}" style="--c:${si.c || "transparent"}">${si.ic}${EN?`</span><div><small class="kicker">Step `:`</span><div><small class="kicker">Paso `}${i + 1} ${EN ? "of" : "de"} ${N}</small><b>${esc(si.t1)}</b><small>${esc(si.t2)}</small></div></div>
+        <div class="acts nav"><button class="btn ghost" data-act="step-prev" ${i === 0 ? "disabled" : ""}${EN?` aria-label="Previous step">‹</button><button class="btn" data-act="step-next">`:` aria-label="Paso anterior">‹</button><button class="btn" data-act="step-next">`}${i === N - 1 ? (EN?"I'm there":"Llegué") : (EN?"Next ›":"Siguiente ›")}</button></div>`;
     }
     /* Avisos dentro de la ruta: posición antigua del amigo y gente fuera de pistas */
     const fp = rt.to.uid ? positions().find(p => p.uid === rt.to.uid) : null, mp = myPos();
     const warns = [];
-    if (fp && !isLive(fp) && Date.now() - fp.at > OLD_ROUTE_MS) warns.push(`La posición de ${esc(toName)} es de ${esc(ago(fp.at))}. Puede que ya no esté ahí.`);
-    if (fp && fp.node < 0) warns.push(`${esc(toName)} está fuera de pistas. La ruta llega al punto de pistas más cercano.`);
-    if (mp && mp.node < 0) warns.push(`Estás fuera de pistas. La ruta sale del punto de pistas más cercano.`);
-    if (r.ofi === "none") warns.push(`Con lo que está abierto ahora no hay camino. Te enseño la ruta normal: comprueba en pistas qué está cerrado.`);
+    if (fp && !isLive(fp) && Date.now() - fp.at > OLD_ROUTE_MS) warns.push(`${EN?`The position of `:`La posición de `}${esc(toName)} ${EN ? "is from" : "es de"} ${esc(ago(fp.at))}${EN?`. They may not be there any more.`:`. Puede que ya no esté ahí.`}`);
+    if (fp && fp.node < 0) warns.push(`${esc(toName)}${EN?` is off piste. The route goes to the nearest point on the pistes.`:` está fuera de pistas. La ruta llega al punto de pistas más cercano.`}`);
+    if (mp && mp.node < 0) warns.push(`${EN?`You're off piste. The route starts from the nearest point on the pistes.`:`Estás fuera de pistas. La ruta sale del punto de pistas más cercano.`}`);
+    if (r.ofi === "none") warns.push(`${EN?`With what's open now there's no way through. Here's the normal route: check which pistes are closed.`:`Con lo que está abierto ahora no hay camino. Te enseño la ruta normal: comprueba en pistas qué está cerrado.`}`);
     const speek = head(sub) + warns.map(w => `<p class="warnline"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD23F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${w}</span></p>`).join("") + card;
     const smore = `
       ${profileSvg()}
       <div class="acts one">${tog}</div>
-      ${r.steps.some(s => s.ty === 0 && (s.f.d === "n" || s.f.d === "i")) ? `<p class="quiet">La ruta más rápida pasa por una negra o un itinerario.</p>` : ""}
-      <ol class="steps">${r.steps.map((st, k) => { const si = stepInfo(st); return `<li class="${k === i ? "cur" : k < i ? "past" : ""}"><button data-act="step-go" data-i="${k}"><span class="ic ${si.cls}" style="--c:${si.c || "transparent"}">${si.ic}</span><span><b>${esc(si.t1)}</b><small>${esc(si.t2)}</small></span></button></li>`; }).join("")}</ol>
+      ${r.steps.some(s => s.ty === 0 && (s.f.d === "n" || s.f.d === "i")) ? `${EN?`<p class="quiet">The fastest route uses a black or an itinerary.</p>`:`<p class="quiet">La ruta más rápida pasa por una negra o un itinerario.</p>`}` : ""}
+      <ol class="steps">${r.steps.map((st, k) => { const si = stepInfo(st); return `<li class="${k === i ? "cur" : k < i ? "past" : ""}"><button data-act="step-go" data-i="${k}"><span class="ic ${si.cls}" style="--c:${si.c || "transparent"}">${si.ic}</span><span><b>${esc(si.t1)}</b><small>${esc(si.t2)}</small></span></button></li>`; }).join("")}${EN?`</ol>
+      <button class="btn ghost wide" data-act="route-all">See the whole route</button>
+      `:`</ol>
       <button class="btn ghost wide" data-act="route-all">Ver la ruta entera</button>
-      ${AVX.closed.size ? `<p class="quiet">La ruta evita lo que el grupo ha marcado como cerrado.</p>` : ""}
-      ${r.ofi === "ok" ? `<p class="quiet">Ruta con lo que está abierto según Les 3 Vallées (${esc(agoMin(OFI.at))}). Courchevel aún no está incluido.</p>` : ""}
-      <p class="quiet">Tiempo aproximado, con unos 2 min de espera por remonte${AVX.cola.size ? " y 10 más donde avisan de cola" : ""}. Comprobad en la estación qué está abierto.</p>`;
+      `}${AVX.closed.size ? `${EN?`<p class="quiet">The route avoids what the group has marked as closed.</p>`:`<p class="quiet">La ruta evita lo que el grupo ha marcado como cerrado.</p>`}` : ""}
+      ${r.ofi === "ok" ? `${EN?`<p class="quiet">Route using what's open according to Les 3 Vallées (`:`<p class="quiet">Ruta con lo que está abierto según Les 3 Vallées (`}${esc(agoMin(OFI.at))}${EN?`). Courchevel isn't included yet.</p>`:`). Courchevel aún no está incluido.</p>`}` : ""}${EN?`
+      <p class="quiet">Approximate time, with about 2 min wait per lift`:`
+      <p class="quiet">Tiempo aproximado, con unos 2 min de espera por remonte`}${AVX.cola.size ? (EN?" and 10 more where a queue is reported":" y 10 más donde avisan de cola") : ""}${EN?`. Check what's open at the resort.</p>`:`. Comprobad en la estación qué está abierto.</p>`}`;
     return { speek, smore };
   }
 
   function markHtml() {
     const c = markCand;
-    return { speek: `
+    return { speek: `${EN?`
+      <div class="headrow"><div><small class="kicker">I'm here</small><h2 class="title">Put the cross on your piste</h2></div><button class="x" data-act="mark-cancel" aria-label="Cancel">×</button></div>
+      <p class="facts candidate" id="markname">`:`
       <div class="headrow"><div><small class="kicker">Estoy aquí</small><h2 class="title">Pon la cruz sobre tu pista</h2></div><button class="x" data-act="mark-cancel" aria-label="Cancelar">×</button></div>
-      <p class="facts candidate" id="markname">${candText(c)}</p>
-      <div class="acts two"><button class="btn" data-act="mark-ok" id="markok" ${c ? "" : "disabled"}>Confirmar aquí</button><button class="btn ghost" data-act="mark-cancel">Cancelar</button></div>${navigator.geolocation && window.PISTEA_GROUP ? `<button class="btn dark wide" data-act="gps">Usar mi ubicación</button>` : ""}`, smore: `<p class="quiet">Mueve el mapa con un dedo y pon la cruz sobre tu pista. También puedes tocar directamente la pista o el remonte.</p>` };
+      <p class="facts candidate" id="markname">`}${candText(c)}</p>
+      <div class="acts two"><button class="btn" data-act="mark-ok" id="markok" ${c ? "" : "disabled"}${EN?`>Confirm here</button><button class="btn ghost" data-act="mark-cancel">Cancel</button></div>`:`>Confirmar aquí</button><button class="btn ghost" data-act="mark-cancel">Cancelar</button></div>`}${navigator.geolocation && window.PISTEA_GROUP ? `${EN?`<button class="btn dark wide" data-act="gps">Use my location</button>`:`<button class="btn dark wide" data-act="gps">Usar mi ubicación</button>`}` : ""}`, smore: `${EN?`<p class="quiet">Move the map with one finger and put the cross on your piste. You can also tap the piste or lift directly.</p>`:`<p class="quiet">Mueve el mapa con un dedo y pon la cruz sobre tu pista. También puedes tocar directamente la pista o el remonte.</p>`}` };
   }
   function candText(c) {
-    if (!c) return `<span class="plate none"></span>Acerca la cruz a una pista o un remonte`;
+    if (!c) return `${EN?`<span class="plate none"></span>Move the cross closer to a piste or a lift`:`<span class="plate none"></span>Acerca la cruz a una pista o un remonte`}`;
     const f = F[c.fi];
     return `${plate(f.k, f.d)}${esc(describeNode(c.node, c.fi).replace(/^en /, "").replace(/^./, m => m.toUpperCase()))}`;
   }
@@ -2571,33 +2675,38 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const items = diarioScope === "hoy" ? all.filter(p => p.day === today()) : all;
     const st = stats(items), days = [...new Set(items.map(p => p.day))].sort().reverse();
     const nDays = new Set(all.map(p => p.day)).size;
-    const speek = `
+    const speek = `${EN?`
+      <div class="headrow center"><button class="back" data-act="diario-close" style="justify-self:start">‹ Map</button><h2 class="title">My day</h2><span></span></div>
+      <div class="seg" role="tablist"><button role="tab" data-act="scope" data-s="hoy" aria-selected="`:`
       <div class="headrow center"><button class="back" data-act="diario-close" style="justify-self:start">‹ Mapa</button><h2 class="title">Diario</h2><span></span></div>
-      <div class="seg" role="tablist"><button role="tab" data-act="scope" data-s="hoy" aria-selected="${diarioScope === "hoy"}">Hoy</button><button role="tab" data-act="scope" data-s="viaje" aria-selected="${diarioScope === "viaje"}">Todo el viaje</button></div>`;
+      <div class="seg" role="tablist"><button role="tab" data-act="scope" data-s="hoy" aria-selected="`}${diarioScope === "hoy"}${EN?`">Today</button><button role="tab" data-act="scope" data-s="viaje" aria-selected="`:`">Hoy</button><button role="tab" data-act="scope" data-s="viaje" aria-selected="`}${diarioScope === "viaje"}${EN?`">Whole trip</button></div>`:`">Todo el viaje</button></div>`}`;
     const sugg = dq ? suggestions(dq) : "";
     const smore = `
       <div class="board">
-        <div class="bnum"><b>${st.n}</b><small>${st.n === 1 ? "pista" : "pistas"}${diarioScope === "viaje" && nDays ? ` en ${nDays} ${nDays === 1 ? "día" : "días"}` : ""}</small></div>
-        <div class="bnum"><b>${fmtNum(st.drop)}</b><small>m de desnivel</small></div>
-        <div class="bnum"><b>${st.km.toLocaleString("es-ES", { maximumFractionDigits: 1 })}</b><small>km bajados</small></div>
+        <div class="bnum"><b>${st.n}</b><small>${st.n === 1 ? (EN?"piste":"pista") : (EN?"pistes":"pistas")}${diarioScope === "viaje" && nDays ? ` ${EN ? "in" : "en"} ${nDays} ${nDays === 1 ? (EN?"day":"día") : (EN?"days":"días")}` : ""}</small></div>
+        <div class="bnum"><b>${fmtNum(st.drop)}${EN?`</b><small>m vertical</small></div>
+        <div class="bnum"><b>`:`</b><small>m de desnivel</small></div>
+        <div class="bnum"><b>`}${st.km.toLocaleString(EN ? "en-GB" : "es-ES", { maximumFractionDigits: 1 })}</b><small>${EN ? "km skied" : "km bajados"}</small></div>
         <div class="bars">${colorBars(st, false)}</div>
       </div>
-      ${items.length ? `<button class="btn ghost wide" data-act="card">Tarjeta para compartir</button>` : ""}
+      ${items.length ? `${EN?`<button class="btn ghost wide" data-act="card">Card to share</button>`:`<button class="btn ghost wide" data-act="card">Tarjeta para compartir</button>`}` : ""}${EN?`
+      <h3 class="sec">Log a piste</h3>
+      <div class="addbox"><input type="search" id="dq" maxlength="80" placeholder="Type the name, e.g. Combe de Caron" autocomplete="off" enterkeyhint="done" value="`:`
       <h3 class="sec">Apuntar una pista</h3>
-      <div class="addbox"><input type="search" id="dq" maxlength="80" placeholder="Escribe el nombre, ej.: Combe de Caron" autocomplete="off" enterkeyhint="done" value="${esc(dq)}"></div>
+      <div class="addbox"><input type="search" id="dq" maxlength="80" placeholder="Escribe el nombre, ej.: Combe de Caron" autocomplete="off" enterkeyhint="done" value="`}${esc(dq)}"></div>
       <ul class="sugg" id="sugg">${sugg}</ul>
       ${days.length ? days.map(d => {
         const runs = items.filter(p => p.day === d);
-        return `<h3 class="sec day"><span>${esc(fmtDay(d))}${d === today() ? " · hoy" : ""}</span><span>${runs.length}</span></h3>
-          <ul class="log">${runs.map(p => { const t = TIPOS[p.tipo] || TIPOS.azul, g = runGeo(p); return `<li style="--c:${t.c}"><span class="plate" style="--c:${t.c}"></span><span><b>${esc(p.nombre)}</b><small>${hhmm(p.at)} · ${esc(who(p.uid))}${g && g.zt - g.zb > 10 ? " · " + fmtNum(g.zt - g.zb) + " m" : ""}</small></span>${p.uid === me ? `<button class="link" data-act="pista-del" data-id="${esc(p.id)}">Quitar</button>` : ""}</li>`; }).join("")}</ul>`;
-      }).join("") : `<div class="empty">${diarioScope === "hoy" ? "Hoy todavía no hay pistas. Toca una en el mapa y pulsa La hice, o búscala aquí arriba." : "Todavía no hay pistas en el viaje."}</div>`}`;
+        return `<h3 class="sec day"><span>${esc(fmtDay(d))}${d === today() ? (EN?" · today":" · hoy") : ""}</span><span>${runs.length}</span></h3>
+          <ul class="log">${runs.map(p => { const t = TIPOS[p.tipo] || TIPOS.azul, g = runGeo(p); return `<li style="--c:${t.c}"><span class="plate" style="--c:${t.c}"></span><span><b>${esc(p.nombre)}</b><small>${hhmm(p.at)} · ${esc(who(p.uid))}${g && g.zt - g.zb > 10 ? " · " + fmtNum(g.zt - g.zb) + " m" : ""}</small></span>${p.uid === me ? `<button class="link" data-act="pista-del" data-id="${esc(p.id)}${EN?`">Remove</button>`:`">Quitar</button>`}` : ""}</li>`; }).join("")}</ul>`;
+      }).join("") : `<div class="empty">${diarioScope === "hoy" ? (EN?"No pistes today yet. Tap one on the map and press I did it, or search for it above.":"Hoy todavía no hay pistas. Toca una en el mapa y pulsa La hice, o búscala aquí arriba.") : (EN?"No pistes on this trip yet.":"Todavía no hay pistas en el viaje.")}</div>`}`;
     return { speek, smore };
   }
   function suggestions(q) {
     const n = norm(q); if (!n) return "";
     const res = [...RUNIDX.values()].filter(e => norm(e.name).includes(n)).sort((a, b) => (norm(a.name).startsWith(n) ? 0 : 1) - (norm(b.name).startsWith(n) ? 0 : 1)).slice(0, 6);
     const rows = res.flatMap(e => Object.keys(e.ds).filter(d => DIF[d].tipo).map(d => `<li><button data-act="sugg-add" data-n="${esc(e.name)}" data-t="${DIF[d].tipo}"><span class="plate" style="--c:${DIF[d].hex}"></span><b>${esc(e.name)}</b><small>${DIF[d].s}</small><span class="plus">+</span></button></li>`));
-    rows.push(`<li><button data-act="sugg-free"><span class="plate none"></span><b>Apuntar «${esc(q.trim())}»</b><small>Otra pista</small><span class="plus">+</span></button></li>`);
+    rows.push(`${EN?`<li><button data-act="sugg-free"><span class="plate none"></span><b>Log «`:`<li><button data-act="sugg-free"><span class="plate none"></span><b>Apuntar «`}${esc(q.trim())}${EN?`»</b><small>Another piste</small><span class="plus">+</span></button></li>`:`»</b><small>Otra pista</small><span class="plus">+</span></button></li>`}`);
     return rows.join("");
   }
 
@@ -2623,13 +2732,13 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     if (fid) { const el = document.getElementById(fid); if (el) { el.focus({ preventScroll: true }); if (selr) try { el.setSelectionRange(selr[0], selr[1]); } catch (e) {} } }
     /* capa superior */
     const chips = [];
-    if (mode === "loading") chips.push(`<span class="chip">Conectando con el grupo…</span>`);
-    if (mode === "demo") chips.push(`<button class="chip warn" data-act="demo-info">Ejemplo · ¿qué es esto?</button>`);
-    if (mode === "nocon") chips.push(`<button class="chip bad" data-act="retry">Sin conexión con el grupo · Reintentar</button>`);
-    if (offline) chips.push(`<span class="chip bad">Sin cobertura · ves lo último guardado</span>`);
-    else if (stale) chips.push(`<span class="chip">Conexión lenta</span>`);
-    if (mode === "live" && pendingLong()) chips.push(`<span class="chip">${offline ? "Se enviará al recuperar la cobertura" : "Pendiente de enviar"}</span>`);
-    if (mode === "live" && !canWrite) chips.push(`<span class="chip warn">Solo lectura</span>`);
+    if (mode === "loading") chips.push(`${EN?`<span class="chip">Connecting to the group…</span>`:`<span class="chip">Conectando con el grupo…</span>`}`);
+    if (mode === "demo") chips.push(`${EN?`<button class="chip warn" data-act="demo-info">Example · what is this?</button>`:`<button class="chip warn" data-act="demo-info">Ejemplo · ¿qué es esto?</button>`}`);
+    if (mode === "nocon") chips.push(`${EN?`<button class="chip bad" data-act="retry">Not connected to the group · Retry</button>`:`<button class="chip bad" data-act="retry">Sin conexión con el grupo · Reintentar</button>`}`);
+    if (offline) chips.push(`${EN?`<span class="chip bad">No signal · showing the last saved data</span>`:`<span class="chip bad">Sin cobertura · ves lo último guardado</span>`}`);
+    else if (stale) chips.push(`${EN?`<span class="chip">Slow connection</span>`:`<span class="chip">Conexión lenta</span>`}`);
+    if (mode === "live" && pendingLong()) chips.push(`<span class="chip">${offline ? (EN?"Will be sent when signal returns":"Se enviará al recuperar la cobertura") : (EN?"Waiting to send":"Pendiente de enviar")}</span>`);
+    if (mode === "live" && !canWrite) chips.push(`${EN?`<span class="chip warn">Read only</span>`:`<span class="chip warn">Solo lectura</span>`}`);
     const cc = casaChip(); if (cc) chips.push(cc);
     setHtml($("#chips"), chips.join(""));
     /* Mensajes nuevos: los normales se van solos a los 12 s; «Necesito ayuda» se queda hasta cerrarlo */
@@ -2639,7 +2748,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const nOff = ["v", "a", "r", "n", "i", "L"].filter(k => !filt[k]).length;
     $("#filtbtn").setAttribute("aria-expanded", filtOpen); $("#filtbadge").textContent = nOff ? nOff : ""; $("#filtbadge").hidden = !nOff;
     $("#filters").hidden = !filtOpen;
-    setHtml($("#filters"), ["v", "a", "r", "n", "i"].map(d => `<button class="fchip" style="--c:${DIF[d].hex}" data-act="filt" data-d="${d}" aria-pressed="${filt[d]}"><i></i>${DIF[d].p}</button>`).join("") + `<button class="fchip lift" data-act="filt" data-d="L" aria-pressed="${filt.L}"><i></i>Remontes</button>` + Object.keys(POI_CAT).map(k => `<button class="fchip" style="--c:${POI_CAT[k].c}" data-act="filt" data-d="${k}" aria-pressed="${filt[k]}"><i></i>${POI_CAT[k].s}</button>`).join(""));
+    setHtml($("#filters"), ["v", "a", "r", "n", "i"].map(d => `<button class="fchip" style="--c:${DIF[d].hex}" data-act="filt" data-d="${d}" aria-pressed="${filt[d]}"><i></i>${DIF[d].p}</button>`).join("") + `<button class="fchip lift" data-act="filt" data-d="L" aria-pressed="${filt.L}${EN?`"><i></i>Lifts</button>`:`"><i></i>Remontes</button>`}` + Object.keys(POI_CAT).map(k => `<button class="fchip" style="--c:${POI_CAT[k].c}" data-act="filt" data-d="${k}" aria-pressed="${filt[k]}"><i></i>${POI_CAT[k].s}</button>`).join(""));
     $("#cross").hidden = !marking;
     $("#sunbtn").setAttribute("aria-pressed", sunOn);
     document.body.classList.toggle("marking", marking);
@@ -2692,11 +2801,11 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     M.places.forEach(pl => { const n = norm(pl[0]); if (n.includes(q)) res.push({ pl, sc: n.startsWith(q) ? 0.5 : 1.5 }); });
     POIS.forEach(p => { const i = p.n.indexOf(q); if (i >= 0) res.push({ poi: p, sc: i === 0 ? 1.2 : 2.2 }); });
     res.sort((a, b) => a.sc - b.sc);
-    if (!res.length) return `<li class="none">Nada con ese nombre</li>`;
+    if (!res.length) return `${EN?`<li class="none">Nothing with that name</li>`:`<li class="none">Nada con ese nombre</li>`}`;
     return res.slice(0, 25).map(r => {
       if (r.person) return `<li><button data-act="res-person" data-uid="${esc(r.person.uid)}">${av(r.person.uid)}<span><b>${esc(who(r.person.uid))}</b><small>${esc(r.person.en || "")}</small></span></button></li>`;
       if (r.poi) return `<li><button data-act="res-poi" data-id="${esc(r.poi.id)}"><span class="poiic" style="--c:${POI_CAT[r.poi.cat].c};width:36px;height:36px;flex-basis:36px">${POI_ICON[r.poi.cat]}</span><span><b>${esc(r.poi.name)}</b><small>${esc(poiKind(r.poi))}${r.poi.z ? " · " + fmtNum(r.poi.z) + " m" : ""}</small></span></button></li>`;
-      if (r.pl) return `<li><button data-act="res-place" data-i="${M.places.indexOf(r.pl)}"><span class="plate town" aria-hidden="true"></span><span><b>${esc(r.pl[0])}</b><small>Estación</small></span></button></li>`;
+      if (r.pl) return `<li><button data-act="res-place" data-i="${M.places.indexOf(r.pl)}"><span class="plate town" aria-hidden="true"></span><span><b>${esc(r.pl[0])}${EN?`</b><small>Resort</small></span></button></li>`:`</b><small>Estación</small></span></button></li>`}`;
       const g = r.g, isL = g.k === "L";
       return `<li><button data-act="res-g" data-i="${GROUPS.indexOf(g)}">${plate(g.k, g.d)}<span><b>${esc(g.name)}</b><small>${isL ? (LIFT[g.t] || LIFT.tsd).s : DIF[g.d].s}${g.zt ? " · " + fmtNum(g.zt) + " m" : ""}</small></span></button></li>`;
     }).join("");
@@ -2749,19 +2858,19 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   /* GPS: tu posición real. Cerca de una pista se describe con la pista; más lejos (restaurante,
      pueblo) se guarda igual como «fuera de pistas». Las lecturas con más de 100 m de error se ignoran. */
   function gpsHere() {
-    if (!navigator.geolocation) { toast("Este móvil no da la ubicación. Márcalo a mano en el mapa."); return; }
-    toast("Buscando tu ubicación…");
+    if (!navigator.geolocation) { toast((EN?"This phone doesn't share its location. Mark it by hand on the map.":"Este móvil no da la ubicación. Márcalo a mano en el mapa.")); return; }
+    toast((EN?"Finding your location…":"Buscando tu ubicación…"));
     navigator.geolocation.getCurrentPosition(pos => {
       const c = pos.coords;
-      if (c.accuracy && c.accuracy > GPS_MAX_ACC) { toast("El GPS va mal ahora (±" + Math.round(c.accuracy) + " m). Prueba en un momento o márcalo a mano."); return; }
+      if (c.accuracy && c.accuracy > GPS_MAX_ACC) { toast((EN?"GPS is poor right now (±":"El GPS va mal ahora (±") + Math.round(c.accuracy) + (EN?" m). Try again in a moment or mark it by hand.":" m). Prueba en un momento o márcalo a mano.")); return; }
       const lon = c.longitude, lat = c.latitude, [x, y] = toXY(lon, lat), node = nearestNode(x, y, 400);
       marking = false;
       const en = node >= 0 ? describeNode(node) : describeOff(x, y);
       if (LIVE.on) liveStop(true);
       put("aqui", me, { uid: me, lon: +lon.toFixed(6), lat: +lat.toFixed(6), en, at: Date.now() })
-        .then(ok => { if (ok) toast(sentMsg("Listo. El grupo te ve " + en)); if (rt) recalc(true); ui(); });
+        .then(ok => { if (ok) toast(sentMsg((EN?"Done. The group sees you ":"Listo. El grupo te ve ") + en)); if (rt) recalc(true); ui(); });
       ui();
-    }, err => toast(err && err.code === 1 ? "No diste permiso de ubicación. Márcalo a mano en el mapa." : "No se pudo leer tu ubicación. Márcalo a mano en el mapa."),
+    }, err => toast(err && err.code === 1 ? (EN?"You didn't allow location access. Mark it by hand on the map.":"No diste permiso de ubicación. Márcalo a mano en el mapa.") : (EN?"Couldn't read your location. Mark it by hand on the map.":"No se pudo leer tu ubicación. Márcalo a mano en el mapa.")),
     { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 });
   }
   /* En directo: mientras la app está abierta, tu posición se actualiza sola.
@@ -2794,10 +2903,10 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     put("aqui", me, data);
   }
   function liveWatch() {
-    if (NATIVE) { if (LIVE.on && LIVE.watch == null) { LIVE.watch = "native"; window.PisteaNative.watch(liveFix, () => { liveStop(true); toast("Sin permiso de ubicación. Actívalo en Ajustes › Pistea › Ubicación › Siempre."); }); } return; }
+    if (NATIVE) { if (LIVE.on && LIVE.watch == null) { LIVE.watch = "native"; window.PisteaNative.watch(liveFix, () => { liveStop(true); toast((EN?"No location permission. Turn it on in Settings › Vallik › Location › Always.":"Sin permiso de ubicación. Actívalo en Ajustes › Pistea › Ubicación › Siempre.")); }); } return; }
     if (LIVE.watch != null || !LIVE.on || document.hidden || !navigator.geolocation) return;
     LIVE.watch = navigator.geolocation.watchPosition(liveFix, err => {
-      if (err && err.code === 1) { liveStop(true); toast("No diste permiso de ubicación. Actívalo en Ajustes para compartir en directo."); }
+      if (err && err.code === 1) { liveStop(true); toast((EN?"You didn't allow location access. Turn it on in Settings to share live.":"No diste permiso de ubicación. Actívalo en Ajustes para compartir en directo.")); }
     }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 });
   }
   function liveUnwatch() {
@@ -2807,7 +2916,17 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   }
   /* Antes del primer directo en la app nativa: explicar por qué pedimos «Permitir siempre». */
   function permisoAsk() {
-    $("#modal").innerHTML = `<div class="permiso" role="dialog" aria-labelledby="perm-t">
+    $("#modal").innerHTML = `${EN?`<div class="permiso" role="dialog" aria-labelledby="perm-t">
+      <svg width="220" height="190" viewBox="0 0 220 190" role="img" aria-label="A locked phone still sending your position to the group" style="margin:0 auto"><circle cx="110" cy="95" r="88" fill="rgba(200,240,60,.06)"/><circle cx="110" cy="95" r="62" fill="none" stroke="rgba(200,240,60,.25)" stroke-width="2" stroke-dasharray="4 7"/><rect x="78" y="40" width="64" height="112" rx="14" fill="#14355A" stroke="rgba(255,255,255,.25)" stroke-width="2"/><rect x="100" y="48" width="20" height="5" rx="2.5" fill="rgba(255,255,255,.25)"/><rect x="99" y="86" width="22" height="18" rx="4" fill="none" stroke="#A9BCD0" stroke-width="3"/><path d="M103 86v-5a7 7 0 0 1 14 0v5" fill="none" stroke="#A9BCD0" stroke-width="3"/><circle cx="176" cy="46" r="14" fill="#C8F03C"/><circle cx="40" cy="132" r="14" fill="#C8F03C"/><path d="M145 70 Q160 58 164 56M76 120 Q62 126 54 128" fill="none" stroke="#C8F03C" stroke-width="2.5" stroke-linecap="round"/><circle cx="110" cy="128" r="6" fill="#FF4D4F"/></svg>
+      <h1 id="perm-t">Let the group see you with the phone in your pocket</h1>
+      <p>For live sharing, your iPhone will ask for permission. Choose the option that keeps tracking your location with the screen locked.</p>
+      <div class="opts">
+        <div class="opt on"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E2A47" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></i><span><b>Always allow</b><small>They can follow you even when your phone is locked</small></span></div>
+        <div class="opt"><i></i><span><b>While using the app</b><small>Only with Vallik open</small></span></div>
+      </div>
+      <p class="fine">It's only shared while live is on. Turn it off whenever you like.</p>
+      <div class="end"><button class="btn" data-act="permiso-ok">Continue</button><button class="btn ghost" data-act="modal-close">Not now</button></div>
+    </div>`:`<div class="permiso" role="dialog" aria-labelledby="perm-t">
       <svg width="220" height="190" viewBox="0 0 220 190" role="img" aria-label="Un móvil bloqueado que sigue enviando tu posición al grupo" style="margin:0 auto"><circle cx="110" cy="95" r="88" fill="rgba(200,240,60,.06)"/><circle cx="110" cy="95" r="62" fill="none" stroke="rgba(200,240,60,.25)" stroke-width="2" stroke-dasharray="4 7"/><rect x="78" y="40" width="64" height="112" rx="14" fill="#14355A" stroke="rgba(255,255,255,.25)" stroke-width="2"/><rect x="100" y="48" width="20" height="5" rx="2.5" fill="rgba(255,255,255,.25)"/><rect x="99" y="86" width="22" height="18" rx="4" fill="none" stroke="#A9BCD0" stroke-width="3"/><path d="M103 86v-5a7 7 0 0 1 14 0v5" fill="none" stroke="#A9BCD0" stroke-width="3"/><circle cx="176" cy="46" r="14" fill="#C8F03C"/><circle cx="40" cy="132" r="14" fill="#C8F03C"/><path d="M145 70 Q160 58 164 56M76 120 Q62 126 54 128" fill="none" stroke="#C8F03C" stroke-width="2.5" stroke-linecap="round"/><circle cx="110" cy="128" r="6" fill="#FF4D4F"/></svg>
       <h1 id="perm-t">Que el grupo te vea con el móvil en el bolsillo</h1>
       <p>Para el directo, iPhone te pedirá permiso. Elige la opción que deja seguir tu ubicación con la pantalla bloqueada.</p>
@@ -2817,15 +2936,15 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       </div>
       <p class="fine">Solo se comparte mientras el directo está encendido. Lo apagas cuando quieras.</p>
       <div class="end"><button class="btn" data-act="permiso-ok">Continuar</button><button class="btn ghost" data-act="modal-close">Ahora no</button></div>
-    </div>`;
+    </div>`}`;
     $("#modal").hidden = false;
   }
   function liveStart() {
-    if (!NATIVE && !navigator.geolocation) { toast("Este móvil no da la ubicación."); return; }
+    if (!NATIVE && !navigator.geolocation) { toast((EN?"This phone doesn't share its location.":"Este móvil no da la ubicación.")); return; }
     if (!window.PISTEA_GROUP) return;
     if (NATIVE) { let seen = false; try { seen = localStorage.getItem("pistea.permiso") === "1"; } catch (e) {} if (!seen) { permisoAsk(); return; } }
     LIVE.on = true; LIVE.last = null; liveSave(true);
-    liveWatch(); wakeOn(); toast(NATIVE ? "En directo. Tu grupo te ve aunque bloquees el móvil." : "En directo. El grupo te sigue mientras tengas Vallik abierta."); ui();
+    liveWatch(); wakeOn(); toast(NATIVE ? (EN?"Live. Your group sees you even with your phone locked.":"En directo. Tu grupo te ve aunque bloquees el móvil.") : (EN?"Live. The group can follow you while Vallik is open.":"En directo. El grupo te sigue mientras tengas Vallik abierta.")); ui();
   }
   function liveStop(quiet) {
     const was = LIVE.on;
@@ -2833,7 +2952,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     // Deja tu última posición, pero sin la marca de "en directo".
     const mp = was && me ? S.aqui.get(me) : null;
     if (mp && mp.live) put("aqui", me, Object.assign({}, mp, { live: false }));
-    if (!quiet) toast("Has dejado de compartir en directo. El grupo ve tu última posición.");
+    if (!quiet) toast((EN?"You've stopped sharing live. The group sees your last position.":"Has dejado de compartir en directo. El grupo ve tu última posición."));
     ui();
   }
   /* Pantalla encendida (Wake Lock) mientras estás en directo. Es la única forma de que el iPhone siga
@@ -2849,7 +2968,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   function wakeOff() { const l = WAKE.lock; WAKE.lock = null; if (l) l.release().catch(() => {}); }
   function wakeSet(v) {
     WAKE.want = v; try { localStorage.setItem("pistea.pantalla", v ? "1" : "0"); } catch (e) {}
-    if (v) { wakeOn().then(() => toast(WAKE.lock ? "La pantalla se quedará encendida mientras estés en directo." : "Ahora no se ha podido dejar la pantalla encendida. Se reintenta al volver a la app.")); } else wakeOff();
+    if (v) { wakeOn().then(() => toast(WAKE.lock ? (EN?"The screen will stay on while you're live.":"La pantalla se quedará encendida mientras estés en directo.") : (EN?"Couldn't keep the screen on right now. It will try again when you come back to the app.":"Ahora no se ha podido dejar la pantalla encendida. Se reintenta al volver a la app."))); } else wakeOff();
     ui();
   }
   document.addEventListener("visibilitychange", () => {
@@ -2862,12 +2981,12 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   });
   function inviteGroup() {
     const g = window.PISTEA_GROUP; if (!g) return;
-    if (navigator.share) { navigator.share({ title: "Vallik", text: "Únete a mi grupo en Vallik", url: g.link }).catch(() => {}); return; }
-    (navigator.clipboard ? navigator.clipboard.writeText(g.link) : Promise.reject()).then(() => toast("Enlace copiado. Envíalo al grupo."), () => toast(g.link));
+    if (navigator.share) { navigator.share({ title: "Vallik", text: (EN?"Join my group on Vallik":"Únete a mi grupo en Vallik"), url: g.link }).catch(() => {}); return; }
+    (navigator.clipboard ? navigator.clipboard.writeText(g.link) : Promise.reject()).then(() => toast((EN?"Link copied. Send it to the group.":"Enlace copiado. Envíalo al grupo.")), () => toast(g.link));
   }
   function copyCode() {
     const g = window.PISTEA_GROUP; if (!g) return;
-    (navigator.clipboard ? navigator.clipboard.writeText(g.code) : Promise.reject()).then(() => toast("Código copiado: " + g.code), () => toast("Tu código: " + g.code));
+    (navigator.clipboard ? navigator.clipboard.writeText(g.code) : Promise.reject()).then(() => toast((EN?"Code copied: ":"Código copiado: ") + g.code), () => toast((EN?"Your code: ":"Tu código: ") + g.code));
   }
   function addPista(nombre, t) { return put("pistas", newId(), { nombre, tipo: t, uid: me, at: Date.now(), day: today() }); }
   document.addEventListener("input", e => {
@@ -2888,7 +3007,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "zfit": overview(); break;
       case "north": flyTo({ b: Math.abs(((CAM.b + 180) % 360) - 180) < 1 ? DEF.b : 0 }, 600); break;
       case "dim": flyTo(CAM.t > 8 ? { t: 0, b: 0 } : { t: DEF.t, b: DEF.b, d: CAM.d * 0.9 }, 800); break;
-      case "zme": { const mp = myPos(); if (mp) centerOn(mp.x, mp.y, 0.3); else toast("Todavía no has marcado dónde estás."); break; }
+      case "zme": { const mp = myPos(); if (mp) centerOn(mp.x, mp.y, 0.3); else toast((EN?"You haven't marked where you are yet.":"Todavía no has marcado dónde estás.")); break; }
       case "filt-toggle": filtOpen = !filtOpen; ui(); break;
       case "filt": filt[el.dataset.d] = !filt[el.dataset.d]; ui(); break;
       case "res-g": { closeSearch(); rt = null; diario = false; marking = false; selectGroup(GROUPS[+el.dataset.i], null, true); setSnap("peek"); break; }
@@ -2898,15 +3017,15 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "peter": peterOpen(); break;
       case "peter-close": peterClose(); break;
       case "peter-sug": peterAsk(el.textContent); break;
-      case "peter-poi": { const p = poiById(el.dataset.id); peterOpen(p ? `Háblame de ${p.name}: qué es, cómo llego y qué tal está.` : ""); break; }
-      case "poi-go": { const p = poiById(el.dataset.id); if (!p) break; peterClose(); const n = poiNode(p); if (n < 0) { toast("Ese sitio queda lejos de las pistas."); break; } poiSheet = null; closeSearch(); startRoute({ node: n, label: p.name }); break; }
+      case "peter-poi": { const p = poiById(el.dataset.id); peterOpen(p ? `${EN?`Tell me about `:`Háblame de `}${p.name}${EN?`: what it is, how I get there and what it's like.`:`: qué es, cómo llego y qué tal está.`}` : ""); break; }
+      case "poi-go": { const p = poiById(el.dataset.id); if (!p) break; peterClose(); const n = poiNode(p); if (n < 0) { toast((EN?"That place is far from the pistes.":"Ese sitio queda lejos de las pistas.")); break; } poiSheet = null; closeSearch(); startRoute({ node: n, label: p.name }); break; }
       case "poi-meet": { const p = poiById(el.dataset.id); if (!p) break; const n = poiNode(p); if (n >= 0) meetAsk(n, p.name); break; }
       case "res-poi": { closeSearch(); clearModes(); rt = null; const p = poiById(el.dataset.id); if (p) { showPoi(p); setSnap("peek"); } break; }
       /* Punto de encuentro */
       case "meet-here": {
         if (!sel) break;
         const mt = meet();
-        if (mt && !canEditMeet(mt)) { toast("Ya hay una quedada de " + who(mt.uid) + ". Solo esa persona o quien creó el grupo puede cambiarla."); break; }
+        if (mt && !canEditMeet(mt)) { toast((EN?"There's already a meet-up from ":"Ya hay una quedada de ") + who(mt.uid) + (EN?". Only that person or whoever created the group can change it.":". Solo esa persona o quien creó el grupo puede cambiarla.")); break; }
         const n = selNode(sel.g.k === "L" ? "bottom" : "top");
         if (n >= 0) meetAsk(n, describeNode(n, [...sel.fis][0]).replace(/^en /, ""));
         break;
@@ -2920,39 +3039,40 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "permiso-ok": try { localStorage.setItem("pistea.permiso", "1"); } catch (e) {} $("#modal").hidden = true; $("#modal").innerHTML = ""; liveStart(); break;
       case "meet-open": clearModes(); rt = null; diario = false; meetSheet = true; { const mt = meet(); if (mt) centerOn(mt.x, mt.y, 0.25); } setSnap("peek"); ui(); break;
       case "banner-meet": markSeen(el.dataset.k); clearModes(); rt = null; diario = false; meetSheet = true; { const mt = meet(); if (mt) centerOn(mt.x, mt.y, 0.25); } setSnap("peek"); ui(); break;
-      case "meet-route": { const mt = meet(); if (!mt) break; if (mt.near < 0) { toast("La quedada está lejos de las pistas."); break; } meetSheet = false; startRoute({ node: mt.near, label: "la quedada" }); break; }
-      case "meet-del": { const mt = meet(); if (!mt || !canEditMeet(mt)) break; meetSheet = false; del("quedada", "actual").then(ok => ok && toast(sentMsg("Quedada quitada"))); ui(); break; }
+      case "meet-route": { const mt = meet(); if (!mt) break; if (mt.near < 0) { toast((EN?"The meet-up is far from the pistes.":"La quedada está lejos de las pistas.")); break; } meetSheet = false; startRoute({ node: mt.near, label: (EN?"the meet-up":"la quedada") }); break; }
+      case "meet-del": { const mt = meet(); if (!mt || !canEditMeet(mt)) break; meetSheet = false; del("quedada", "actual").then(ok => ok && toast(sentMsg((EN?"Meet-up removed":"Quedada quitada")))); ui(); break; }
       /* Avisos en pistas y remontes */
       case "aviso": {
         if (!sel) break;
         const g = sel.g, ref = refOf(g), t = el.dataset.t, A = AVISOS[t]; if (!A) break;
         const mine = avisos().find(a => a.ref === ref && a.tipo === t && a.uid === me);
-        if (mine) { del("avisos", mine.id).then(ok => ok && toast("Aviso quitado")); break; }
+        if (mine) { del("avisos", mine.id).then(ok => ok && toast((EN?"Alert removed":"Aviso quitado"))); break; }
         const fi = [...sel.fis][0], n = sel.node != null && sel.node >= 0 ? sel.node : F[fi].ns[F[fi].ns.length >> 1];
         const [lon, lat] = toLL(NX[n], NY[n]), now = Date.now();
         put("avisos", newId(), { uid: me, tipo: t, ref, nombre: String(g.name || "").slice(0, 60), lat: +lat.toFixed(6), lon: +lon.toFixed(6), at: now, exp: now + AVISO_MS })
-          .then(ok => { if (ok) { toast(sentMsg(A.s + (g.name ? " en " + g.name : "") + ". El grupo lo verá 2 h.")); if (rt) recalc(false); } });
+          .then(ok => { if (ok) { toast(sentMsg(A.s + (g.name ? " en " + g.name : "") + (EN?". The group will see it for 2 h.":". El grupo lo verá 2 h."))); if (rt) recalc(false); } });
         break;
       }
-      case "aviso-go": { const g = groupOfRef(el.dataset.ref); if (!g) { toast("No encuentro esa pista en el mapa."); break; } clearModes(); rt = null; diario = false; selectGroup(g, null, true); setSnap("peek"); break; }
+      case "aviso-go": { const g = groupOfRef(el.dataset.ref); if (!g) { toast((EN?"I can't find that piste on the map.":"No encuentro esa pista en el mapa.")); break; } clearModes(); rt = null; diario = false; selectGroup(g, null, true); setSnap("peek"); break; }
       /* Mensajes de un toque */
       case "msg": {
         const t = el.dataset.t, cur = S.mensajes.get(me);
         if (!MSGS[t]) break;
-        if (cur && cur.tipo === t && Date.now() - cur.at < MSG_HELP_MS) { del("mensajes", me).then(ok => ok && toast("Aviso quitado")); break; }
+        if (cur && cur.tipo === t && Date.now() - cur.at < MSG_HELP_MS) { del("mensajes", me).then(ok => ok && toast((EN?"Alert removed":"Aviso quitado"))); break; }
         if (t === "ayuda" && confirmAct !== "msg:ayuda") { confirmAct = "msg:ayuda"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
         confirmAct = null; msgSend(t); break;
       }
       case "banner-x": markSeen(el.dataset.k); ui(); break;
       case "banner-go": markSeen(el.dataset.k); clearModes(); diario = false; startRoute({ uid: el.dataset.uid }); break;
-      case "casa-set": { const pl = (M.places || [])[+el.dataset.i]; if (!pl) break; CASA = { n: pl[0], x: pl[1], y: pl[2] }; try { localStorage.setItem("vallik.casa", JSON.stringify({ n: CASA.n, x: CASA.x, y: CASA.y })); } catch (e) {} casaPick = false; casaCache.k = ""; toast("Te aviso de cuándo salir para volver a " + CASA.n); ui(); break; }
+      case "casa-set": { const pl = (M.places || [])[+el.dataset.i]; if (!pl) break; CASA = { n: pl[0], x: pl[1], y: pl[2] }; try { localStorage.setItem("vallik.casa", JSON.stringify({ n: CASA.n, x: CASA.x, y: CASA.y })); } catch (e) {} casaPick = false; casaCache.k = ""; toast((EN?"I'll tell you when to leave to get back to ":"Te aviso de cuándo salir para volver a ") + CASA.n); ui(); break; }
       case "casa-change": casaPick = true; ui(); break;
       case "casa-cierre": casaCierre = Math.min(19 * 60, Math.max(14 * 60, casaCierre + +el.dataset.d)); try { localStorage.setItem("vallik.cierre", String(casaCierre)); } catch (e) {} casaCache.k = ""; ui(); break;
-      case "casa-route": { const n = casaNode(); if (n < 0) { toast("Elige primero dónde dormís."); break; } if (!myPos()) { toast("Marca primero dónde estás con el botón Aquí."); break; } clearModes(); startRoute({ node: n, label: CASA.n }); break; }
+      case "casa-route": { const n = casaNode(); if (n < 0) { toast((EN?"First choose where you're staying.":"Elige primero dónde dormís.")); break; } if (!myPos()) { toast((EN?"First mark where you are with the Here button.":"Marca primero dónde estás con el botón Aquí.")); break; } clearModes(); startRoute({ node: n, label: CASA.n }); break; }
       case "juntar": { clearModes(); diario = false; juntar = juntarCalc(); if (!juntar.err) centerOn(NX[juntar.n], NY[juntar.n], 0.12); setSnap("peek"); ui(); break; }
       case "juntar-meet": if (juntar && !juntar.err) meetAsk(juntar.n, juntar.name); break;
-      case "juntar-go": if (juntar && !juntar.err) { const j = juntar; juntar = null; if (!myPos()) { toast("Marca primero dónde estás con el botón Aquí."); break; } startRoute({ node: j.n, label: j.name }); } break;
-      case "acc-link": { const G = window.PISTEA_GROUP; if (!G || !G.signIn) break; el.disabled = true; G.signIn(el.dataset.k).then(r => { if (r.ok) toast("Perfil guardado en tu cuenta"); else if (r.msg) toast(r.msg); ui(); }); break; }
+      case "juntar-go": if (juntar && !juntar.err) { const j = juntar; juntar = null; if (!myPos()) { toast((EN?"First mark where you are with the Here button.":"Marca primero dónde estás con el botón Aquí.")); break; } startRoute({ node: j.n, label: j.name }); } break;
+      case "lang": { if (el.dataset.v === VLANG) break; try { localStorage.setItem("vallik.lang", el.dataset.v); } catch (e) {} location.reload(); break; }
+      case "acc-link": { const G = window.PISTEA_GROUP; if (!G || !G.signIn) break; el.disabled = true; G.signIn(el.dataset.k).then(r => { if (r.ok) toast((EN?"Profile saved to your account":"Perfil guardado en tu cuenta")); else if (r.msg) toast(r.msg); ui(); }); break; }
       case "tab-map": clearModes(); diario = false; setSnap("peek"); ui(); break;
       case "tab-group": { clearModes(); diario = false; setSnap("full"); ui(); requestAnimationFrame(() => { const g = $("#grupo"), sm = $("#smore"); if (g && sm) sm.scrollTop = g.offsetTop - sm.offsetTop - 4; }); break; }
       case "sheet-toggle": setSnap(snap === "peek" ? "half" : snap === "half" ? "full" : "peek"); break;
@@ -2978,15 +3098,15 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
         const k = "kick:" + el.dataset.uid, nm = who(el.dataset.uid);
         if (confirmAct !== k) { confirmAct = k; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
         confirmAct = null; personSheet = null;
-        const kok = window.PISTEA_GROUP.kick(el.dataset.uid, () => toast("No se ha podido quitar a " + nm + "."));
-        toast(kok ? sentMsg(nm + " ya no está en el grupo") : "No se ha podido quitar");
+        const kok = window.PISTEA_GROUP.kick(el.dataset.uid, () => toast((EN?"Couldn't remove ":"No se ha podido quitar a ") + nm + "."));
+        toast(kok ? sentMsg(nm + (EN?" is no longer in the group":" ya no está en el grupo")) : (EN?"Couldn't remove":"No se ha podido quitar"));
         ui(); break;
       }
-      case "unmark": if (LIVE.on) liveStop(true); del("aqui", me).then(ok => ok && toast("Ya no apareces en el mapa")); personSheet = null; ui(); break;
+      case "unmark": if (LIVE.on) liveStop(true); del("aqui", me).then(ok => ok && toast((EN?"You no longer appear on the map":"Ya no apareces en el mapa"))); personSheet = null; ui(); break;
       case "here": { const n = selNode("top"); if (n >= 0) setMyPos(n, describeNode(n, [...sel.fis][0])).then(() => { sel = null; ui(); }); break; }
       case "route-here": {
         const n = selNode(sel.g.k === "L" ? "bottom" : "top");
-        if (n >= 0) { const lbl = sel.g.name || (sel.g.k === "L" ? "ese remonte" : "esa pista"); sel = null; startRoute({ node: n, label: lbl }); }
+        if (n >= 0) { const lbl = sel.g.name || (sel.g.k === "L" ? (EN?"that lift":"ese remonte") : (EN?"that piste":"esa pista")); sel = null; startRoute({ node: n, label: lbl }); }
         break;
       }
       case "route-friend": personSheet = null; sel = null; diario = false; startRoute({ uid: el.dataset.uid }); break;
@@ -2996,12 +3116,12 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "step-prev": if (rt && rt.res) { rt.cur = Math.max(0, rt.cur - 1); ui(); focusStep(); } break;
       case "step-go": if (rt && rt.res) { rt.cur = +el.dataset.i; setSnap("peek"); ui(); focusStep(); } break;
       case "route-all": setSnap("peek"); routeAll(); break;
-      case "route-log": { const rr = routeRuns(); Promise.all(rr.map(r => addPista(r.nombre, r.tipo))).then(oks => { if (oks.every(Boolean)) toast(rr.length === 1 ? "Apuntada en el diario" : rr.length + " pistas apuntadas en el diario"); rt = null; ui(); }); break; }
+      case "route-log": { const rr = routeRuns(); Promise.all(rr.map(r => addPista(r.nombre, r.tipo))).then(oks => { if (oks.every(Boolean)) toast(rr.length === 1 ? (EN?"Logged in your day":"Apuntada en el diario") : rr.length + (EN?" pistes logged in your day":" pistas apuntadas en el diario")); rt = null; ui(); }); break; }
       case "sel-add": {
         const g = sel.g, t = DIF[g.d].tipo;
         const mine = list("pistas").filter(p => p.uid === me && p.day === today() && norm(p.nombre) === norm(g.name));
-        if (mine.length) { toast("Ya la apuntaste hoy. Si la repetiste, apúntala desde el diario."); break; }
-        addPista(g.name, t).then(ok => { if (ok) { toast(g.name + " apuntada en el diario"); ui(); } }); break;
+        if (mine.length) { toast((EN?"You already logged it today. If you skied it again, log it from your day.":"Ya la apuntaste hoy. Si la repetiste, apúntala desde el diario.")); break; }
+        addPista(g.name, t).then(ok => { if (ok) { toast(g.name + (EN?" logged in your day":" apuntada en el diario")); ui(); } }); break;
       }
       case "diario": clearModes(); rt = null; diario = true; diarioScope = "hoy"; setSnap("full"); ui(); break;
       case "diario-close": diario = false; dq = ""; setSnap("peek"); ui(); break;
@@ -3017,11 +3137,11 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "card": dayCard(); break;
       case "modal-close": meetDraft = null; $("#modal").hidden = true; $("#modal").innerHTML = ""; break;
       case "retry": if (mode === "nocon") connect(); break;
-      case "demo-info": toast("Datos de ejemplo. El grupo todavía no está conectado."); break;
+      case "demo-info": toast((EN?"Example data. The group isn't connected yet.":"Datos de ejemplo. El grupo todavía no está conectado.")); break;
     }
   });
   function askTipo(n) {
-    $("#sugg").innerHTML = `<li class="ask">¿De qué color es «${esc(n)}»?</li>` + Object.entries(TIPOS).map(([k, t]) => `<li><button data-act="tipo-pick" data-n="${esc(n)}" data-t="${k}"><span class="plate" style="--c:${t.c}"></span><b>${t.s}</b><span class="plus">+</span></button></li>`).join("");
+    $("#sugg").innerHTML = `${EN?`<li class="ask">What colour is «`:`<li class="ask">¿De qué color es «`}${esc(n)}»?</li>` + Object.entries(TIPOS).map(([k, t]) => `<li><button data-act="tipo-pick" data-n="${esc(n)}" data-t="${k}"><span class="plate" style="--c:${t.c}"></span><b>${t.s}</b><span class="plus">+</span></button></li>`).join("");
   }
   window.addEventListener("online", () => { offline = false; if (mode === "nocon") connect(); ui(); });
   window.addEventListener("offline", () => { offline = true; ui(); });
@@ -3167,7 +3287,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       const l = $("#mload"); if (l) l.remove();
       sizeCanvas(); initGL(); layoutSheet(); camUpdate(); overview(0);
       schedule();
-    }).catch(() => { const l = $("#mload"); if (l) l.innerHTML = "No se pudo cargar el mapa<small>Revisa la conexión y recarga la página.</small>"; });
+    }).catch(() => { const l = $("#mload"); if (l) l.innerHTML = (EN?"Couldn't load the map<small>Check your connection and reload the page.</small>":"No se pudo cargar el mapa<small>Revisa la conexión y recarga la página.</small>"); });
     /* Sin configuración de Firebase (ni almacén de Claude): datos de ejemplo. Con configuración,
        si falla la conexión no se inventan personas: se queda en «sin conexión» y se puede reintentar. */
     const c = window.claude;

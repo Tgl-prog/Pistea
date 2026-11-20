@@ -77,8 +77,8 @@
       rememberToken();
       watcher = "pending";
       BG.addWatcher({
-        backgroundTitle: "Vallik en directo",
-        backgroundMessage: "Tu grupo ve dónde estás. Abre Vallik para parar.",
+        backgroundTitle: (EN?"Vallik live":"Vallik en directo"),
+        backgroundMessage: (EN?"Your group can see where you are. Open Vallik to stop.":"Tu grupo ve dónde estás. Abre Vallik para parar."),
         requestPermissions: true,
         stale: false,
         distanceFilter: 20
