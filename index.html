@@ -3716,6 +3716,12 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   }
   init();
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  /* Versión nueva instalada: si la página acaba de abrirse, se recarga sola para no quedar a medias
+     (parte vieja y parte nueva). Si ya la estás usando, no se interrumpe: la nueva entra la próxima vez. */
+  if ("serviceWorker" in navigator) {
+    const t0 = Date.now(), hadCtl = !!navigator.serviceWorker.controller; let done = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadCtl && !done && Date.now() - t0 < 20000) { done = true; location.reload(); } });
+  }
 })();
 </script>
 </body>
