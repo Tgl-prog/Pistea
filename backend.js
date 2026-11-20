@@ -215,7 +215,7 @@
       // Si me quitan mientras tengo la app abierta, salgo en el momento.
       group.collection("fuera").doc(uid).onSnapshot(s => { if (s.exists) kicked(); }, () => {});
 
-      const base = location.origin + location.pathname;
+      const base = /^https?:$/.test(location.protocol) ? location.origin + location.pathname : "https://vallik.app/";   // en la app nativa el origen es capacitor://
       const G = window.PISTEA_GROUP = {
         code,
         link: base + "#g=" + code,

@@ -4,7 +4,7 @@
 
 const MODEL = process.env.PETER_MODEL || "claude-haiku-5-5";
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY || "AIzaSyDIKhknu_nWMjFPoxwtdASuBSbikHIZT54";
-const ORIGINS = (process.env.PETER_ORIGINS || "https://tgl-prog.github.io,capacitor://localhost,http://localhost,https://localhost").split(",");
+const ORIGINS = (process.env.PETER_ORIGINS || "https://vallik.app,https://www.vallik.app,https://tgl-prog.github.io,capacitor://localhost,http://localhost,https://localhost").split(",");
 
 const SYSTEM = `Eres Peter, el guía de esquí de la app Vallik para Les 3 Vallées (Courchevel, La Tania, Méribel, Brides-les-Bains, Saint-Martin-de-Belleville, Les Menuires, Val Thorens y Orelle).
 
