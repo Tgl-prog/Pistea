@@ -54,14 +54,15 @@
         <div class="lp">
         <header class="lp-hero">
           <div class="lp-logo"><svg width="48" height="48" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#14355A" stroke-width="4.5" stroke-linecap="round"/></svg><svg class="lp-wm" viewBox="0 0 331 100" width="122" height="37" role="img" aria-label="Vallik"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg></div>
-          <h1>El mapa de tu grupo en la estación</h1>
-          <p>Dónde está cada uno, cómo llegar y cuándo volver. Hecho para Les 3 Vallées.</p>
+          <h1>Que nadie se pierda del grupo</h1>
+          <p>Ves a tus amigos en el mapa de pistas, llegas hasta ellos y volvéis a casa antes de que cierren los remontes.</p>
+          <p class="lp-tags"><span>Gratis</span><span>Sin instalar nada</span><span>Les 3 Vallées</span></p>
         </header>
-        ${code ? `<p class="lp-inv">Te han invitado a un grupo. Entra y os veréis en el mapa.</p>` : ""}
+        ${code ? `<p class="lp-inv">Te han invitado a un grupo. Entra y en un momento os veis todos en el mapa.</p>` : ""}
         ${canLogin("google") || canLogin("apple") ? `<div class="lp-auth" id="lpauth">
           ${canLogin("google") ? `<button class="btn wide lp-google" type="button" data-login="google">${G_ICON}Continuar con Google</button>` : ""}
           ${canLogin("apple") ? `<button class="btn wide lp-apple" type="button" data-login="apple">${A_ICON}Continuar con Apple</button>` : ""}
-          <small>Con tu cuenta no pierdes el perfil si cambias de móvil. También puedes entrar solo con tu nombre.</small>
+          <small>Con Google tu perfil te sigue aunque cambies de móvil. Si prefieres, entra solo con tu nombre aquí debajo.</small>
         </div>` : ""}
         <form class="join-card glass" autocomplete="off" novalidate>
           <h2>Entra en tu grupo</h2>
@@ -72,12 +73,14 @@
           <button class="btn wide" type="submit">Entrar</button>
           ${code ? "" : `<div class="join-or">o</div><button class="btn ghost wide" type="button" data-new>Crear un grupo nuevo</button>`}
         </form>
+        <h2 class="lp-h2">Lo que hace por tu grupo</h2>
         <ul class="lp-feat">
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.6c2.4 0 4 1.3 4.6 3.9"/></svg></span><div><b>Tu grupo en el mapa</b><small>Ves dónde está cada uno, en directo, sobre el mapa en 3D de las pistas.</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c3-1 4-5 7-7s6-2 7-7"/><circle cx="5" cy="19" r="2"/><path d="M15 5h4v4"/></svg></span><div><b>Ir hasta un amigo o un bar</b><small>Ruta paso a paso por pistas y remontes, sin negras si lo prefieres.</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><div><b>Vuelve a casa a tiempo</b><small>Te avisa de cuándo salir para no quedarte en otro valle al cerrar los remontes.</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><div><b>Quedad sin perder tiempo</b><small>Punto de encuentro, «te espero en el bar» y el sitio más justo para juntaros.</small></div></li>
+          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.6c2.4 0 4 1.3 4.6 3.9"/></svg></span><div><b>Tu grupo, en directo</b><small>Cada amigo es un punto en el mapa 3D de la estación. Sabes dónde está sin llamar a nadie.</small></div></li>
+          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c3-1 4-5 7-7s6-2 7-7"/><circle cx="5" cy="19" r="2"/><path d="M15 5h4v4"/></svg></span><div><b>Llega hasta quien sea</b><small>Ruta paso a paso por pistas y remontes hasta un amigo, un bar o un remonte. Sin negras, si lo prefieres.</small></div></li>
+          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><div><b>Vuelve a casa a tiempo</b><small>Te avisa de cuándo salir para no quedarte atrapado en otro valle cuando cierran los remontes.</small></div></li>
+          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><div><b>Quedad sin perder media mañana</b><small>Vallik elige el punto que os queda a todos más a mano. Y si alguien tiene un problema, el resto ve cómo llegar.</small></div></li>
         </ul>
+        <p class="lp-made">Hecha por un grupo de amigos que esquía en Les&nbsp;3&nbsp;Vallées.</p>
         <p class="lp-foot">vallik.app · <a href="privacidad/" style="color:inherit">Privacidad</a> · <a href="condiciones/" style="color:inherit">Condiciones</a> · mapa © OpenStreetMap</p>
         </div>`;
       const st = document.createElement("style");
@@ -87,6 +90,7 @@
       .lp-logo{display:flex;align-items:center;gap:14px}
       .lp-hero h1{margin:6px 0 0;font:800 34px/36px var(--font);letter-spacing:-.035em;color:var(--tx)}
       .lp-hero p{margin:0;font-size:17px;line-height:24px;color:var(--tx-2)}
+      .lp-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px!important}.lp-tags span{padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.07);color:var(--tx);font:500 12px/1 var(--mono);letter-spacing:.01em}.lp-h2{margin:14px 0 -2px;font:700 13px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--tx-2)}.lp-made{margin:6px 0 0;text-align:center;color:var(--tx-2);font-size:14px}
       .lp-inv{margin:0;padding:12px 14px;border-radius:14px;background:rgba(200,240,60,.12);box-shadow:inset 0 0 0 1px rgba(200,240,60,.35);font-size:15px}
       .lp-auth{display:grid;gap:10px}
       .lp-auth small{color:var(--tx-2);font-size:13px;line-height:18px;padding:0 4px}
