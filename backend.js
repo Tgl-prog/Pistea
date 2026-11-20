@@ -45,43 +45,47 @@
   /* ----- Pantalla de entrada: nombre y grupo ----- */
   // En iPhone, la app de la pantalla de inicio no comparte datos con Safari: al abrirla hay que
   // volver a entrar. Por eso se acepta pegar el enlace entero o el código.
+  // Idioma de la landing: el del móvil, salvo que se haya elegido otro con ES/EN.
+  const LANG = LS.get("vallik.lang") || (/^es\b/i.test(navigator.language || "es") ? "es" : "en");
+  const L = (es, en) => `<span lang="es">${es}</span><span lang="en">${en}</span>`;
   function askJoin() {
     const note = LS.get("pistea.aviso") || ""; LS.del("pistea.aviso");
     return new Promise(resolve => {
       const el = document.createElement("div");
       el.className = "join";
       el.innerHTML = `
-        <div class="lp">
+        <div class="lp" data-lang="${LANG}">
+        <div class="lp-lang" role="group" aria-label="Idioma / Language"><button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button></div>
         <header class="lp-hero">
           <div class="lp-logo"><svg width="48" height="48" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#14355A" stroke-width="4.5" stroke-linecap="round"/></svg><svg class="lp-wm" viewBox="0 0 331 100" width="122" height="37" role="img" aria-label="Vallik"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg></div>
-          <h1>Que nadie se pierda del grupo</h1>
-          <p>Ves a tus amigos en el mapa de pistas, llegas hasta ellos y volvéis a casa antes de que cierren los remontes.</p>
-          <p class="lp-tags"><span>Gratis</span><span>Sin instalar nada</span><span>Les 3 Vallées</span></p>
+          <h1>${L("Que nadie se pierda del grupo","Nobody gets lost from the group")}</h1>
+          <p>${L("Ves a tus amigos en el mapa de pistas, llegas hasta ellos y volvéis a casa antes de que cierren los remontes.","See your friends on the piste map, get to them in a few turns and make it home before the lifts close.")}</p>
+          <p class="lp-tags"><span>${L("Gratis","Free")}</span><span>${L("Sin instalar nada","No install")}</span><span>${L("Para grupos","Made for groups")}</span></p>
         </header>
-        ${code ? `<p class="lp-inv">Te han invitado a un grupo. Entra y en un momento os veis todos en el mapa.</p>` : ""}
+        ${code ? `<p class="lp-inv">${L("Te han invitado a un grupo. Entra y en un momento os veis todos en el mapa.","You have been invited to a group. Join and you will all be on the map in a moment.")}</p>` : ""}
         ${canLogin("google") || canLogin("apple") ? `<div class="lp-auth" id="lpauth">
-          ${canLogin("google") ? `<button class="btn wide lp-google" type="button" data-login="google">${G_ICON}Continuar con Google</button>` : ""}
-          ${canLogin("apple") ? `<button class="btn wide lp-apple" type="button" data-login="apple">${A_ICON}Continuar con Apple</button>` : ""}
-          <small>Con Google tu perfil te sigue aunque cambies de móvil. Si prefieres, entra solo con tu nombre aquí debajo.</small>
+          ${canLogin("google") ? `<button class="btn wide lp-google" type="button" data-login="google">${G_ICON}${L("Continuar con Google","Continue with Google")}</button>` : ""}
+          ${canLogin("apple") ? `<button class="btn wide lp-apple" type="button" data-login="apple">${A_ICON}${L("Continuar con Apple","Continue with Apple")}</button>` : ""}
+          <small>${L("Con Google tu perfil te sigue aunque cambies de móvil. Si prefieres, entra solo con tu nombre aquí debajo.","With Google your profile follows you if you change phones. Or just use your name below.")}</small>
         </div>` : ""}
         <form class="join-card glass" autocomplete="off" novalidate>
-          <h2>Entra en tu grupo</h2>
+          <h2>${L("Entra en tu grupo","Join your group")}</h2>
           <p class="join-note" role="status" hidden></p>
-          <p>Tus amigos te verán con este nombre.</p>
-          <label>Tu nombre<input name="n" maxlength="24" value="${myName.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" autocapitalize="words" enterkeyhint="next"></label>
-          ${code ? "" : `<label>Enlace o código del grupo<span class="join-row"><input name="c" maxlength="400" placeholder="Pega el enlace o el código" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go">${navigator.clipboard && navigator.clipboard.readText ? `<button class="btn dark" type="button" data-paste>Pegar</button>` : ""}</span><small>Pídeselo a quien creó el grupo.</small></label>`}
-          <button class="btn wide" type="submit">Entrar</button>
-          ${code ? "" : `<div class="join-or">o</div><button class="btn ghost wide" type="button" data-new>Crear un grupo nuevo</button>`}
+          <p>${L("Tus amigos te verán con este nombre.","This is the name your friends will see.")}</p>
+          <label>${L("Tu nombre","Your name")}<input name="n" maxlength="24" value="${myName.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" autocapitalize="words" enterkeyhint="next"></label>
+          ${code ? "" : `<label>${L("Enlace o código del grupo","Group link or code")}<span class="join-row"><input name="c" maxlength="400" placeholder="${LANG==="en"?"Paste the link or code":"Pega el enlace o el código"}" data-ph-es="Pega el enlace o el código" data-ph-en="Paste the link or code" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go">${navigator.clipboard && navigator.clipboard.readText ? `<button class="btn dark" type="button" data-paste>${L("Pegar","Paste")}</button>` : ""}</span><small>${L("Pídeselo a quien creó el grupo.","Ask whoever created the group.")}</small></label>`}
+          <button class="btn wide" type="submit">${L("Entrar","Join")}</button>
+          ${code ? "" : `<div class="join-or">${L("o","or")}</div><button class="btn ghost wide" type="button" data-new>${L("Crear un grupo nuevo","Create a new group")}</button>`}
         </form>
-        <h2 class="lp-h2">Lo que hace por tu grupo</h2>
+        <h2 class="lp-h2">${L("Lo que hace por tu grupo","What it does for your group")}</h2>
         <ul class="lp-feat">
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.6c2.4 0 4 1.3 4.6 3.9"/></svg></span><div><b>Tu grupo, en directo</b><small>Cada amigo es un punto en el mapa 3D de la estación. Sabes dónde está sin llamar a nadie.</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c3-1 4-5 7-7s6-2 7-7"/><circle cx="5" cy="19" r="2"/><path d="M15 5h4v4"/></svg></span><div><b>Llega hasta quien sea</b><small>Ruta paso a paso por pistas y remontes hasta un amigo, un bar o un remonte. Sin negras, si lo prefieres.</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><div><b>Vuelve a casa a tiempo</b><small>Te avisa de cuándo salir para no quedarte atrapado en otro valle cuando cierran los remontes.</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><div><b>Quedad sin perder media mañana</b><small>Vallik elige el punto que os queda a todos más a mano. Y si alguien tiene un problema, el resto ve cómo llegar.</small></div></li>
+          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.6c2.4 0 4 1.3 4.6 3.9"/></svg></span><div><b>${L("Tu grupo, en directo","Your group, live")}</b><small>${L("Cada amigo es un punto en el mapa 3D de la estación. Sabes dónde está sin llamar a nadie.","Every friend is a dot on the 3D resort map. You know where they are without calling anyone.")}</small></div></li>
+          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c3-1 4-5 7-7s6-2 7-7"/><circle cx="5" cy="19" r="2"/><path d="M15 5h4v4"/></svg></span><div><b>${L("Llega hasta quien sea","Get to anyone")}</b><small>${L("Ruta paso a paso por pistas y remontes hasta un amigo, un bar o un remonte. Sin negras, si lo prefieres.","Step by step route over pistes and lifts to a friend, a bar or a lift. Skip the blacks if you like.")}</small></div></li>
+          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><div><b>${L("Vuelve a casa a tiempo","Make it home in time")}</b><small>${L("Te avisa de cuándo salir para no quedarte atrapado en otro valle cuando cierran los remontes.","It tells you when to head back so you are not stuck in the wrong valley when the lifts close.")}</small></div></li>
+          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><div><b>${L("Quedad sin perder media mañana","Meet up without wasting the morning")}</b><small>${L("Vallik elige el punto que os queda a todos más a mano. Y si alguien tiene un problema, el resto ve cómo llegar.","Vallik picks the spot that is fairest for everyone. And if someone has a problem, the rest see how to reach them.")}</small></div></li>
         </ul>
-        <p class="lp-made">Hecha por un grupo de amigos que esquía en Les&nbsp;3&nbsp;Vallées.</p>
-        <p class="lp-foot">vallik.app · <a href="privacidad/" style="color:inherit">Privacidad</a> · <a href="condiciones/" style="color:inherit">Condiciones</a> · mapa © OpenStreetMap</p>
+        <p class="lp-made">${L("Hecha por un grupo de amigos que esquía junto.","Made by a group of friends who ski together.")}</p>
+        <p class="lp-foot">vallik.app · <a href="privacidad/" style="color:inherit">${L("Privacidad","Privacy")}</a> · <a href="condiciones/" style="color:inherit">${L("Condiciones","Terms")}</a> · ${L("mapa","map")} © OpenStreetMap</p>
         </div>`;
       const st = document.createElement("style");
       st.textContent = `.join{position:fixed;inset:0;z-index:30;display:block;padding:calc(var(--sat,0px) + 28px) 16px calc(var(--sab,0px) + 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(14,42,71,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
@@ -91,6 +95,7 @@
       .lp-hero h1{margin:6px 0 0;font:800 34px/36px var(--font);letter-spacing:-.035em;color:var(--tx)}
       .lp-hero p{margin:0;font-size:17px;line-height:24px;color:var(--tx-2)}
       .lp-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px!important}.lp-tags span{padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.07);color:var(--tx);font:500 12px/1 var(--mono);letter-spacing:.01em}.lp-h2{margin:14px 0 -2px;font:700 13px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--tx-2)}.lp-made{margin:6px 0 0;text-align:center;color:var(--tx-2);font-size:14px}
+      .lp{position:relative}.lp-lang{position:absolute;top:10px;right:4px;display:flex;padding:3px;border-radius:99px;background:rgba(255,255,255,.07);z-index:1}.lp-lang button{all:unset;cursor:pointer;padding:6px 10px;border-radius:99px;font:600 12px/1 var(--mono);color:var(--tx-2)}.lp[data-lang=es] .lp-lang [data-lang=es],.lp[data-lang=en] .lp-lang [data-lang=en]{background:var(--tx);color:var(--bg)}.lp[data-lang=es] [lang=en],.lp[data-lang=en] [lang=es]{display:none}
       .lp-inv{margin:0;padding:12px 14px;border-radius:14px;background:rgba(200,240,60,.12);box-shadow:inset 0 0 0 1px rgba(200,240,60,.35);font-size:15px}
       .lp-auth{display:grid;gap:10px}
       .lp-auth small{color:var(--tx-2);font-size:13px;line-height:18px;padding:0 4px}
@@ -155,12 +160,18 @@
           const u = await login(k, true);
           const box = el.querySelector("#lpauth"), nm = (u.displayName || "").split(" ")[0];
           if (nm && !f.n.value.trim()) f.n.value = nm.slice(0, 24);
-          if (box) box.innerHTML = `<div class="lp-done">${k === "apple" ? A_ICON : G_ICON}<span><b>Has entrado con ${k === "apple" ? "Apple" : "Google"}</b>${(u.email || "").replace(/</g, "&lt;")}</span></div>`;
+          if (box) box.innerHTML = `<div class="lp-done">${k === "apple" ? A_ICON : G_ICON}<span><b>${L("Has entrado con","Signed in with")} ${k === "apple" ? "Apple" : "Google"}</b>${(u.email || "").replace(/</g, "&lt;")}</span></div>`;
           say(code ? "Ya está. Revisa tu nombre y pulsa Entrar." : "Ya está. Ahora pega el enlace de tu grupo o crea uno nuevo.");
           (f.c || f.n).focus();
         } catch (er) { const t = loginErr(er); if (t) say(t); }
         busy(false);
       }));
+      el.querySelectorAll(".lp-lang [data-lang]").forEach(b => b.addEventListener("click", () => {
+        const v = b.dataset.lang, root = el.querySelector(".lp"); root.dataset.lang = v; LS.set("vallik.lang", v);
+        document.documentElement.lang = v;
+        el.querySelectorAll("[data-ph-es]").forEach(i => { i.placeholder = i.dataset["ph" + (v === "en" ? "En" : "Es")]; });
+      }));
+      document.documentElement.lang = LANG;
       const pb = el.querySelector("[data-paste]");
       if (pb) pb.addEventListener("click", async () => { try { const t = await navigator.clipboard.readText(); if (t) { f.c.value = t.trim(); say(""); } } catch (er) { f.c.focus(); } });
       const nb = el.querySelector("[data-new]");
