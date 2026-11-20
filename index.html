@@ -2378,7 +2378,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const a = G.account(); if (!a) return "";
     if (!a.anon) return `<h3 class="sec">Tu cuenta</h3><p class="quiet">Has entrado con ${esc(a.via || "tu cuenta")}${a.email ? " · " + esc(a.email) : ""}. Tu perfil te sigue si cambias de móvil.</p>`;
     const ks = ["google", "apple"].filter(k => G.canLogin(k)); if (!ks.length) return "";
-    return `<h3 class="sec">Guarda tu perfil</h3><p class="quiet">Ahora tu perfil vive solo en este móvil. Con una cuenta lo recuperas en cualquier otro, sin perder nada de lo de hoy.</p>
+    return `<h3 class="sec">Guarda tu perfil</h3><p class="quiet">Ahora tu perfil vive solo en este móvil. Con una cuenta lo recuperas en cualquier otro, sin perder nada de lo de hoy. <a href="privacidad/" style="color:var(--acc)">Privacidad</a></p>
       ${ks.map(k => `<button class="btn wide acc-btn ${k}" data-act="acc-link" data-k="${k}">Continuar con ${k === "google" ? "Google" : "Apple"}</button>`).join("")}`;
   }
 

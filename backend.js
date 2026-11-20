@@ -78,7 +78,7 @@
           <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><div><b>Vuelve a casa a tiempo</b><small>Te avisa de cuándo salir para no quedarte en otro valle al cerrar los remontes.</small></div></li>
           <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><div><b>Quedad sin perder tiempo</b><small>Punto de encuentro, «te espero en el bar» y el sitio más justo para juntaros.</small></div></li>
         </ul>
-        <p class="lp-foot">vallik.app · mapa © OpenStreetMap</p>
+        <p class="lp-foot">vallik.app · <a href="privacidad/" style="color:inherit">Privacidad</a> · mapa © OpenStreetMap</p>
         </div>`;
       const st = document.createElement("style");
       st.textContent = `.join{position:fixed;inset:0;z-index:30;display:block;padding:calc(var(--sat,0px) + 28px) 16px calc(var(--sab,0px) + 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(14,42,71,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
