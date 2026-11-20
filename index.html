@@ -211,7 +211,7 @@ body.searching .mapctl, body.searching .filters { visibility: hidden; }
 body.marking .mapctl { top: calc(var(--sat) + 74px); }
 
 /* ---------- Hoja inferior ---------- */
-.sheet { position: fixed; z-index: 5; left: 8px; right: 8px; bottom: 8px; max-width: 640px; margin: 0 auto; border-radius: var(--r-lg) var(--r-lg) var(--r-bot) var(--r-bot); display: flex; flex-direction: column; transition: height .32s cubic-bezier(.2,.8,.2,1); overflow: hidden; background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
+.sheet { position: fixed; z-index: 5; left: 8px; right: 8px; bottom: 8px; max-width: 640px; margin: 0 auto; border-radius: var(--r-lg) var(--r-lg) var(--r-bot) var(--r-bot); display: flex; flex-direction: column; transition: height .24s cubic-bezier(.2,.8,.2,1); overflow: hidden; background: #112C49; will-change: height; contain: layout paint; border: 1px solid var(--hair); box-shadow: var(--shadow); }
 .sheet.dragging { transition: none; }
 /* Dock inferior (Vallik): navegación principal con el botón central «Estoy aquí» */
 .dock { position: fixed; z-index: 7; left: 12px; right: 12px; bottom: calc(var(--sab) + 10px); max-width: 624px; margin: 0 auto; height: 64px; border-radius: 32px; display: none; align-items: center; padding: 0 6px; background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
@@ -3212,13 +3212,13 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const sb = $("#sheet"); let st = null;
     sb.addEventListener("pointerdown", e => {
       if (!e.target.closest("#grab, #speek") || e.target.closest("input, textarea")) return;
-      st = { y: e.clientY, h: sb.offsetHeight, id: e.pointerId, moved: false, t: performance.now() };
+      st = { y: e.clientY, h: sb.offsetHeight, id: e.pointerId, moved: false, t: performance.now(), onBtn: !!(e.target.closest && e.target.closest("button, a, label, [data-act]")) };
     });
     window.addEventListener("pointermove", e => {
       if (!st || e.pointerId !== st.id) return;
       const dy = e.clientY - st.y;
       if (!st.moved) {
-        if (Math.abs(dy) < 8) return;
+        if (Math.abs(dy) < (st.onBtn ? 18 : 10)) return;   /* un toque con el dedo algo movido sigue siendo un toque */
         st.moved = true; sb.classList.add("dragging"); try { sb.setPointerCapture(e.pointerId); } catch (er) {}
       }
       const hs = sheetHeights();
@@ -3535,6 +3535,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "retry": if (mode === "nocon") connect(); break;
       case "demo-info": toast((EN?"Example data. The group isn't connected yet.":"Datos de ejemplo. El grupo todavía no está conectado.")); break;
     }
+    /* Repinta siempre al momento (solo cambia el HTML que de verdad cambia), para que ningún botón se quede sin respuesta */
+    ui();
   });
   function askTipo(n) {
     $("#sugg").innerHTML = `${EN?`<li class="ask">What colour is «`:`<li class="ask">¿De qué color es «`}${esc(n)}»?</li>` + Object.entries(TIPOS).map(([k, t]) => `<li><button data-act="tipo-pick" data-n="${esc(n)}" data-t="${k}"><span class="plate" style="--c:${t.c}"></span><b>${t.s}</b><span class="plus">+</span></button></li>`).join("");
