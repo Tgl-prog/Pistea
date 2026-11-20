@@ -8,7 +8,7 @@
  * aunque se olvide subir VERSION, y con mala señal la app abre igual desde la copia. Si la red llega
  * tarde, la respuesta se guarda igualmente para la próxima vez.
  */
-const VERSION = "vallik-v11";
+const VERSION = "vallik-v12";
 const CORE = [
   "./", "index.html", "manifest.webmanifest", "backend.js", "native.js", "firebase-config.js",
   "mapdata.json", "pois.json", "dem.json", "relief.jpg",
