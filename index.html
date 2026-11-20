@@ -193,6 +193,9 @@ body.has-dock #smore { padding-bottom: 20px; }
 .junttimes li { display: flex; align-items: center; gap: 10px; font-size: 15px; }
 .junttimes li span { flex: 1; }
 .junttimes li b { font: 600 15px/1 var(--mono); }
+.acc-btn { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.acc-btn.google { background: #fff; color: #1F1F1F; }
+.acc-btn.apple { background: #000; color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
 .btn.sos { background: rgba(255,90,78,.14); color: var(--tx); box-shadow: inset 0 0 0 1px rgba(255,90,78,.55); }
 .btn.sos svg { color: var(--bad); }
 .btn.sos.on { background: var(--bad); color: var(--acc-ink); }
@@ -2224,7 +2227,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       ${casaHtml()}
       <h3 class="sec">Ir a la zona</h3>
       <div class="zones">${ZONES.map((z, i) => `<button data-act="zone" data-i="${i}">${esc(z.n)}</button>`).join("")}<button data-act="zfit">Las 3 Vallées</button></div>
-      <h3 class="sec">Invitar</h3>${invite}
+      <h3 class="sec">Invitar</h3>${invite}${accHtml()}
       <h3 class="sec">Hoy</h3>
       <button class="board mini" data-act="diario">
         <span><b>${hoy.n}</b><small>${hoy.n === 1 ? "pista" : "pistas"}</small></span>
@@ -2367,6 +2370,16 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const smore = `<h3 class="sec">Lo que tarda cada uno</h3><ul class="junttimes">${j.times.map(t => `<li>${av(t.uid)}<span>${esc(t.uid === me ? "Tú" : who(t.uid))}</span><b>${t.m} min</b></li>`).join("")}</ul>
       <p class="quiet">Elijo el sitio donde el que más tarda tarda lo menos posible, y si hay un bar o un restaurante a la misma distancia, mejor.</p>`;
     return { speek, smore };
+  }
+
+  /* Cuenta: guardar el perfil con Google o Apple (mismo usuario, no se pierde nada) */
+  function accHtml() {
+    const G = window.PISTEA_GROUP; if (!G || !G.account) return "";
+    const a = G.account(); if (!a) return "";
+    if (!a.anon) return `<h3 class="sec">Tu cuenta</h3><p class="quiet">Has entrado con ${esc(a.via || "tu cuenta")}${a.email ? " · " + esc(a.email) : ""}. Tu perfil te sigue si cambias de móvil.</p>`;
+    const ks = ["google", "apple"].filter(k => G.canLogin(k)); if (!ks.length) return "";
+    return `<h3 class="sec">Guarda tu perfil</h3><p class="quiet">Ahora tu perfil vive solo en este móvil. Con una cuenta lo recuperas en cualquier otro, sin perder nada de lo de hoy.</p>
+      ${ks.map(k => `<button class="btn wide acc-btn ${k}" data-act="acc-link" data-k="${k}">Continuar con ${k === "google" ? "Google" : "Apple"}</button>`).join("")}`;
   }
 
   /* «Ir hasta»: elegir destino. Amigos, la quedada, sitios cerca y la búsqueda. */
@@ -2924,6 +2937,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "juntar": { clearModes(); diario = false; juntar = juntarCalc(); if (!juntar.err) centerOn(NX[juntar.n], NY[juntar.n], 0.12); setSnap("peek"); ui(); break; }
       case "juntar-meet": if (juntar && !juntar.err) meetAsk(juntar.n, juntar.name); break;
       case "juntar-go": if (juntar && !juntar.err) { const j = juntar; juntar = null; if (!myPos()) { toast("Marca primero dónde estás con el botón Aquí."); break; } startRoute({ node: j.n, label: j.name }); } break;
+      case "acc-link": { const G = window.PISTEA_GROUP; if (!G || !G.signIn) break; el.disabled = true; G.signIn(el.dataset.k).then(r => { if (r.ok) toast("Perfil guardado en tu cuenta"); else if (r.msg) toast(r.msg); ui(); }); break; }
       case "tab-map": clearModes(); diario = false; setSnap("peek"); ui(); break;
       case "tab-group": { clearModes(); diario = false; setSnap("full"); ui(); requestAnimationFrame(() => { const g = $("#grupo"), sm = $("#smore"); if (g && sm) sm.scrollTop = g.offsetTop - sm.offsetTop - 4; }); break; }
       case "sheet-toggle": setSnap(snap === "peek" ? "half" : snap === "half" ? "full" : "peek"); break;
