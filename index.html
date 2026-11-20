@@ -180,6 +180,19 @@ body.has-dock .dock { display: flex; }
 .dock .badge[hidden] { display: none; }
 body.has-dock .sheet { bottom: calc(var(--sab) + 84px); border-radius: var(--r-lg); }
 body.has-dock #smore { padding-bottom: 20px; }
+.casacard, .juntcard { padding: 14px; border-radius: var(--r-md); background: rgba(200,240,60,.07); box-shadow: inset 0 0 0 1px rgba(200,240,60,.28); display: grid; gap: 10px; }
+.casacard p { margin: 0; font-size: 15px; line-height: 21px; }
+.casacard p b { font: 600 17px/1 var(--mono); color: var(--acc); }
+.casacard small { color: var(--tx-2); font-size: 13px; line-height: 18px; }
+.cierre { display: flex; align-items: center; gap: 8px; }
+.cierre span { flex: 1; color: var(--tx-2); font-size: 14px; }
+.cierre b { font: 600 17px/1 var(--mono); min-width: 52px; text-align: center; }
+.cierre .btn { min-height: 40px; padding: 0 12px; }
+.juntbtn { width: 100%; }
+.junttimes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.junttimes li { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+.junttimes li span { flex: 1; }
+.junttimes li b { font: 600 15px/1 var(--mono); }
 .btn.sos { background: rgba(255,90,78,.14); color: var(--tx); box-shadow: inset 0 0 0 1px rgba(255,90,78,.55); }
 .btn.sos svg { color: var(--bad); }
 .btn.sos.on { background: var(--bad); color: var(--acc-ink); }
@@ -1758,6 +1771,13 @@ body.has-dock #smore { padding-bottom: 20px; }
       ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillStyle = A.t; ctx.fillText(t, X + 17, Y + h / 2 + 0.5);
     });
     /* Punto de encuentro: bandera amarilla */
+    if (juntar && !juntar.err && juntar.n >= 0) {   /* ¿Dónde nos juntamos?: el punto propuesto */
+      const jq = proj(NX[juntar.n], NY[juntar.n], NH[juntar.n]);
+      if (jq) { const [X, Y] = jq, pulse = 0.5 + 0.5 * Math.sin(performance.now() / 380);
+        ctx.beginPath(); ctx.arc(X, Y, 18 + pulse * 6, 0, 7); ctx.fillStyle = "rgba(200,240,60,.25)"; ctx.fill();
+        ctx.beginPath(); ctx.arc(X, Y, 11, 0, 7); ctx.fillStyle = "#0E2A47"; ctx.fill();
+        ctx.beginPath(); ctx.arc(X, Y, 7, 0, 7); ctx.fillStyle = "#C8F03C"; ctx.fill(); }
+    }
     if (mq) {
       const [X, Y] = mq;
       ctx.beginPath(); ctx.ellipse(X, Y, 7, 3, 0, 0, 7); ctx.fillStyle = "rgba(16,33,49,.35)"; ctx.fill();
@@ -1908,7 +1928,7 @@ body.has-dock #smore { padding-bottom: 20px; }
   }
 
   /* ================= Ruta ================= */
-  function startRoute(to) { ofiRefresh(); marking = false; diario = false; gotoOpen = false; rt = { to, noBlack: rt ? rt.noBlack : false, res: null, cur: 0 }; setSnap("peek"); recalc(true); }
+  function startRoute(to) { ofiRefresh(); marking = false; diario = false; gotoOpen = false; juntar = null; rt = { to, noBlack: rt ? rt.noBlack : false, res: null, cur: 0 }; setSnap("peek"); recalc(true); }
   function recalc(fit) {
     if (!rt) return;
     const mp = myPos(); rt.err = null;
@@ -2141,7 +2161,7 @@ body.has-dock #smore { padding-bottom: 20px; }
   /* ================= Interfaz: hoja inferior ================= */
   let snap = "peek", gotoOpen = false, diario = false, diarioScope = "hoy", filtOpen = false, markCand = null, offline = !navigator.onLine, dq = "";
   let meetSheet = false, meetDraft = null;
-  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : gotoOpen ? "goto" : "home"; }
+  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : gotoOpen ? "goto" : juntar ? "juntar" : "home"; }
   function updateMapUI() { ui(); }
 
   /* Datos para el diario: desnivel y longitud de cada pista registrada */
@@ -2200,7 +2220,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       <h3 class="sec">Avisos en pistas y remontes</h3>
       <ul class="avs">${avs.map(a => `<li><button data-act="aviso-go" data-ref="${esc(a.ref)}"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><span><b>${esc(a.nombre || "Sin nombre")}</b><small>${esc(a.uid === me ? "Tú" : who(a.uid))} · ${esc(ago(a.at))} · hasta las ${hhmm(a.exp)}</small></span></button></li>`).join("")}</ul>` : "";
     const smore = `
-      <h3 class="sec" id="grupo">Tu grupo${others.length ? ` <small>${others.length + 1} personas</small>` : ""}</h3>${people}${msgs}${avList}
+      <h3 class="sec" id="grupo">Tu grupo${others.length ? ` <small>${others.length + 1} personas</small>` : ""}</h3>${people}${others.length ? `<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>` : ""}${msgs}${avList}
+      ${casaHtml()}
       <h3 class="sec">Ir a la zona</h3>
       <div class="zones">${ZONES.map((z, i) => `<button data-act="zone" data-i="${i}">${esc(z.n)}</button>`).join("")}<button data-act="zfit">Las 3 Vallées</button></div>
       <h3 class="sec">Invitar</h3>${invite}
@@ -2273,13 +2294,91 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     return { speek, smore };
   }
 
+  /* ================= Vuelta a casa: cuándo salir para no quedarse en otro valle ================= */
+  const CASA_CIERRE_DEF = 16 * 60 + 30;
+  let CASA = null, casaPick = false, casaCache = { k: "", v: null };
+  try { CASA = JSON.parse(localStorage.getItem("vallik.casa") || "null"); } catch (e) {}
+  let casaCierre = CASA_CIERRE_DEF; try { casaCierre = +localStorage.getItem("vallik.cierre") || CASA_CIERRE_DEF; } catch (e) {}
+  function liftClose(f) { let c = null; ((f && f.ofi) || []).forEach(it => { if (it.h && it.h[1] > 0) c = c == null ? it.h[1] : Math.max(c, it.h[1]); }); return c; }
+  function casaNode() { if (!CASA || !M.ok) return -1; if (CASA.node == null) CASA.node = nearestNode(CASA.x, CASA.y, 3000); return CASA.node; }
+  function casaPlan() {
+    const mp = myPos(), dst = casaNode(); if (!mp || mp.near < 0 || dst < 0) return null;
+    const k = mp.near + "|" + dst + "|" + Math.floor(Date.now() / 60e3) + "|" + casaCierre;
+    if (casaCache.k === k) return casaCache.v;
+    const r = routeBest(mp.near, dst, false); let v = null;
+    if (r) {
+      let T = 0, leave = Infinity, lifts = 0, crit = null, ofi = false;
+      r.steps.forEach(st => {
+        if (st.ty === 1 || st.ty === 3) {
+          lifts++; const c0 = liftClose(st.f); if (c0 != null) ofi = true;
+          const lv = (c0 != null ? c0 : casaCierre) - 5 - T / 60;   // 5 min de margen en cada remonte
+          if (lv < leave) { leave = lv; crit = st.f; }
+        }
+        T += st.t;
+      });
+      v = { min: Math.max(1, Math.round(r.time / 60)), lifts, leave: isFinite(leave) ? Math.floor(leave) : null, crit: crit ? (crit.g ? crit.g.name : crit.name) : null, ofi };
+    }
+    casaCache = { k, v }; return v;
+  }
+  function casaChip() {
+    if (!CASA || !(mode === "live" || mode === "demo")) return "";
+    const mp = myPos(), now = nowMin(); if (!mp || Date.now() - mp.at > 3 * 3600e3 || now < 9 * 60 || now > casaCierre + 30) return "";
+    const pl = casaPlan(); if (!pl || pl.leave == null) return "";
+    const left = pl.leave - now; if (left > 45) return "";
+    return `<button class="chip ${left <= 0 ? "bad" : "warn"}" data-act="casa-route">${left <= 0 ? "Puede que no llegues a " + esc(CASA.n) + " en remontes · ver ruta" : "Para volver a " + esc(CASA.n) + ", sal antes de las " + hm24(pl.leave)}</button>`;
+  }
+  function casaHtml() {
+    if (!CASA || casaPick) return `<h3 class="sec">Vuelta a casa</h3><p class="quiet">Dime dónde dormís y te aviso de cuándo salir para no quedarte en otro valle cuando cierren los remontes.</p>
+      <div class="zones">${(M.places || []).map((p, i) => `<button data-act="casa-set" data-i="${i}">${esc(p[0])}</button>`).join("")}</div>`;
+    const pl = casaPlan(), mp = myPos();
+    const txt = !mp ? "Marca dónde estás con el botón Aquí y te digo cuándo salir." : !pl ? "No encuentro un camino desde donde estás." : pl.leave == null ? `Llegas esquiando en unos ${pl.min} min.`
+      : `Sal antes de las <b>${hm24(pl.leave)}</b>. Tardas unos ${pl.min} min, con ${pl.lifts} ${pl.lifts === 1 ? "remonte" : "remontes"}${pl.crit ? `, y el que más aprieta es ${esc(pl.crit)}` : ""}.`;
+    const note = pl && pl.leave != null ? `<small>${pl.ofi ? "Con los horarios oficiales de hoy." : `Cuento con que los remontes cierran a las ${hm24(casaCierre)}. Ajusta la hora con la de tu estación.`}</small>` : "";
+    const cierre = pl && pl.ofi ? "" : `<div class="cierre"><span>Últimos remontes</span><button class="btn dark" data-act="casa-cierre" data-d="-15" aria-label="15 minutos antes">−15</button><b>${hm24(casaCierre)}</b><button class="btn dark" data-act="casa-cierre" data-d="15" aria-label="15 minutos después">+15</button></div>`;
+    return `<h3 class="sec">Vuelta a ${esc(CASA.n)}</h3><div class="casacard"><p>${txt}</p>${note}${cierre}<div class="acts two"><button class="btn" data-act="casa-route">Cómo volver</button><button class="btn ghost" data-act="casa-change">Cambiar</button></div></div>`;
+  }
+
+  /* ================= ¿Dónde nos juntamos? El punto más justo para todos ================= */
+  let juntar = null;
+  function juntarCalc() {
+    const ps = positions().filter(p => p.near >= 0 && Date.now() - p.at < 4 * 3600e3);
+    if (ps.length < 2) return { err: "Hace falta que al menos dos del grupo hayan marcado dónde están." };
+    const ds = ps.map(p => { const d = distAll(p.near); return d ? Float64Array.from(d) : null; });
+    if (ds.some(d => !d)) return { err: "Todavía se está cargando el mapa. Prueba en un momento." };
+    const cands = new Map();
+    F.forEach(f => { if (f.k === "L" && f.ns.length) [f.ns[0], f.ns[f.ns.length - 1]].forEach(n => { if (ROUTABLE[n] && !cands.has(n)) cands.set(n, null); }); });
+    POIS.forEach(p => { const n = poiNode(p); if (n >= 0) cands.set(n, p); });
+    let best = null;
+    cands.forEach((poi, n) => {
+      let w = 0, sum = 0;
+      for (const d of ds) { const t = d[n]; if (!isFinite(t)) return; if (t > w) w = t; sum += t; }
+      const sc = w + sum * 0.05 - (poi ? 90 : 0);   // lo justo: que el que más tarda tarde lo menos posible; un bar suma
+      if (!best || sc < best.sc) best = { n, poi, w, sc };
+    });
+    if (!best) return { err: "No encuentro un punto al que podáis llegar todos." };
+    return { n: best.n, poi: best.poi, w: Math.max(1, Math.round(best.w / 60)), name: best.poi ? best.poi.name : cap(describeNode(best.n)), times: ps.map((p, i) => ({ uid: p.uid, m: Math.max(0, Math.round(ds[i][best.n] / 60)) })).sort((a, b) => b.m - a.m) };
+  }
+  function juntarHtml() {
+    const j = juntar;
+    if (j.err) return { speek: `<div class="headrow"><div class="title-wrap"><div><small class="kicker">¿Dónde nos juntamos?</small><h2 class="title md">Aún no se puede</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div><p class="quiet">${esc(j.err)}</p>`, smore: "" };
+    const speek = `<div class="headrow"><div class="title-wrap"><div><small class="kicker">Lo más justo para todos</small><h2 class="title md">${esc(j.name)}</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
+      <p class="facts">Llegáis todos en unos ${j.w} min.</p>
+      <div class="acts two"><button class="btn" data-act="juntar-meet">Proponer al grupo</button><button class="btn dark" data-act="juntar-go">Cómo llegar</button></div>`;
+    const smore = `<h3 class="sec">Lo que tarda cada uno</h3><ul class="junttimes">${j.times.map(t => `<li>${av(t.uid)}<span>${esc(t.uid === me ? "Tú" : who(t.uid))}</span><b>${t.m} min</b></li>`).join("")}</ul>
+      <p class="quiet">Elijo el sitio donde el que más tarda tarda lo menos posible, y si hay un bar o un restaurante a la misma distancia, mejor.</p>`;
+    return { speek, smore };
+  }
+
   /* «Ir hasta»: elegir destino. Amigos, la quedada, sitios cerca y la búsqueda. */
   function gotoHtml() {
     const mp = myPos(), others = positions().filter(p => p.uid !== me), mt = meet();
     const speek = `<div class="headrow"><div class="title-wrap"><div><small class="kicker">Ir hasta</small><h2 class="title md">¿A dónde vas?</h2></div></div><button class="x" data-act="tab-map" aria-label="Cerrar">×</button></div>
       <button class="btn dark wide" data-act="goto-search">Buscar una pista, un remonte o un sitio</button>`;
+    const others0 = positions().filter(p => p.uid !== me);
     let more = "";
     if (!mp) more += `<p class="quiet">Marca primero dónde estás con el botón Aquí. Así se calcula la ruta desde tu sitio.</p>`;
+    if (others0.length) more += `<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>`;
+    if (CASA) { const n = casaNode(); if (n >= 0) more += `<h3 class="sec">Vuelta a casa</h3><ul class="people"><li class="person"><button class="pbtn" data-act="casa-route"><span><b>${esc(CASA.n)}</b><small>${(pl => pl && pl.leave != null ? "Sal antes de las " + hm24(pl.leave) : "Tu alojamiento")(casaPlan())}</small></span></button><button class="btn go" data-act="casa-route">Ir</button></li></ul>`; }
     if (mt) more += `<h3 class="sec">Punto de encuentro</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Quedada${mt.hora ? " a las " + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}</small></span></button>`;
     more += `<h3 class="sec">Tu grupo</h3>` + (others.length ? `<ul class="people">${others.map(p => `
         <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}"><button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${esc(p.en || "")} · ${esc(ago(p.at))}</small></span></button><button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">Ir</button></li>`).join("")}</ul>`
@@ -2485,7 +2584,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   function ui() {
     if (!$("#sheet")) return;
     if (ptrDown && !dragging) { uiLater = true; drawSoon(); return; }
-    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
+    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, juntar: juntarHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
     const sb = $("#sheet");
     const ae = document.activeElement, fid = ae && ae.id && sb.contains(ae) ? ae.id : null;
     let selr = null; try { if (fid && ae.selectionStart != null) selr = [ae.selectionStart, ae.selectionEnd]; } catch (e) {}
@@ -2503,6 +2602,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     else if (stale) chips.push(`<span class="chip">Conexión lenta</span>`);
     if (mode === "live" && pendingLong()) chips.push(`<span class="chip">${offline ? "Se enviará al recuperar la cobertura" : "Pendiente de enviar"}</span>`);
     if (mode === "live" && !canWrite) chips.push(`<span class="chip warn">Solo lectura</span>`);
+    const cc = casaChip(); if (cc) chips.push(cc);
     setHtml($("#chips"), chips.join(""));
     /* Mensajes nuevos: los normales se van solos a los 12 s; «Necesito ayuda» se queda hasta cerrarlo */
     const bs = banners();
@@ -2750,7 +2850,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   document.addEventListener("focusin", e => { if (e.target.id === "q") { document.body.classList.add("searching"); $("#results").innerHTML = resultsHtml(); } if (e.target.id === "dq" && snap !== "full") setSnap("full"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.id === "q") closeSearch(); });
   document.addEventListener("pointerdown", e => { if (!e.target.closest(".topbar")) { const r = $("#results"); if (r && r.innerHTML) { r.innerHTML = ""; document.body.classList.remove("searching"); } } });
-  function clearModes() { sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; gotoOpen = false; }
+  function clearModes() { sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; gotoOpen = false; juntar = null; }
   document.addEventListener("click", e => {
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
     const act = el.dataset.act, id = el.dataset.id;
@@ -2766,7 +2866,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "res-g": { closeSearch(); rt = null; diario = false; marking = false; selectGroup(GROUPS[+el.dataset.i], null, true); setSnap("peek"); break; }
       case "res-place": { closeSearch(); clearModes(); const p = M.places[+el.dataset.i]; centerOn(p[1], p[2], 0.1); ui(); break; }
       case "res-person": case "person": case "center-person": { closeSearch(); const p = positions().find(q => q.uid === el.dataset.uid); if (p) { rt = null; diario = false; showPerson(p); setSnap("peek"); } break; }
-      case "close-sel": sel = null; personSheet = null; meetSheet = false; poiSheet = null; ui(); break;
+      case "close-sel": sel = null; personSheet = null; meetSheet = false; poiSheet = null; juntar = null; ui(); break;
       case "peter": peterOpen(); break;
       case "peter-close": peterClose(); break;
       case "peter-sug": peterAsk(el.textContent); break;
@@ -2817,6 +2917,13 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       }
       case "banner-x": markSeen(el.dataset.k); ui(); break;
       case "banner-go": markSeen(el.dataset.k); clearModes(); diario = false; startRoute({ uid: el.dataset.uid }); break;
+      case "casa-set": { const pl = (M.places || [])[+el.dataset.i]; if (!pl) break; CASA = { n: pl[0], x: pl[1], y: pl[2] }; try { localStorage.setItem("vallik.casa", JSON.stringify({ n: CASA.n, x: CASA.x, y: CASA.y })); } catch (e) {} casaPick = false; casaCache.k = ""; toast("Te aviso de cuándo salir para volver a " + CASA.n); ui(); break; }
+      case "casa-change": casaPick = true; ui(); break;
+      case "casa-cierre": casaCierre = Math.min(19 * 60, Math.max(14 * 60, casaCierre + +el.dataset.d)); try { localStorage.setItem("vallik.cierre", String(casaCierre)); } catch (e) {} casaCache.k = ""; ui(); break;
+      case "casa-route": { const n = casaNode(); if (n < 0) { toast("Elige primero dónde dormís."); break; } if (!myPos()) { toast("Marca primero dónde estás con el botón Aquí."); break; } clearModes(); startRoute({ node: n, label: CASA.n }); break; }
+      case "juntar": { clearModes(); diario = false; juntar = juntarCalc(); if (!juntar.err) centerOn(NX[juntar.n], NY[juntar.n], 0.12); setSnap("peek"); ui(); break; }
+      case "juntar-meet": if (juntar && !juntar.err) meetAsk(juntar.n, juntar.name); break;
+      case "juntar-go": if (juntar && !juntar.err) { const j = juntar; juntar = null; if (!myPos()) { toast("Marca primero dónde estás con el botón Aquí."); break; } startRoute({ node: j.n, label: j.name }); } break;
       case "tab-map": clearModes(); diario = false; setSnap("peek"); ui(); break;
       case "tab-group": { clearModes(); diario = false; setSnap("full"); ui(); requestAnimationFrame(() => { const g = $("#grupo"), sm = $("#smore"); if (g && sm) sm.scrollTop = g.offsetTop - sm.offsetTop - 4; }); break; }
       case "sheet-toggle": setSnap(snap === "peek" ? "half" : snap === "half" ? "full" : "peek"); break;
