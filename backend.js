@@ -62,19 +62,19 @@
           ${code ? "" : `<div class="join-or">o</div><button class="btn ghost wide" type="button" data-new>Crear un grupo nuevo</button>`}
         </form>`;
       const st = document.createElement("style");
-      st.textContent = `.join{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:16px;overflow-y:auto;background:rgba(10,22,32,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+      st.textContent = `.join{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:16px;overflow-y:auto;background:rgba(14,42,71,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
       .join-brand{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
       .join-brand b{font:700 28px/1.1 var(--font);letter-spacing:-.01em;margin-top:4px}
       .join-brand span{font-size:15px;color:var(--tx-2)}
       .join-row{display:flex;gap:8px}.join-row input{flex:1;min-width:0}.join-row .btn{min-height:52px;padding:0 16px}
       .join-card label small{font:400 13px/16px var(--font);color:var(--tx-2)}
       .join-or{display:flex;align-items:center;gap:10px;color:var(--tx-2);font-size:13px}.join-or::before,.join-or::after{content:"";flex:1;height:1px;background:var(--hair-2)}
-      .join-card{width:min(100%,380px);border-radius:var(--r-lg,28px);padding:24px 20px 20px;display:grid;gap:14px;background:var(--glass-2)}
+      .join-card{width:min(100%,380px);grid-template-columns:minmax(0,1fr);border-radius:var(--r-lg,28px);padding:24px 20px 20px;display:grid;gap:14px;background:var(--glass-2)}
       .join-card h2{margin:0;font:700 22px/26px var(--font);letter-spacing:-.02em}
       .join-card p{margin:-8px 0 0;color:var(--tx-2);font-size:14px}
       .join-card .join-note{margin:0;padding:12px 14px;border-radius:14px;background:rgba(200,240,60,.12);color:var(--tx);font-size:14px}
       .join-card .join-note[hidden]{display:none}
-      .join-card label{display:grid;gap:6px;font:600 13px/16px var(--font);color:var(--tx-2)}
+      .join-card label{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;font:600 13px/16px var(--font);color:var(--tx-2)}
       .join-card input{height:52px;border-radius:26px;padding:0 18px;font-size:16px;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid var(--hair);-webkit-appearance:none}
       .join-card input:focus{outline:none;border-color:var(--acc)}
       .join-card .btn.wide+.btn.wide{margin-top:-4px}
