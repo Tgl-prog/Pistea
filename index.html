@@ -175,6 +175,9 @@ body.searching .peterbtn { display: none; }
 .slopeleg .lbl { display: grid; grid-template-columns: repeat(8, 26px); font: 500 10px/1 var(--mono); color: var(--tx-2); }
 .pstats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin: 10px 0 2px; }
 .pstats div { display: grid; gap: 3px; }
+.pstats.three { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pstats.three div { padding: 12px; border-radius: 16px; background: rgba(255,255,255,.055); }
+.pstats.three b { font: 500 17px/1.1 var(--mono); }
 .pstats b { font: 600 17px/1.1 var(--font); color: var(--tx); }
 .pstats small { font-size: 12px; color: var(--tx-2); }
 .pprof { margin: 14px 0 6px; }
@@ -553,6 +556,87 @@ body.has-dock #smore { padding-bottom: 20px; }
 .mcard p { margin: 0; font-size: 14px; color: var(--tx-2); }
 @media (min-width: 700px) { .sheet { left: 16px; right: auto; width: 400px; margin: 0; } .topbar { max-width: 432px; } }
 .langrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 4px;color:var(--tx-2);font-size:14px}.lp-seg{display:flex;padding:3px;border-radius:99px;background:rgba(255,255,255,.07)}.lp-seg button{all:unset;cursor:pointer;padding:7px 12px;border-radius:99px;font:600 13px/1 var(--font);color:var(--tx-2)}.lp-seg button.on{background:var(--tx);color:var(--bg)}
+/* ---------- Liquid Glass: solo lo que flota sobre el mapa. El contenido va en panel sólido. ---------- */
+:root {
+  --lg-bg: linear-gradient(180deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,.04) 42%, rgba(255,255,255,0) 100%), rgba(11,32,56,.60);
+  --lg-blur: blur(30px) saturate(180%);
+  --lg-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(255,255,255,.14), 0 14px 34px rgba(4,16,30,.30);
+}
+.search { border-radius: 26px; background: var(--lg-bg); -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur); box-shadow: var(--lg-shadow); }
+.search input { background-color: transparent !important; border-color: transparent !important; box-shadow: none !important; }
+.search input:focus { border-color: var(--acc) !important; }
+.iconbtn, .mapctl, .dock, .chip, .banner, .slopeleg, .glass2 { background: var(--lg-bg); -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur); border: 0; box-shadow: var(--lg-shadow); }
+.iconbtn[aria-expanded=true] { background: var(--acc); box-shadow: 0 0 0 4px rgba(200,240,60,.18); }
+.mapctl button + button { border-top: 0; }
+.mapctl button { height: 46px; }
+.mapctl button[aria-pressed=true] { border-radius: 21px; width: 42px; height: 42px; margin: 4px 5px; }
+.dock .dock-main { box-shadow: 0 0 0 5px rgba(200,240,60,.16), 0 8px 20px rgba(200,240,60,.30); }
+.chip.casa { background: var(--acc); color: var(--acc-ink); box-shadow: 0 10px 26px rgba(4,16,30,.30); font-weight: 600; height: 40px; border-radius: 20px; padding: 0 14px 0 8px; }
+.chip.casa .ci { width: 28px; height: 28px; border-radius: 14px; background: rgba(14,42,71,.10); display: grid; place-items: center; }
+.chip.casa.bad { background: var(--bad); color: #fff; }
+.sec { font: 600 11px/14px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tx-2); margin: 20px 0 0; }
+.sec small { font: 500 11px/14px var(--mono); letter-spacing: .04em; text-transform: none; }
+/* Vista de mapa: el grupo flota sobre el mapa en cristal; al subir el panel, todo ordenado */
+#glance { position: fixed; z-index: 6; left: 0; right: 0; bottom: calc(var(--sab) + 84px); display: none; flex-direction: column; gap: 10px; pointer-events: none; }
+body.glance #glance { display: flex; }
+body.glance #sheet { visibility: hidden; pointer-events: none; }
+#glance > * { pointer-events: auto; }
+.gl-row { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 0 12px; max-width: 640px; margin: 0 auto; width: 100%; }
+.gl-me { min-width: 0; flex: 0 1 auto; display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 26px; color: var(--tx); text-align: left; }
+.gl-me .av { width: 36px; height: 36px; flex: 0 0 36px; font-size: 13px; }
+.gl-me span { display: grid; gap: 3px; min-width: 0; }
+.gl-me b { font: 600 14px/1.15 var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gl-me small { font: 500 11px/1.1 var(--font); color: var(--tx-2); }
+.gl-me small.live { color: #FF8A80; }
+.gl-sos { flex: 0 0 auto; height: 48px; padding: 0 16px; border-radius: 24px; color: var(--tx); display: flex; align-items: center; gap: 8px; font: 600 14px/1 var(--font); }
+.gl-sos svg { color: var(--bad); }
+.gl-sos.on { background: var(--bad); color: #fff; }
+.gl-sos.on svg { color: #fff; }
+.gl-cards { display: flex; gap: 10px; overflow-x: auto; padding: 2px 12px 4px; scroll-snap-type: x mandatory; scrollbar-width: none; max-width: 640px; margin: 0 auto; width: 100%; }
+.gl-cards::-webkit-scrollbar { display: none; }
+.gl-card { flex: 0 0 148px; height: 128px; scroll-snap-align: start; border-radius: 26px; padding: 13px 14px; display: flex; flex-direction: column; justify-content: space-between; color: var(--tx); text-align: left; }
+.gl-card .top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.gl-card .top .av { width: 30px; height: 30px; flex: 0 0 30px; font-size: 12px; }
+.gl-card .top b { font: 600 14px/1 var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gl-card .ld { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 4px; background: var(--bad); }
+.gl-card .n { font: 500 40px/.9 var(--mono); letter-spacing: -.05em; }
+.gl-card .n small { font: 500 14px/1 var(--mono); letter-spacing: 0; color: rgba(246,248,250,.7); }
+.gl-card .w { font: 500 12px/1.2 var(--font); color: rgba(246,248,250,.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gl-card.help { box-shadow: inset 0 0 0 2px var(--bad), var(--lg-shadow); }
+.gl-card.help .w { color: #FF8A80; }
+.gl-card.invite { justify-content: center; align-items: flex-start; gap: 8px; flex-basis: 200px; }
+/* Panel: tu grupo en tarjetas con los minutos en grande */
+.ftiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.ftile { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 0; border-radius: 20px; background: rgba(255,255,255,.055); color: var(--tx); text-align: left; min-width: 0; }
+.ftile .top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ftile .top .av { width: 28px; height: 28px; flex: 0 0 28px; font-size: 11px; }
+.ftile .top b { font: 600 13px/1 var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ftile .n { font: 500 28px/1 var(--mono); letter-spacing: -.04em; }
+.ftile .n small { font-size: 12px; color: var(--tx-2); letter-spacing: 0; }
+.ftile .w { font: 400 12px/1.25 var(--font); color: var(--tx-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ftile.help { box-shadow: inset 0 0 0 2px var(--bad); }
+.ftile.help .w { color: #FF8A80; }
+.ftile.old { opacity: .6; }
+.casastrip { margin-top: 14px; width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; border-radius: 20px; background: var(--acc); color: var(--acc-ink); text-align: left; }
+.casastrip.bad { background: var(--bad); color: #fff; }
+.casastrip .ci { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 12px; background: rgba(14,42,71,.10); display: grid; place-items: center; }
+.casastrip span { flex: 1; display: grid; gap: 3px; }
+.casastrip small { font: 600 12px/1 var(--font); opacity: .75; }
+.casastrip b { font: 700 20px/1.1 var(--font); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+
+/* Número protagonista: tiempos y pendientes */
+.bigrow { display: flex; align-items: flex-end; gap: 10px; margin: 14px 0 2px; }
+.bigrow .big { font: 500 72px/.85 var(--mono); letter-spacing: -.06em; }
+.bigrow .unit { font: 500 20px/1 var(--mono); color: var(--tx-2); padding-bottom: 4px; }
+.bigrow .meta { margin-left: auto; display: grid; gap: 6px; justify-items: end; font-size: 13px; color: var(--tx-2); padding-bottom: 4px; }
+.bigrow .meta b { font: 600 13px/1 var(--mono); color: var(--tx); }
+.segbar { display: flex; gap: 4px; margin: 16px 0 12px; }
+.segbar i { height: 8px; border-radius: 4px; min-width: 6px; }
+.ruler { position: relative; height: 52px; margin: 16px 0 6px; }
+.ruler .tk { position: absolute; left: 0; right: 0; top: 4px; height: 30px; }
+.ruler .tk i { position: absolute; bottom: 0; width: 2px; margin-left: -1px; border-radius: 1px; }
+.ruler .mk { position: absolute; top: -2px; width: 4px; height: 40px; margin-left: -2px; border-radius: 2px; background: var(--acc); box-shadow: 0 0 0 3px rgba(200,240,60,.18), 0 0 16px rgba(200,240,60,.6); }
+.ruler .lb { position: absolute; left: 0; right: 0; top: 40px; display: flex; justify-content: space-between; font: 500 11px/1 var(--mono); color: var(--tx-2); }
 </style>
 </head>
 <body>
@@ -578,7 +662,6 @@ body.has-dock #smore { padding-bottom: 20px; }
   <button id="sunbtn" data-act="sun-toggle" aria-label="Sol y sombra" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7"/></svg></button>
   <button id="slopebtn" data-act="slope-toggle" aria-label="Pendiente" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19h18L3 6z"/><path d="M3 13.5a5 5 0 0 1 4.2 2.2"/></svg></button>
   <button id="dimbtn" data-act="dim" aria-label="Cambiar entre 3D y plano">2D</button>
-  <button data-act="zfit" aria-label="Ver todo el dominio"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/></svg></button>
   <button data-act="zme" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#C8F03C" stroke="none"/><path d="M12 1.8v3M12 19.2v3M1.8 12h3M19.2 12h3"/></svg></button>
 </div>
 <div class="attr">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · Copernicus DEM</div>
@@ -594,6 +677,7 @@ body.has-dock #smore { padding-bottom: 20px; }
   <button data-act="goto-list" id="tab-go"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c3-1 4-5 7-7s6-2 7-7"/><circle cx="5" cy="19" r="2"/><path d="M15 5h4v4"/></svg>Ir hasta</button>
   <button data-act="diario" id="tab-day"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18l5-7 4 4 3-5 6 8z"/><circle cx="17" cy="6" r="2"/></svg>Mi día</button>
 </nav>
+<div id="glance" aria-label="Tu grupo"></div>
 <div class="toast" id="toast" role="status" hidden></div>
 <script>
 /* Textos fijos del HTML en inglés */
@@ -2595,14 +2679,10 @@ if (EN) (function () {
       return `${EN?`<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Meet-up`:`<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Quedada`}${mt.hora ? (EN?" at ":" a las ") + esc(mt.hora) : ""}</b><small>${esc(cap(placeOf(mt)))}${et.length ? " · " + et.map(e => esc(e.p.uid === me ? (EN?"You":"Tú") : who(e.p.uid)) + " " + etaTxt(e.t)).join(", ") : ""}</small></span><span class="chev" aria-hidden="true">›</span></button>`; })() : "";
     const speek = meetCard + `
       <div class="me-line${LIVE.on ? " is-live" : ""}">${mp ? `<button class="avbtn" data-act="profile" aria-label="${EN ? "Your profile" : "Tu perfil"}">${av(me)}</button>${EN?`<div><b>You're `:`<div><b>Estás `}${esc(placeOf(mp) || (EN?"on the map":"en el mapa"))}</b><small${LIVE.on ? ` class="live"` : ""}>${LIVE.on ? `${EN?`<span class="live-dot"></span>Live and recording · `:`<span class="live-dot"></span>En directo y grabando · `}` : ""}${pendingLong("aqui") ? (EN?"waiting to send":"pendiente de enviar") : LIVE.on ? esc(ago(mp.at)) : (EN?"Marked ":"Marcado ") + esc(ago(mp.at))}</small></div>` : LIVE.on ? `${EN?`<span class="dot-off"></span><div><b>Finding your location…</b><small class="live"><span class="live-dot"></span>Live</small></div>`:`<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small class="live"><span class="live-dot"></span>En directo</small></div>`}` : `${EN?`<span class="dot-off"></span><div><b>You haven't marked where you are</b><small>The group can't see you yet</small></div>`:`<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}`}${liveAvailable() ? `<button class="liveswitch" data-act="live" aria-pressed="${LIVE.on}${EN?`" aria-label="Share live"><span class="sw2"></span>Live</button>`:`" aria-label="Compartir en directo"><span class="sw2"></span>Directo</button>`}` : ""}</div>
-${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me), on = mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS;
+${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me), on = mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS;
         return `<button class="btn wide sos${on ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${!!on}">${MSG_IC.ayuda}${on ? (EN?"Help alert sent · Remove":"Aviso de ayuda enviado · Quitar") : confirmAct === "msg:ayuda" ? (EN?"Tap again to alert the group":"Toca otra vez para avisar al grupo") : (EN?"I have a problem":"Tengo un problema")}</button>`; })() : ""}${LIVE.on && WAKE.ok && !NATIVE ? `
       <button class="toggle wake" data-act="wake" aria-pressed="${WAKE.want}${EN?`"><span class="sw2"></span><span>Keep screen on<small>Keeps sending with the phone in your pocket. Uses more battery.</small></span></button>`:`"><span class="sw2"></span><span>Pantalla encendida<small>Sigue enviando con el móvil en el bolsillo. Gasta más batería.</small></span></button>`}` : ""}`;
-    const people = others.length ? `<ul class="people">${others.map(p => { const m = msgOf(p.uid), mNew = m && Date.now() - m.at < MSG_HELP_MS, help = mNew && m.tipo === "ayuda"; return `
-        <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}${help ? " help" : ""}">
-          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b>${mNew ? `<small class="pmsg">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</small>` : ""}<small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(placeOf(p) || "")} · ${esc(isLive(p) ? (EN?"live":"en directo") : ago(p.at))}</small></span></button>
-          <button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">${EN ? "Go" : "Ir"}</button>
-        </li>`; }).join("")}</ul>`
+    const people = others.length ? ftilesHtml(friendList())
       : `${EN?`<p class="quiet">When someone in the group marks where they are, they'll show up here with a button to get to them.</p>`:`<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`}`;
     const G = window.PISTEA_GROUP;
     const invite = G ? `${EN?`<div class="codebox"><span><small>Group code</small><b>`:`<div class="codebox"><span><small>Código del grupo</small><b>`}${esc(G.code)}${EN?`</b></span><button class="btn go" data-act="copy-code">Copy code</button></div>
@@ -2694,7 +2774,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       ? [g.zb && g.zt ? `${fmtNum(g.zb)} → ${fmtNum(g.zt)} m` : "", g.dur ? fmtMin(g.dur) + (EN?" up":" de subida") : "", fmtLen(g.len)]
       : [fmtLen(g.len), g.zt - g.zb > 10 ? fmtNum(g.zt - g.zb) + (EN?" m vertical":" m de desnivel") : ""];
     const pi = isL ? null : pisteInfo(g);
-    const pstats = pi ? `<div class="pstats"><div><b>${ASPECT()[pi.aspect]}</b><small>${EN ? "faces" : "orientación"}</small></div><div><b>${fmtNum(Math.max(pi.drop, g.zt - g.zb))} m</b><small>${EN ? "vertical" : "desnivel"}</small></div><div><b>${pi.max}°</b><small>${EN ? "max" : "máx."}</small></div><div><b>${pi.avg}°</b><small>${EN ? "avg" : "media"}</small></div></div>` : "";
+    const pstats = pi ? `<div class="bigrow"><span class="big">${pi.max}°</span><span class="meta"><span>${EN ? "max slope" : "pendiente máx."}</span><span>${EN ? "average" : "media"} <b>${pi.avg}°</b></span></span></div>${slopeRuler(pi.max)}<div class="pstats three"><div><b>${ASPECT()[pi.aspect]}</b><small>${EN ? "faces" : "orientación"}</small></div><div><b>${fmtNum(Math.max(pi.drop, g.zt - g.zb))} m</b><small>${EN ? "vertical" : "desnivel"}</small></div><div><b>${fmtLen(g.len)}</b><small>${EN ? "length" : "longitud"}</small></div></div>` : "";
+    if (pi) facts.length = 0;   /* los datos ya van en grande */
     const speek = `
       <div class="headrow">
         <div class="title-wrap">${plate(g.k, g.d)}<div><small class="kicker">${esc(kind)}</small><h2 class="title">${esc(g.name || (isL ? (EN?"Unnamed lift":"Remonte sin nombre") : (EN?"Unnamed piste":"Pista sin nombre")))}${EN?`</h2></div></div>
@@ -2763,7 +2844,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const mp = myPos(), now = nowMin(); if (!mp || Date.now() - mp.at > 3 * 3600e3 || now < 9 * 60 || now > casaCierre + 30) return "";
     const pl = casaPlan(); if (!pl || pl.leave == null) return "";
     const left = pl.leave - now; if (left > 45) return "";
-    return `<button class="chip ${left <= 0 ? "bad" : "warn"}" data-act="casa-route">${left <= 0 ? (EN?"You might not make it to ":"Puede que no llegues a ") + esc(CASA.n) + (EN?" on lifts · see route":" en remontes · ver ruta") : (EN?"To get back to ":"Para volver a ") + esc(CASA.n) + (EN?", leave before ":", sal antes de las ") + hm24(pl.leave)}</button>`;
+    return `<button class="chip casa${left <= 0 ? " bad" : ""}" data-act="casa-route"><span class="ci"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg></span>${left <= 0 ? (EN?"You might not make it to ":"Puede que no llegues a ") + esc(CASA.n) + (EN?" on lifts · see route":" en remontes · ver ruta") : (EN?"To get back to ":"Para volver a ") + esc(CASA.n) + (EN?", leave before ":", sal antes de las ") + hm24(pl.leave)}</button>`;
   }
   function casaHtml() {
     if (!CASA || casaPick) return `${EN?`<h3 class="sec">Back home</h3><p class="quiet">Tell me where you're staying and I'll let you know when to leave so you're not stuck in another valley when the lifts close.</p>
@@ -3023,7 +3104,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     if (fp && fp.node < 0) warns.push(`${esc(toName)}${EN?` is off piste. The route goes to the nearest point on the pistes.`:` está fuera de pistas. La ruta llega al punto de pistas más cercano.`}`);
     if (mp && mp.node < 0) warns.push(`${EN?`You're off piste. The route starts from the nearest point on the pistes.`:`Estás fuera de pistas. La ruta sale del punto de pistas más cercano.`}`);
     if (r.ofi === "none") warns.push(`${EN?`With what's open now there's no way through. Here's the normal route: check which pistes are closed.`:`Con lo que está abierto ahora no hay camino. Te enseño la ruta normal: comprueba en pistas qué está cerrado.`}`);
-    const speek = head(sub) + warns.map(w => `<p class="warnline"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD23F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${w}</span></p>`).join("") + card;
+    const speek = head(`${EN ? "arrive " : "llegas "}${hm24(nowMin() + Math.round(r.time / 60))}${rt.noBlack ? (EN ? " · no blacks" : " · sin negras") : ""}`) + routeBig(r) + warns.map(w => `<p class="warnline"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD23F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${w}</span></p>`).join("") + card;
     const smore = `
       ${profileSvg()}
       <div class="acts one">${tog}</div>
@@ -3149,10 +3230,60 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       const nNew = positions().filter(p => p.uid !== me).filter(p => { const mm = msgOf(p.uid); return mm && Date.now() - mm.at < MSG_HELP_MS; }).length;
       const bd = $("#dockbadge"); if (bd) { bd.textContent = nNew || ""; bd.hidden = !nNew; }
     }
-    layoutSheet(); drawSoon();
+    glanceSync(); layoutSheet(); drawSoon();
   }
+
+
+  function slopeRuler(max) {
+    let tk = ""; for (let d = 0; d <= 60; d += 2.5) { const c = slopeRGBA(Math.max(d, 0.1)), h = d % 15 === 0 ? 30 : d % 5 === 0 ? 20 : 12; tk += `<i style="left:${(d / 60 * 100).toFixed(2)}%;height:${h}px;background:${c ? `rgb(${c[0]},${c[1]},${c[2]})` : "rgba(246,248,250,.3)"}"></i>`; }
+    return `<div class="ruler" role="img" aria-label="${EN ? "Slope ruler from 0 to 60 degrees, mark at " : "Regla de pendiente de 0 a 60 grados, marca en "}${max}"><div class="tk">${tk}</div><span class="mk" style="left:${Math.min(100, max / 60 * 100).toFixed(2)}%"></span><div class="lb"><span>0°</span><span>15°</span><span>30°</span><span>45°</span><span>60°</span></div></div>`;
+  }
+  function routeBig(r) {
+    const nL = r.steps.filter(s => s.ty === 1 || s.ty === 3).length, km = r.steps.reduce((a, s) => a + (s.m || 0), 0) / 1000;
+    const m = Math.max(1, Math.round(r.time / 60)), big = m < 60 ? `<span class="big">${m}</span><span class="unit">min</span>` : `<span class="big">${Math.floor(m / 60)}<span style="font-size:.5em"> h </span>${String(m % 60).padStart(2, "0")}</span>`;
+    const col = st => st.ty === 1 || st.ty === 3 ? "#C8F03C" : st.ty === 2 ? "#7D8A96" : st.f.d === "n" ? "#E8EDF2" : DIF[st.f.d].hex;
+    return `<div class="bigrow">${big}<span class="meta"><span><b>${nL}</b> ${nL === 1 ? (EN ? "lift" : "remonte") : (EN ? "lifts" : "remontes")}</span><span><b>${km.toLocaleString(EN ? "en-GB" : "es-ES", { maximumFractionDigits: 1 })}</b> km</span></span></div>
+      <div class="segbar" aria-hidden="true">${r.steps.map((st, k) => `<i style="flex:${Math.max(30, st.t || 0).toFixed(0)} 1 0;background:${col(st)};opacity:${k < rt.cur ? .35 : 1}"></i>`).join("")}</div>`;
+  }
+  /* ---------- Vista de mapa (cristal) y tarjetas del grupo ---------- */
+  function friendList() {
+    return positions().filter(p => p.uid !== me).map(p => {
+      const m = msgOf(p.uid), help = !!(m && m.tipo === "ayuda" && Date.now() - m.at < MSG_HELP_MS);
+      return { p, help, t: p.near >= 0 ? minsTo(p.near) : null };
+    }).sort((a, b) => (b.help - a.help) || ((a.t == null ? 1e9 : a.t) - (b.t == null ? 1e9 : b.t)));
+  }
+  const minsHtml = t => t == null ? `–` : t < 1 ? (EN ? "here" : "aquí") : `${t}<small> min</small>`;
+  function ftilesHtml(fl) {
+    return `<div class="ftiles">${fl.map(({ p, help, t }) => `<button class="ftile${help ? " help" : ""}${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}" data-act="person" data-uid="${esc(p.uid)}"><span class="top">${av(p.uid)}<b>${esc(who(p.uid))}</b></span><span class="n">${minsHtml(t)}</span><span class="w">${help ? (EN ? "Needs help" : "Necesita ayuda") : esc(cap(placeOf(p) || ""))}</span></button>`).join("")}</div>`;
+  }
+  function casaStrip() {
+    if (!CASA || !(mode === "live" || mode === "demo")) return "";
+    const pl = casaPlan(); if (!pl || pl.leave == null) return "";
+    const late = pl.leave - nowMin() <= 0;
+    return `<button class="casastrip${late ? " bad" : ""}" data-act="casa-route"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg></span><span><small>${EN ? "Back to " : "Vuelta a "}${esc(CASA.n)}</small><b>${late ? (EN ? "Leave now" : "Sal ya") : (EN ? "Leave by " : "Sal a las ") + hm24(pl.leave)}</b></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`;
+  }
+  function glanceHtml() {
+    const mp = myPos(), fl = friendList();
+    const mm = S.mensajes.get(me), helpOn = !!(mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS);
+    const title = mp ? cap(placeOf(mp) || (EN ? "On the map" : "En el mapa")) : (EN ? "Mark where you are" : "Marca dónde estás");
+    const sub = LIVE.on ? (EN ? "Live · recording" : "En directo · grabando") : mp ? (EN ? "Marked " : "Marcado ") + ago(mp.at) : (EN ? "The group can't see you yet" : "El grupo no te ve todavía");
+    const sos = `<button class="gl-sos glass2${helpOn ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${helpOn}">${MSG_IC.ayuda}<span>${helpOn ? (EN ? "Help sent" : "Aviso enviado") : confirmAct === "msg:ayuda" ? (EN ? "Tap again" : "Toca otra vez") : (EN ? "Problem" : "Problema")}</span></button>`;
+    const cards = fl.length ? fl.map(({ p, help, t }) => `<button class="gl-card glass2${help ? " help" : ""}" data-act="person" data-uid="${esc(p.uid)}"><span class="top">${av(p.uid)}<b>${esc(who(p.uid))}</b>${isLive(p) ? `<span class="ld" aria-label="${EN ? "live" : "en directo"}"></span>` : ""}</span><span class="n">${minsHtml(t)}</span><span class="w">${help ? (EN ? "Needs help" : "Necesita ayuda") : esc(cap(placeOf(p) || ""))}</span></button>`).join("")
+      : `<button class="gl-card glass2 invite" data-act="invite"><b style="font:600 15px/1.2 var(--font)">${EN ? "Invite your group" : "Invita a tu grupo"}</b><span class="w">${EN ? "Send them the link and you'll see them here." : "Mándales el enlace y los verás aquí."}</span></button>`;
+    return `<div class="gl-row"><button class="gl-me glass2" data-act="glance-open">${av(me)}<span><b>${esc(title)}</b><small${LIVE.on ? ` class="live"` : ""}>${esc(sub)}</small></span></button>${sos}</div><div class="gl-cards">${cards}</div>`;
+  }
+  function glanceSync() {
+    const on = sheetMode() === "home" && snap === "peek" && (mode === "live" || mode === "demo") && !marking;
+    document.body.classList.toggle("glance", on);
+    const g = $("#glance"); if (g) setHtml(g, on ? glanceHtml() : "");
+  }
+  (function () {   /* deslizar hacia arriba sobre las tarjetas abre el panel */
+    let y0 = null;
+    document.addEventListener("touchstart", e => { const g = e.target.closest && e.target.closest("#glance"); y0 = g && !e.target.closest(".gl-cards") ? e.touches[0].clientY : null; }, { passive: true });
+    document.addEventListener("touchend", e => { if (y0 != null && e.changedTouches[0].clientY - y0 < -30) { setSnap("half"); ui(); } y0 = null; }, { passive: true });
+  })();
   function dockSpace() { return document.body.classList.contains("has-dock") ? safeBottom() + 76 : 0; }
-  function setSnap(s) { snap = s; layoutSheet(); }
+  function setSnap(s) { snap = s; glanceSync(); layoutSheet(); }
   function sheetHeights() {
     const vh = window.innerHeight, sp = $("#speek"), gh = $("#grab").offsetHeight;
     const ds = dockSpace();
@@ -3176,7 +3307,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const at = document.querySelector(".attr"); if (at) at.style.bottom = (Math.min(vis + ds, window.innerHeight * 0.62) + 14) + "px";   // atribución justo encima del panel
     const mc = $("#mapctl"), tb = $("#topbar");
     if (mc && tb) mc.style.top = (tb.offsetTop + tb.offsetHeight + 10) + "px";   // los mensajes empujan los controles, no los tapan
-    if (mc) mc.classList.toggle("hide", vis + ds > window.innerHeight - (mc.offsetTop + mc.offsetHeight) - 8);
+    const gl = document.body.classList.contains("glance") ? $("#glance") : null, occ = gl ? window.innerHeight - gl.getBoundingClientRect().top : vis + ds;
+    if (mc) mc.classList.toggle("hide", occ > window.innerHeight - (mc.offsetTop + mc.offsetHeight) - 8);
   }
 
   /* ---------- Búsqueda ---------- */
@@ -3461,6 +3593,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "juntar-go": if (juntar && !juntar.err) { const j = juntar; juntar = null; if (!myPos()) { toast((EN?"First mark where you are with the Here button.":"Marca primero dónde estás con el botón Aquí.")); break; } startRoute({ node: j.n, label: j.name }); } break;
       case "lang": { if (el.dataset.v === VLANG) break; try { localStorage.setItem("vallik.lang", el.dataset.v); } catch (e) {} location.reload(); break; }
       case "acc-link": { const G = window.PISTEA_GROUP; if (!G || !G.signIn) break; el.disabled = true; G.signIn(el.dataset.k).then(r => { if (r.ok) toast((EN?"Profile saved to your account":"Perfil guardado en tu cuenta")); else if (r.msg) toast(r.msg); ui(); }); break; }
+      case "glance-open": setSnap("half"); break;
       case "tab-map": clearModes(); diario = false; setSnap("peek"); ui(); break;
       case "tab-group": { clearModes(); diario = false; setSnap("full"); ui(); requestAnimationFrame(() => { const g = $("#grupo"), sm = $("#smore"); if (g && sm) sm.scrollTop = g.offsetTop - sm.offsetTop - 4; }); break; }
       case "sheet-toggle": setSnap(snap === "peek" ? "half" : snap === "half" ? "full" : "peek"); break;
