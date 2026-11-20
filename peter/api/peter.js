@@ -6,7 +6,7 @@ const MODEL = process.env.PETER_MODEL || "claude-haiku-5-5";
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY || "AIzaSyDIKhknu_nWMjFPoxwtdASuBSbikHIZT54";
 const ORIGINS = (process.env.PETER_ORIGINS || "https://tgl-prog.github.io,capacitor://localhost,http://localhost,https://localhost").split(",");
 
-const SYSTEM = `Eres Peter, el guía de esquí de la app Pistea para Les 3 Vallées (Courchevel, La Tania, Méribel, Brides-les-Bains, Saint-Martin-de-Belleville, Les Menuires, Val Thorens y Orelle).
+const SYSTEM = `Eres Peter, el guía de esquí de la app Vallik para Les 3 Vallées (Courchevel, La Tania, Méribel, Brides-les-Bains, Saint-Martin-de-Belleville, Les Menuires, Val Thorens y Orelle).
 
 Solo hablas de esquiar en Les 3 Vallées: rutas y pistas que merecen la pena, cómo moverse entre valles, dónde comer, dónde tomar algo o hacer après-ski, sol y sombra según la hora, y consejos prácticos en pista. Si te preguntan otra cosa, dilo con simpatía en una frase y vuelve a tu tema.
 
@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
   if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: "Falta la clave de Peter en el servidor." });
   try {
     const uid = await verify(String(req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
-    if (!uid) return res.status(401).json({ error: "Entra en un grupo de Pistea para hablar con Peter." });
+    if (!uid) return res.status(401).json({ error: "Entra en un grupo de Vallik para hablar con Peter." });
     if (limited(uid)) return res.status(429).json({ error: "Demasiadas preguntas seguidas. Espera un poco." });
 
     const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});

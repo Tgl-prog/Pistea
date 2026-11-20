@@ -51,7 +51,7 @@
       const el = document.createElement("div");
       el.className = "join";
       el.innerHTML = `
-        <div class="join-brand"><svg width="72" height="72" viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" rx="228" fill="#0A1620"/><g transform="translate(141 130) scale(2.9)"><path d="M128 226 C114 204 54 166 54 102 A74 74 0 1 1 202 102 C202 166 142 204 128 226 Z" fill="#5BE7F2"/><rect x="72" y="72" width="112" height="60" rx="30" fill="#0A1620"/><path d="M92 120 L113 98 L124 109 L141 90 L164 120" fill="none" stroke="#5BE7F2" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/></g></svg><b>Pistea</b><span>El mapa del grupo en la montaña</span></div>
+        <div class="join-brand"><svg width="72" height="72" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#0E2A47"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#0E2A47" stroke-width="4.5" stroke-linecap="round"/></svg><b>Vallik</b><span>El mapa del grupo en la montaña</span></div>
         <form class="join-card glass" autocomplete="off" novalidate>
           <h2>Entra en tu grupo</h2>
           <p class="join-note" role="status" hidden></p>
@@ -72,7 +72,7 @@
       .join-card{width:min(100%,380px);border-radius:var(--r-lg,28px);padding:24px 20px 20px;display:grid;gap:14px;background:var(--glass-2)}
       .join-card h2{margin:0;font:700 22px/26px var(--font);letter-spacing:-.02em}
       .join-card p{margin:-8px 0 0;color:var(--tx-2);font-size:14px}
-      .join-card .join-note{margin:0;padding:12px 14px;border-radius:14px;background:rgba(255,210,63,.12);color:var(--tx);font-size:14px}
+      .join-card .join-note{margin:0;padding:12px 14px;border-radius:14px;background:rgba(200,240,60,.12);color:var(--tx);font-size:14px}
       .join-card .join-note[hidden]{display:none}
       .join-card label{display:grid;gap:6px;font:600 13px/16px var(--font);color:var(--tx-2)}
       .join-card input{height:52px;border-radius:26px;padding:0 18px;font-size:16px;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid var(--hair);-webkit-appearance:none}

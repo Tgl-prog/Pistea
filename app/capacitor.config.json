@@ -1,11 +1,11 @@
 {
   "appId": "com.pistea.app",
-  "appName": "Pistea",
+  "appName": "Vallik",
   "webDir": "www",
-  "backgroundColor": "#0A1620",
+  "backgroundColor": "#0E2A47",
   "ios": {
     "contentInset": "never",
-    "backgroundColor": "#0A1620",
+    "backgroundColor": "#0E2A47",
     "overrideUserAgent": "Mozilla/5.0 (PisteaApp; iOS) AppleWebKit/605.1.15 (KHTML, like Gecko) PisteaNative/1.0"
   }
 }

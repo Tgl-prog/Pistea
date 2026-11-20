@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>es</string>
 	<key>CFBundleDisplayName</key>
-	<string>Pistea</string>
+	<string>Vallik</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -29,7 +29,7 @@
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Para que tu grupo te vea en directo aunque lleves el móvil bloqueado en el bolsillo. Puedes parar el directo cuando quieras.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Pistea usa tu ubicación para ponerte en el mapa y guiarte hasta tu grupo.</string>
+	<string>Vallik usa tu ubicación para ponerte en el mapa y guiarte hasta tu grupo.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>Pistea</title>
-<meta name="theme-color" content="#0A1620">
-<meta name="apple-mobile-web-app-title" content="Pistea">
+<title>Vallik</title>
+<meta name="theme-color" content="#0E2A47">
+<meta name="apple-mobile-web-app-title" content="Vallik">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -27,32 +27,32 @@
 <style>
 @font-face { font-family: "Geist"; src: url(Geist-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "Geist Mono"; src: url(GeistMono-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
-/* Sistema visual: cristal oscuro sobre la montaña. Un solo acento, hielo; los colores de pista solo para las pistas. */
+/* Sistema visual: cristal oscuro sobre la montaña. Un solo acento, lima; los colores de pista solo para las pistas. */
 :root {
-  /* Pistea: tokens del sistema (tema Noche) */
-  --bg: #0A1620;
-  --raised: #111F2B;
-  --glass: rgba(13, 22, 31, .74);
-  --glass-2: rgba(13, 22, 31, .86);
+  /* Vallik: tokens del sistema */
+  --bg: #0E2A47;
+  --raised: #14355A;
+  --glass: rgba(14, 42, 71, .80);
+  --glass-2: rgba(14, 42, 71, .90);
   --glass-hi: rgba(255, 255, 255, .07);
   --hair: rgba(255, 255, 255, .10);
   --hair-2: rgba(255, 255, 255, .2);
-  --line: #22323F;
-  --tx: #F4F7F8;
-  --tx-2: #9AABB8;
-  --tx-3: rgba(154, 171, 184, .75);
-  --acc: #5BE7F2;
-  --acc-ink: #0A1620;
-  --acc-dim: rgba(91, 231, 242, .14);
-  --sol: #FFD23F;
-  --on-sol: #0A1620;
+  --line: #2A4A6B;
+  --tx: #F6F8FA;
+  --tx-2: #A9BCD0;
+  --tx-3: rgba(169, 188, 208, .75);
+  --acc: #C8F03C;
+  --acc-ink: #0E2A47;
+  --acc-dim: rgba(200, 240, 60, .14);
+  --sol: #F6F8FA;
+  --on-sol: #0E2A47;
   --warn: #FFD23F;
-  --bad: #FFD23F;
-  --shadow: 0 8px 28px rgba(0, 0, 0, .45);
+  --bad: #FF5A4E;
+  --shadow: 0 10px 30px rgba(14, 42, 71, .35);
   --r-md: 18px;
   --r-lg: 28px;
   --verde: #2B8A3E;
-  --azul: #1864AB;
+  --azul: #1C6DD0;
   --roja: #C92A2A;
   --negra: #0B0F14;
   --itin: #C98A2B;
@@ -76,7 +76,7 @@ button { cursor: pointer; }
 /* ---------- Mapa ---------- */
 #mapvp { position: fixed; inset: 0; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; background: linear-gradient(180deg, #6E9DC8 0%, #A9C6E2 26%, #D2E1EE 44%, #E3EBF1 100%); }
 #mapvp canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.loading { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 18px; color: #0A1620; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 18px; color: #0E2A47; }
 .loading .lock svg { width: min(56vw, 220px); height: auto; display: block; }
 .loading small { font: 500 14px/1.3 var(--font); color: #4A5B68; }
 .attr { position: fixed; left: 16px; z-index: 2; font: 500 9px/1 var(--mono); color: rgba(244,247,248,.72); bottom: 16px; letter-spacing: .02em; padding: 4px 7px; border-radius: 999px; background: rgba(10,22,32,.45); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
@@ -88,27 +88,27 @@ button { cursor: pointer; }
 .topbar { position: fixed; z-index: 6; left: 0; right: 0; top: 0; padding: calc(var(--sat) + 10px) 12px 0; display: grid; grid-template-columns: 1fr 52px; gap: 8px; pointer-events: none; }
 .topbar > * { pointer-events: auto; }
 .search { position: relative; }
-.search input { width: 100%; height: 52px; border-radius: 26px; color: var(--tx); background: var(--glass) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256.00 256.00'%3E%3Cdefs%3E%3CclipPath id='pc'%3E%3Cpath d='M128 226 C114 204 54 166 54 102 A74 74 0 1 1 202 102 C202 166 142 204 128 226 Z'/%3E%3C/clipPath%3E%3C/defs%3E%0A%3Cpath d='M128 226 C114 204 54 166 54 102 A74 74 0 1 1 202 102 C202 166 142 204 128 226 Z' fill='%235BE7F2'/%3E%0A%3Crect x='40' y='93' width='176' height='18' fill='%230A1620' clip-path='url%28%23pc%29'/%3E%0A%3Crect x='72' y='72' width='112' height='60' rx='30' fill='%230A1620'/%3E%0A%3Cpath d='M92 120 L113 98 L124 109 L141 90 L164 120' fill='none' stroke='%235BE7F2' stroke-width='9' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 14px 50% / 24px 24px; -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); padding: 0 16px 0 48px; font-size: 16px; box-shadow: var(--shadow); -webkit-appearance: none; }
+.search input { width: 100%; height: 52px; border-radius: 26px; color: var(--tx); background: var(--glass) url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%2314355A%22/%3E%3Crect x=%2227%22 y=%2216%22 width=%2217%22 height=%2268%22 fill=%22%23F6F8FA%22/%3E%3Cpolygon points=%2243,58 67,32 87,32 43,79%22 fill=%22%23F6F8FA%22/%3E%3Cpolygon points=%2256,65 66,55 88,84 67,84%22 fill=%22%23C8F03C%22/%3E%3Cpath d=%22M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72%22 fill=%22none%22 stroke=%22%2314355A%22 stroke-width=%224.5%22 stroke-linecap=%22round%22/%3E%3C/svg%3E") no-repeat 12px 50% / 28px 28px; -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); padding: 0 16px 0 48px; font-size: 16px; box-shadow: var(--shadow); -webkit-appearance: none; }
 .search input::placeholder { color: var(--tx-3); }
 .search input { padding-right: 56px; }
-.peterbtn { position: absolute; right: 5px; top: 5px; width: 42px; height: 42px; border: 0; border-radius: 21px; padding: 0; background: rgba(91,231,242,.14); box-shadow: inset 0 0 0 1px rgba(91,231,242,.45); display: grid; place-items: center; }
+.peterbtn { position: absolute; right: 5px; top: 5px; width: 42px; height: 42px; border: 0; border-radius: 21px; padding: 0; background: rgba(200,240,60,.14); box-shadow: inset 0 0 0 1px rgba(200,240,60,.45); display: grid; place-items: center; }
 .peterbtn .eye { transform-origin: center; transform-box: fill-box; animation: blink 5s infinite; }
 @keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
 @media (prefers-reduced-motion: reduce) { .peterbtn .eye { animation: none; } }
 body.searching .peterbtn { display: none; }
-.peterhi { position: fixed; right: 74px; z-index: 6; width: 236px; padding: 12px 14px; border-radius: 18px 4px 18px 18px; background: #F4F7F8; color: #0A1620; box-shadow: var(--shadow); font-size: 14px; line-height: 1.35; border: 0; text-align: left; }
+.peterhi { position: fixed; right: 74px; z-index: 6; width: 236px; padding: 12px 14px; border-radius: 18px 4px 18px 18px; background: #F4F7F8; color: #0E2A47; box-shadow: var(--shadow); font-size: 14px; line-height: 1.35; border: 0; text-align: left; }
 .peterhi b { display: block; font-size: 15px; margin-bottom: 2px; }
 .peter { position: fixed; inset: 0; z-index: 30; background: rgba(6,12,18,.55); display: flex; padding: calc(var(--sat) + 10px) 8px calc(var(--sab) + 8px); }
 .peter[hidden] { display: none; }
 .peter .pbox { flex: 1; display: flex; flex-direction: column; border-radius: 30px; background: #0F1C27; border: 1px solid var(--hair); box-shadow: var(--shadow); overflow: hidden; min-height: 0; }
 .peter .phead { display: flex; align-items: center; gap: 12px; padding: 14px 14px 12px 16px; border-bottom: 1px solid rgba(255,255,255,.08); }
-.peter .phead .pav { width: 48px; height: 48px; border-radius: 50%; background: rgba(91,231,242,.12); display: grid; place-items: center; flex: 0 0 48px; }
+.peter .phead .pav { width: 48px; height: 48px; border-radius: 50%; background: rgba(200,240,60,.12); display: grid; place-items: center; flex: 0 0 48px; }
 .peter .phead h2 { margin: 0; font: 700 20px/1.1 var(--font); }
 .peter .phead small { display: block; font-size: 13px; color: var(--tx-2); margin-top: 2px; }
 .peter .phead > div { flex: 1; }
 .peter .plog { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
 .peter .msg { max-width: 86%; padding: 10px 14px; font-size: 15px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
-.peter .msg.u { align-self: flex-end; background: var(--acc); color: #0A1620; border-radius: 18px 18px 4px 18px; }
+.peter .msg.u { align-self: flex-end; background: var(--acc); color: #0E2A47; border-radius: 18px 18px 4px 18px; }
 .peter .msg.a { align-self: flex-start; background: rgba(255,255,255,.08); border-radius: 18px 18px 18px 4px; }
 .peter .msg.err { background: rgba(255,77,79,.14); color: #FFB3AD; }
 .peter .msg.typing { color: var(--tx-2); }
@@ -210,7 +210,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .permiso > p { margin: 12px 0 0; font-size: 16px; line-height: 1.45; color: var(--tx-2); }
 .permiso .opts { margin-top: 24px; display: grid; gap: 10px; text-align: left; }
 .permiso .opt { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 18px; background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); font-size: 15px; color: #C9D4DC; }
-.permiso .opt.on { background: rgba(91,231,242,.10); box-shadow: inset 0 0 0 1.5px var(--acc); color: var(--tx); }
+.permiso .opt.on { background: rgba(200,240,60,.10); box-shadow: inset 0 0 0 1.5px var(--acc); color: var(--tx); }
 .permiso .opt i { width: 28px; height: 28px; flex: 0 0 28px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.3); display: grid; place-items: center; }
 .permiso .opt.on i { background: var(--acc); box-shadow: none; }
 .permiso .opt small { display: block; margin-top: 2px; font-size: 13px; color: var(--tx-2); }
@@ -235,7 +235,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .toggle.wake { margin-top: -4px; }
 .toggle small { display: block; color: var(--tx-2); font-size: 13px; line-height: 1.25; margin-top: 2px; }
 .dot-off { width: 34px; height: 34px; border-radius: 50%; border: 2px dashed var(--hair-2); flex: 0 0 auto; }
-.av { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: var(--c); color: #0A1620; display: grid; place-items: center; font: 700 14px/1 var(--font); }
+.av { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: var(--c); color: #0E2A47; display: grid; place-items: center; font: 700 14px/1 var(--font); }
 .person.old .av { background: var(--raised); color: var(--tx-2); box-shadow: 0 0 0 2px var(--sol); }
 .av.big { width: 48px; height: 48px; font-size: 19px; }
 
@@ -303,7 +303,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .avgrid { display: grid; gap: 6px; }
 .avgrid button { min-height: 60px; border: 0; border-radius: 18px; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); color: var(--tx); font: 600 13px/1 var(--font); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
 .avgrid button i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
-.avgrid button[aria-pressed=true] { background: rgba(91,231,242,.12); box-shadow: inset 0 0 0 2px var(--acc); }
+.avgrid button[aria-pressed=true] { background: rgba(200,240,60,.12); box-shadow: inset 0 0 0 2px var(--acc); }
 .avgrid + small, .avhint { display: block; margin-top: 6px; font-size: 12px; color: var(--tx-2); }
 .sublabel { display: block; font: 600 13px/16px var(--font); color: var(--tx-2); margin-bottom: 8px; }
 .avcard { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: rgba(255,210,63,.12); box-shadow: inset 0 0 0 1px rgba(255,210,63,.35); }
@@ -380,7 +380,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 .timerow input { height: 54px; min-width: 0; border-radius: 27px; padding: 0 18px; font: 500 17px/1 var(--mono); color: var(--tx); background: rgba(255,255,255,.06); border: 1px solid var(--hair); -webkit-appearance: none; color-scheme: dark; }
 
 /* Ruta */
-.stepcard { display: flex; gap: 14px; align-items: center; border-radius: var(--r-md); padding: 14px; background: var(--acc-dim); border: 1px solid rgba(91,231,242,.35); }
+.stepcard { display: flex; gap: 14px; align-items: center; border-radius: var(--r-md); padding: 14px; background: var(--acc-dim); border: 1px solid rgba(200,240,60,.35); }
 .stepcard b { display: block; font: 600 21px/1.15 var(--font); letter-spacing: -.015em; }
 .stepcard small { color: var(--tx-2); font-size: 14px; display: block; margin-top: 4px; }
 .stepcard .kicker { color: var(--acc); margin-bottom: 6px; }
@@ -460,16 +460,12 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 <body>
 <div id="mapvp">
   <canvas id="gl" aria-hidden="true"></canvas>
-  <canvas id="cv" role="img" aria-label="Pistea: mapa en 3D de pistas y remontes de Les 3 Vallées"></canvas>
-  <div class="loading" id="mload"><div class="lock" aria-label="Pistea"><svg role="img" xmlns="http://www.w3.org/2000/svg" width="839" height="181" viewBox="0 0 838.71 180.80"><g transform="translate(-44.40 -5.02) scale(0.8222)"><defs><clipPath id="pc"><path d="M128 226 C114 204 54 166 54 102 A74 74 0 1 1 202 102 C202 166 142 204 128 226 Z"/></clipPath></defs>
-<path d="M128 226 C114 204 54 166 54 102 A74 74 0 1 1 202 102 C202 166 142 204 128 226 Z" fill="#0A1620"/>
-<rect x="40" y="93" width="176" height="18" fill="#5BE7F2" clip-path="url(#pc)"/>
-<rect x="72" y="72" width="112" height="60" rx="30" fill="#5BE7F2"/>
-<path d="M92 120 L113 98 L124 109 L141 90 L164 120" fill="none" stroke="#0A1620" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/></g><path d="M171.7288888888889 43.2H205.1288888888889L205.5288888888889 59.0Q210.1288888888889 50.2 218.3288888888889 45.50000000000001Q226.5288888888889 40.80000000000001 237.12888888888892 40.80000000000001Q251.3288888888889 40.80000000000001 261.5288888888889 48.00000000000001Q271.7288888888889 55.2 276.9288888888889 68.0Q282.1288888888889 80.80000000000001 282.1288888888889 97.0Q282.1288888888889 113.20000000000002 276.8288888888889 126.00000000000001Q271.5288888888889 138.8 261.3288888888889 146.0Q251.12888888888892 153.20000000000002 236.7288888888889 153.20000000000002Q226.9288888888889 153.20000000000002 218.8288888888889 148.5Q210.7288888888889 143.8 206.1288888888889 135.60000000000002V180.8H171.7288888888889ZM246.7288888888889 97.0Q246.7288888888889 82.80000000000001 241.2288888888889 74.5Q235.7288888888889 66.2 226.3288888888889 66.2Q216.7288888888889 66.2 211.42888888888888 74.10000000000001Q206.1288888888889 82.00000000000001 206.1288888888889 97.0Q206.1288888888889 112.0 211.42888888888888 119.9Q216.7288888888889 127.80000000000001 226.3288888888889 127.80000000000001Q235.7288888888889 127.80000000000001 241.2288888888889 119.50000000000001Q246.7288888888889 111.20000000000002 246.7288888888889 97.0ZM405.10734133569366 117.0 439.7073413356937 115.80000000000001Q441.10734133569366 123.00000000000001 445.7073413356936 126.60000000000002Q450.30734133569365 130.20000000000002 458.7073413356937 130.20000000000002Q473.30734133569365 130.20000000000002 473.30734133569365 121.00000000000001Q473.30734133569365 116.20000000000002 469.4073413356937 113.70000000000002Q465.5073413356937 111.20000000000002 453.5073413356937 109.20000000000002Q435.7073413356937 106.4 425.9073413356937 102.30000000000001Q416.10734133569366 98.20000000000002 411.9073413356937 92.00000000000001Q407.7073413356937 85.80000000000001 407.7073413356937 75.80000000000001Q407.7073413356937 59.60000000000001 420.5073413356937 50.20000000000001Q433.30734133569365 40.80000000000001 457.9073413356937 40.80000000000001Q480.9073413356937 40.80000000000001 493.60734133569366 50.900000000000006Q506.30734133569365 61.0 508.30734133569365 78.60000000000001L474.10734133569366 79.80000000000001Q473.10734133569366 72.2 468.80734133569365 68.0Q464.5073413356937 63.80000000000001 457.5073413356937 63.80000000000001Q450.7073413356937 63.80000000000001 446.9073413356937 66.70000000000002Q443.10734133569366 69.60000000000001 443.10734133569366 74.60000000000001Q443.10734133569366 79.80000000000001 447.0073413356937 82.30000000000001Q450.9073413356937 84.80000000000001 461.10734133569366 86.4Q486.9073413356937 90.0 497.80734133569365 97.9Q508.7073413356937 105.80000000000001 508.7073413356937 120.20000000000002Q508.7073413356937 136.0 495.4073413356937 144.60000000000002Q482.10734133569366 153.20000000000002 458.5073413356937 153.20000000000002Q433.30734133569365 153.20000000000002 419.80734133569365 143.3Q406.30734133569365 133.4 405.10734133569366 117.0ZM536.1073413356937 116.80000000000001V68.0H518.3073413356936V43.2H536.1073413356937V18.0H570.5073413356937V43.2H598.7073413356936V68.0H570.5073413356937V112.4Q570.5073413356937 120.00000000000001 573.7073413356936 123.00000000000001Q576.9073413356937 126.00000000000001 583.9073413356937 126.00000000000001H598.7073413356936V150.8H569.7073413356936Q552.3073413356936 150.8 544.2073413356936 142.60000000000002Q536.1073413356937 134.4 536.1073413356937 116.80000000000001ZM606.3073413356938 97.0Q606.3073413356938 80.2 613.2073413356937 67.5Q620.1073413356937 54.80000000000001 632.7073413356937 47.80000000000001Q645.3073413356938 40.80000000000001 662.1073413356937 40.80000000000001Q678.7073413356937 40.80000000000001 691.0073413356938 47.900000000000006Q703.3073413356938 55.0 709.9073413356937 68.30000000000001Q716.5073413356937 81.60000000000001 716.5073413356937 99.60000000000001V106.0H641.7073413356937Q642.1073413356937 117.0 647.7073413356937 122.60000000000001Q653.3073413356938 128.20000000000002 662.9073413356937 128.20000000000002Q677.1073413356937 128.20000000000002 680.7073413356937 116.60000000000001L715.1073413356937 118.60000000000001Q710.7073413356937 135.20000000000002 696.7073413356937 144.20000000000002Q682.7073413356937 153.20000000000002 662.3073413356938 153.20000000000002Q645.5073413356937 153.20000000000002 632.8073413356938 146.20000000000002Q620.1073413356937 139.20000000000002 613.2073413356937 126.50000000000001Q606.3073413356938 113.80000000000001 606.3073413356938 97.0ZM662.1073413356937 65.2Q653.5073413356937 65.2 648.0073413356937 70.80000000000001Q642.5073413356937 76.4 641.7073413356937 86.4H681.9073413356937Q681.3073413356938 76.00000000000001 676.1073413356937 70.60000000000001Q670.9073413356937 65.2 662.1073413356937 65.2ZM726.1073413356937 123.80000000000001Q726.1073413356937 110.0 735.0073413356937 102.10000000000001Q743.9073413356937 94.20000000000002 762.1073413356937 90.4L795.5073413356937 83.60000000000001Q795.5073413356937 74.2 791.4073413356937 69.30000000000001Q787.3073413356936 64.4 779.5073413356937 64.4Q764.5073413356937 64.4 762.1073413356937 78.60000000000001L727.9073413356937 77.4Q731.1073413356937 59.0 744.3073413356938 49.900000000000006Q757.5073413356937 40.80000000000001 779.5073413356937 40.80000000000001Q829.9073413356937 40.80000000000001 829.9073413356937 86.2V120.20000000000002Q829.9073413356937 125.00000000000001 831.4073413356937 126.70000000000002Q832.9073413356937 128.4 836.1073413356937 128.4H838.7073413356936V150.8Q836.5073413356937 151.4 833.1073413356937 151.8Q829.7073413356936 152.20000000000002 826.5073413356937 152.20000000000002Q805.7073413356936 152.20000000000002 801.9073413356937 134.20000000000002Q797.5073413356937 143.20000000000002 788.1073413356937 148.20000000000002Q778.7073413356936 153.20000000000002 764.5073413356937 153.20000000000002Q747.1073413356937 153.20000000000002 736.6073413356937 145.40000000000003Q726.1073413356937 137.60000000000002 726.1073413356937 123.80000000000001ZM795.5073413356937 108.20000000000002V103.80000000000001L774.5073413356937 108.60000000000001Q761.5073413356937 111.4 761.5073413356937 120.60000000000001Q761.5073413356937 125.4 764.5073413356937 128.10000000000002Q767.5073413356937 130.8 773.3073413356936 130.8Q783.3073413356936 130.8 789.4073413356937 124.9Q795.5073413356937 119.00000000000001 795.5073413356937 108.20000000000002Z" fill="#0A1620"/><path d="M360.25 130.17 L361.87 129.95 L363.44 129.53 L364.95 128.91 L367.03 127.61 L368.82 125.94 L370.87 123.00 L371.82 121.84 L372.92 120.81 L374.14 119.93 L375.47 119.23 L376.88 118.70 L378.34 118.35 L379.84 118.21 L382.09 118.35 L384.26 118.94 L386.29 119.93 L388.07 121.31 L389.56 123.00 L390.69 124.95 L391.41 127.09 L391.71 129.32 L391.66 130.83 L391.22 133.04 L390.69 134.45 L389.98 135.77 L387.82 139.01 L386.36 140.82 L384.26 143.06 L382.55 144.63 L378.84 147.42 L374.79 149.70 L370.48 151.43 L366.72 152.44 L364.43 152.84 L362.13 153.09 L359.43 153.20 L303.03 153.20 L301.53 153.10 L300.05 152.81 L297.94 152.01 L296.64 151.26 L294.90 149.83 L293.47 148.09 L292.71 146.79 L292.14 145.40 L291.75 143.94 L291.53 141.70 L291.75 139.46 L292.40 137.30 L293.47 135.31 L294.90 133.57 L296.64 132.14 L298.63 131.08 L300.79 130.42 L303.03 130.20 L360.25 130.17ZM311.03 43.20 L345.43 43.20 L345.43 124.20 L311.03 124.20 L311.03 43.20Z" fill="#0A1620"/><circle cx="328.23" cy="15.60" r="15.60" fill="#0B6F7C"/></svg></div><small>Cargando la montaña</small></div>
+  <canvas id="cv" role="img" aria-label="Vallik: mapa en 3D de pistas y remontes de Les 3 Vallées"></canvas>
+  <div class="loading" id="mload"><div class="lock" aria-label="Vallik"><svg role="img" xmlns="http://www.w3.org/2000/svg" width="560" height="120" viewBox="0 0 470 100"><rect width="100" height="100" rx="24" fill="#0E2A47"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#0E2A47" stroke-width="4.5" stroke-linecap="round"/><g transform="translate(130,0)"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z" fill="#0E2A47"/><circle cx="104" cy="67" r="23" fill="none" stroke="#0E2A47" stroke-width="20"/><rect x="117" y="34" width="20" height="66" fill="#0E2A47"/><rect x="151" y="0" width="20" height="100" fill="#0E2A47"/><rect x="185" y="0" width="20" height="100" fill="#0E2A47"/><rect x="219" y="34" width="20" height="66" fill="#0E2A47"/><rect x="219" y="4" width="20" height="20" fill="#0E2A47"/><rect x="253" y="0" width="20" height="100" fill="#0E2A47"/><polygon points="272,67 302,34 328,34 272,93" fill="#0E2A47"/><polygon points="288,76 301,63 329,100 302,100" fill="#5E8A00"/></g></svg></div><small>Cargando la montaña</small></div>
 </div>
-<div id="cross" hidden aria-hidden="true"><svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="14" fill="none" stroke="#fff" stroke-width="7"/><circle cx="32" cy="32" r="14" fill="none" stroke="#5BE7F2" stroke-width="3.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#0A1016" stroke-width="3" stroke-linecap="round"/></svg></div>
+<div id="cross" hidden aria-hidden="true"><svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="14" fill="none" stroke="#fff" stroke-width="7"/><circle cx="32" cy="32" r="14" fill="none" stroke="#C8F03C" stroke-width="3.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#0E2A47" stroke-width="3" stroke-linecap="round"/></svg></div>
 <header class="topbar" id="topbar">
-  <div class="search"><input type="search" id="q" placeholder="Buscar pista, sitio o amigo" autocomplete="off" enterkeyhint="search" aria-label="Buscar en el mapa"><button class="peterbtn" data-act="peter" aria-label="Preguntar a Peter"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#5BE7F2"/><ellipse class="eye" cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse class="eye" cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0A1620"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0A1620"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0A1620" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+  <div class="search"><input type="search" id="q" placeholder="Buscar pista, sitio o amigo" autocomplete="off" enterkeyhint="search" aria-label="Buscar en el mapa"><button class="peterbtn" data-act="peter" aria-label="Preguntar a Peter"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#C8F03C"/><ellipse class="eye" cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse class="eye" cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0E2A47"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0E2A47"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0E2A47" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
   <button class="iconbtn" id="filtbtn" data-act="filt-toggle" aria-expanded="false" aria-label="Filtrar por color"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h16M6 11h10M9 16h4"/></svg><span class="badge" id="filtbadge" hidden></span></button>
   <ul class="results" id="results"></ul>
   <div class="filters" id="filters" role="group" aria-label="Filtrar por color" hidden></div>
@@ -479,11 +475,11 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 <div class="mapctl" id="mapctl">
   <button data-act="zin" aria-label="Acercar"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
   <button data-act="zout" aria-label="Alejar"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10h12"/></svg></button>
-  <button data-act="north" aria-label="Orientar al norte"><svg id="compass" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.2"/><path d="M12 3.5l3.2 8.5h-6.4z" fill="#5BE7F2"/><path d="M12 20.5L8.8 12h6.4z" fill="rgba(244,247,248,.75)"/></svg></button>
+  <button data-act="north" aria-label="Orientar al norte"><svg id="compass" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.2"/><path d="M12 3.5l3.2 8.5h-6.4z" fill="#C8F03C"/><path d="M12 20.5L8.8 12h6.4z" fill="rgba(244,247,248,.75)"/></svg></button>
   <button id="sunbtn" data-act="sun-toggle" aria-label="Sol y sombra" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7"/></svg></button>
   <button id="dimbtn" data-act="dim" aria-label="Cambiar entre 3D y plano">2D</button>
   <button data-act="zfit" aria-label="Ver todo el dominio"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/></svg></button>
-  <button data-act="zme" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#5BE7F2" stroke="none"/><path d="M12 1.8v3M12 19.2v3M1.8 12h3M19.2 12h3"/></svg></button>
+  <button data-act="zme" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#C8F03C" stroke="none"/><path d="M12 1.8v3M12 19.2v3M1.8 12h3M19.2 12h3"/></svg></button>
 </div>
 <div class="attr">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · Copernicus DEM</div>
 <section class="sheet" id="sheet" aria-label="Panel">
@@ -526,9 +522,9 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   /* Avisos tipo Waze en pistas y remontes. Caducan a las 2 h. L / R: para remontes / pistas */
   const AVISOS = {
     cerrado: { s: "Cerrado", c: "#E03131", t: "#fff", L: 1, R: 1 },
-    cola: { s: "Cola", c: "#FFD23F", t: "#0A1620", L: 1 },
-    hielo: { s: "Hielo", c: "#A5D8FF", t: "#0A1620", R: 1 },
-    niebla: { s: "Niebla", c: "#CED4DA", t: "#0A1620", L: 1, R: 1 }
+    cola: { s: "Cola", c: "#FFD23F", t: "#0E2A47", L: 1 },
+    hielo: { s: "Hielo", c: "#A5D8FF", t: "#0E2A47", R: 1 },
+    niebla: { s: "Niebla", c: "#CED4DA", t: "#0E2A47", L: 1, R: 1 }
   };
   const AVISO_MS = 2 * 3600e3, COLA_S = 600;
   /* Mensajes de un toque. Salen como aviso a los demás si son de hace menos de 10 min (ayuda: 30 min) */
@@ -566,8 +562,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   function who(uid) { if (uid === me) return "Tú"; const n = names[uid]; return n ? n.split(" ")[0] : "Alguien"; }
   function initial(uid) { const w = uid === me ? (names[uid] || "Tú") : who(uid); return (w || "?").trim().charAt(0).toUpperCase(); }
   function colorOf(uid) {
-    if (uid === me) return "#5BE7F2";
-    return "#FFD23F";
+    if (uid === me) return "#C8F03C";
+    return "#F6F8FA";
     const ids = [...new Set(COLS.flatMap(c => [...S[c].values()].map(v => v.uid)))].filter(x => x && x !== me).sort();
     const i = ids.indexOf(uid); if (i >= 0) return PAL[i % PAL.length];
     let h = 0; for (const c of String(uid)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return PAL[h % PAL.length];
@@ -979,7 +975,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   const PETER = { msgs: [], busy: false };
   try { const o = JSON.parse(sessionStorage.getItem("pistea.peter") || "null"); if (o && Array.isArray(o.msgs)) PETER.msgs = o.msgs.slice(-30); } catch (e) {}
   const PETER_SUG = ["¿Dónde tomamos algo al sol?", "Ruta bonita para esta tarde", "Comer bien en Méribel", "Après-ski cerca"];
-  const PETER_AV = `<svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#5BE7F2"/><ellipse cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0A1620"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0A1620"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0A1620" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+  const PETER_AV = `<svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#C8F03C"/><ellipse cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0E2A47"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0E2A47"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0E2A47" stroke-width="1.8" stroke-linecap="round"/></svg>`;
   function peterSave() { try { sessionStorage.setItem("pistea.peter", JSON.stringify({ msgs: PETER.msgs.slice(-30) })); } catch (e) {} }
   /* Lo que Peter necesita saber: dónde estás, la hora, qué hay cerca y qué está cerrado. Nada de nombres del grupo. */
   function peterContext() {
@@ -1559,7 +1555,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (sel) {
       sel.fis.forEach(fi => {
         const f = F[fi], c = f.k === "L" ? "#1B2733" : DIF[f.d].hex, w = f.k === "L" ? liftW + 1.5 : runW + 2;
-        strokeSet([f], w + 12, "rgba(91,231,242,.5)"); strokeSet([f], w + 4, "#fff");
+        strokeSet([f], w + 12, "rgba(200,240,60,.5)"); strokeSet([f], w + 4, "#fff");
         strokeSet([f], w, c, f.k === "R" && f.d === "i" ? [9, 6] : null);
       });
       ctx.setLineDash([]);
@@ -1571,9 +1567,9 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       const tr = st => { const k = r.steps.indexOf(st), cum = r.cum[k]; let pen = false; for (let j = 0; j < st.nodes.length; j++) { const n = st.nodes[j];
         if (cum[j] > lim) { if (j && pen && PV[n]) { const pn = st.nodes[j - 1], u = (lim - cum[j - 1]) / ((cum[j] - cum[j - 1]) || 1); ctx.lineTo(PX[pn] + (PX[n] - PX[pn]) * u, PY[pn] + (PY[n] - PY[pn]) * u); } break; }
         if (!PV[n]) { pen = false; continue; } if (pen) ctx.lineTo(PX[n], PY[n]); else { ctx.moveTo(PX[n], PY[n]); pen = true; } } };
-      ctx.beginPath(); rt.res.steps.forEach(tr); ctx.lineWidth = 11; ctx.strokeStyle = "#0A1620"; ctx.stroke();
+      ctx.beginPath(); rt.res.steps.forEach(tr); ctx.lineWidth = 11; ctx.strokeStyle = "#0E2A47"; ctx.stroke();
       rt.res.steps.forEach(st => {
-        ctx.beginPath(); tr(st); ctx.strokeStyle = "#5BE7F2"; ctx.lineWidth = st.ty === 2 ? 3.5 : 6;
+        ctx.beginPath(); tr(st); ctx.strokeStyle = "#C8F03C"; ctx.lineWidth = st.ty === 2 ? 3.5 : 6;
         ctx.setLineDash(st.ty === 2 ? [1, 7] : st.ty === 1 || st.ty === 3 ? [12, 5] : []); ctx.stroke();
       });
       ctx.setLineDash([]);
@@ -1644,7 +1640,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
       if (f.k === "L") {
-        const lx = m.x - w / 2 + 8, ly = m.y; ctx.beginPath(); ctx.moveTo(lx - 3.5, ly + 3); ctx.lineTo(lx + 3.5, ly + 3); ctx.lineTo(lx, ly - 3.5); ctx.closePath(); ctx.fillStyle = "#5BE7F2"; ctx.fill();
+        const lx = m.x - w / 2 + 8, ly = m.y; ctx.beginPath(); ctx.moveTo(lx - 3.5, ly + 3); ctx.lineTo(lx + 3.5, ly + 3); ctx.lineTo(lx, ly - 3.5); ctx.closePath(); ctx.fillStyle = "#C8F03C"; ctx.fill();
         ctx.fillStyle = "#F2F6F8"; ctx.fillText(text, m.x + 4, m.y + 0.5);
       } else { ctx.fillStyle = "#fff"; ctx.fillText(text, m.x, m.y + 0.5); }
     };
@@ -1691,7 +1687,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
         if (!on && hit(box)) return; boxes.push(box); POI_SCREEN.push([X, Y, p]);
         const c = POI_CAT[p.cat].c;
         ctx.beginPath(); ctx.arc(X, Y, r, 0, 7); ctx.fillStyle = on ? c : "#0F1C27"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = on ? "#fff" : c; ctx.stroke();
-        ctx.strokeStyle = on ? "#0A1620" : c; ctx.lineWidth = 1.6; ctx.lineCap = "round"; ctx.beginPath();
+        ctx.strokeStyle = on ? "#0E2A47" : c; ctx.lineWidth = 1.6; ctx.lineCap = "round"; ctx.beginPath();
         const k = r / 11;
         if (p.cat === "b") { ctx.moveTo(X - 5 * k, Y - 5 * k); ctx.lineTo(X + 5 * k, Y - 5 * k); ctx.lineTo(X, Y + 1 * k); ctx.closePath(); ctx.moveTo(X, Y + 1 * k); ctx.lineTo(X, Y + 5 * k); ctx.moveTo(X - 3 * k, Y + 5.5 * k); ctx.lineTo(X + 3 * k, Y + 5.5 * k); }
         else { ctx.moveTo(X - 3 * k, Y - 6 * k); ctx.lineTo(X - 3 * k, Y + 6 * k); ctx.moveTo(X - 5 * k, Y - 6 * k); ctx.lineTo(X - 5 * k, Y - 2 * k); ctx.moveTo(X - 1 * k, Y - 6 * k); ctx.lineTo(X - 1 * k, Y - 2 * k); ctx.moveTo(X + 4 * k, Y - 6 * k); ctx.quadraticCurveTo(X + 1.5 * k, Y - 3 * k, X + 4 * k, Y); ctx.lineTo(X + 4 * k, Y + 6 * k); }
@@ -1741,11 +1737,11 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (mq) {
       const [X, Y] = mq;
       ctx.beginPath(); ctx.ellipse(X, Y, 7, 3, 0, 0, 7); ctx.fillStyle = "rgba(16,33,49,.35)"; ctx.fill();
-      ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X, Y - 36); ctx.lineCap = "round"; ctx.lineWidth = 5; ctx.strokeStyle = "#fff"; ctx.stroke(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#0A1620"; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X, Y - 36); ctx.lineCap = "round"; ctx.lineWidth = 5; ctx.strokeStyle = "#fff"; ctx.stroke(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#0E2A47"; ctx.stroke();
       ctx.beginPath(); ctx.moveTo(X + 1, Y - 36); ctx.lineTo(X + 26, Y - 36); ctx.lineTo(X + 19, Y - 28.5); ctx.lineTo(X + 26, Y - 21); ctx.lineTo(X + 1, Y - 21); ctx.closePath();
-      ctx.fillStyle = "#FFD23F"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#0A1620"; ctx.stroke();
+      ctx.fillStyle = "#FFD23F"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#0E2A47"; ctx.stroke();
       const t = mt.hora || "Quedada"; ctx.font = `700 13px "Geist", sans-serif`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
-      ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X + 30, Y - 28.5); ctx.fillStyle = "#0A1620"; ctx.fillText(t, X + 30, Y - 28.5);
+      ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X + 30, Y - 28.5); ctx.fillStyle = "#0E2A47"; ctx.fillText(t, X + 30, Y - 28.5);
     }
 
     /* Gente */
@@ -1760,14 +1756,14 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       ctx.globalAlpha = old ? 0.7 : 1;
       ctx.beginPath(); ctx.ellipse(X, Y, 7, 3, 0, 0, 7); ctx.fillStyle = "rgba(16,33,49,.3)"; ctx.fill();
       ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X - 7, Y - 14); ctx.lineTo(X + 7, Y - 14); ctx.closePath(); ctx.fillStyle = c; ctx.fill();
-      ctx.beginPath(); ctx.arc(X, Y - 24, 16.5, 0, 7); ctx.fillStyle = "#0A1620"; ctx.fill();
+      ctx.beginPath(); ctx.arc(X, Y - 24, 16.5, 0, 7); ctx.fillStyle = "#0E2A47"; ctx.fill();
       ctx.beginPath(); ctx.arc(X, Y - 24, 14.5, 0, 7); ctx.fillStyle = "#fff"; ctx.fill();
       ctx.beginPath(); ctx.arc(X, Y - 24, 12.5, 0, 7); ctx.fillStyle = c; ctx.fill();
-      ctx.font = `600 16px "Geist", sans-serif`; ctx.fillStyle = "#0A1620"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.font = `600 16px "Geist", sans-serif`; ctx.fillStyle = "#0E2A47"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.fillText(p.uid === me ? "Tú" : initial(p.uid), X, Y - 23);
       if (p.uid !== me) {
         ctx.font = `600 13px "Geist", sans-serif`; const t = who(p.uid);
-        ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X, Y + 9); ctx.fillStyle = "#0A1620"; ctx.fillText(t, X, Y + 9);
+        ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X, Y + 9); ctx.fillStyle = "#0E2A47"; ctx.fillText(t, X, Y + 9);
       }
       ctx.globalAlpha = 1;
     });
@@ -1776,11 +1772,11 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       const st = rt.res.steps[rt.cur]; ctx.beginPath(); let pen = false;
       st.nodes.forEach(n => { if (!PV[n]) { pen = false; return; } if (pen) ctx.lineTo(PX[n], PY[n]); else { ctx.moveTo(PX[n], PY[n]); pen = true; } });
       ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.setLineDash([2, 8]); ctx.stroke(); ctx.setLineDash([]);
-      const n0 = st.nodes[0]; if (PV[n0]) { ctx.beginPath(); ctx.arc(PX[n0], PY[n0], 8, 0, 7); ctx.fillStyle = "#fff"; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = "#0A1620"; ctx.stroke(); }
+      const n0 = st.nodes[0]; if (PV[n0]) { ctx.beginPath(); ctx.arc(PX[n0], PY[n0], 8, 0, 7); ctx.fillStyle = "#fff"; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = "#0E2A47"; ctx.stroke(); }
     }
     if (rt && rt.res && rt.to.node != null && PV[rt.to.node]) {
       const n = rt.to.node, X = PX[n], Y = PY[n];
-      ctx.beginPath(); ctx.arc(X, Y, 10, 0, 7); ctx.fillStyle = "#0A1620"; ctx.fill(); ctx.beginPath(); ctx.arc(X, Y, 6.5, 0, 7); ctx.fillStyle = "#5BE7F2"; ctx.fill();
+      ctx.beginPath(); ctx.arc(X, Y, 10, 0, 7); ctx.fillStyle = "#0E2A47"; ctx.fill(); ctx.beginPath(); ctx.arc(X, Y, 6.5, 0, 7); ctx.fillStyle = "#C8F03C"; ctx.fill();
     }
   }
   function markScan(runW) {
@@ -1800,8 +1796,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (best) {
       const f = F[best.fi], c = f.k === "L" ? "#1B2733" : DIF[f.d].hex;
       ctx.beginPath(); let pen = false; f.ns.forEach(n => { if (!PV[n]) { pen = false; return; } if (pen) ctx.lineTo(PX[n], PY[n]); else { ctx.moveTo(PX[n], PY[n]); pen = true; } });
-      ctx.lineWidth = runW + 10; ctx.strokeStyle = "rgba(91,231,242,.5)"; ctx.stroke(); ctx.lineWidth = runW + 1; ctx.strokeStyle = c; ctx.stroke();
-      const n = best.node; if (PV[n]) { ctx.beginPath(); ctx.arc(PX[n], PY[n], 9, 0, 7); ctx.fillStyle = "#5BE7F2"; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = "#0A1620"; ctx.stroke(); }
+      ctx.lineWidth = runW + 10; ctx.strokeStyle = "rgba(200,240,60,.5)"; ctx.stroke(); ctx.lineWidth = runW + 1; ctx.strokeStyle = c; ctx.stroke();
+      const n = best.node; if (PV[n]) { ctx.beginPath(); ctx.arc(PX[n], PY[n], 9, 0, 7); ctx.fillStyle = "#C8F03C"; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = "#0E2A47"; ctx.stroke(); }
     }
     if ((prev && prev.node) !== (best && best.node)) { const el = document.getElementById("markname"); if (el) el.innerHTML = candText(best); const ok = document.getElementById("markok"); if (ok) ok.disabled = !best; }
   }
@@ -2058,7 +2054,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     let segs = "";
     rt.res.steps.forEach((st, k) => {
       const ps = pts.filter(p => p.k === k); if (ps.length < 2) return;
-      const col = st.ty === 0 ? (st.f.d === "n" ? "#E8EDF2" : DIF[st.f.d].hex) : st.ty === 2 ? "#7D8A96" : "#5BE7F2";
+      const col = st.ty === 0 ? (st.f.d === "n" ? "#E8EDF2" : DIF[st.f.d].hex) : st.ty === 2 ? "#7D8A96" : "#C8F03C";
       const dsh = st.ty === 1 || st.ty === 3 ? ' stroke-dasharray="6 4"' : st.ty === 2 ? ' stroke-dasharray="2 4"' : "";
       segs += `<polyline points="${ps.map(p => X(p.d).toFixed(1) + "," + Y(p.z).toFixed(1)).join(" ")}" fill="none" stroke="${col}" stroke-width="${k === rt.cur ? 4.5 : 2.5}" stroke-linecap="round" stroke-linejoin="round" opacity="${k === rt.cur || rt.cur >= rt.res.steps.length ? 1 : 0.55}"${dsh}/>`;
     });
@@ -2077,7 +2073,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     try { await document.fonts.ready; } catch (e) {}
     const st = stats(items), W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H;
     const g = c.getContext("2d");
-    g.fillStyle = "#0A1620"; g.fillRect(0, 0, W, H);
+    g.fillStyle = "#0E2A47"; g.fillRect(0, 0, W, H);
     try { const lg = new Image(); lg.src = LOGO_DARK; await lg.decode(); const lh = 64; g.drawImage(lg, 72, 60, lh * lg.width / lg.height, lh); } catch (e) {}
     g.textBaseline = "top";
     g.fillStyle = "#9AABB8"; g.font = '500 28px "Geist"'; g.textAlign = "right"; g.fillText("Les 3 Vallées", W - 72, 82); g.textAlign = "left";
@@ -2103,7 +2099,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     g.restore();
     /* números */
     const nums = [[st.n, st.n === 1 ? "pista" : "pistas"], [fmtNum(st.drop), "m de desnivel"], [st.km.toLocaleString("es-ES", { maximumFractionDigits: 1 }), "km bajados"]];
-    nums.forEach(([v, l], i) => { const x = 72 + i * 320; g.fillStyle = i === 0 ? "#5BE7F2" : "#F4F7F8"; g.font = '600 104px "Geist Mono"'; g.fillText(String(v), x, 880); g.fillStyle = "#9AABB8"; g.font = '500 26px "Geist"'; g.fillText(l, x, 996); });
+    nums.forEach(([v, l], i) => { const x = 72 + i * 320; g.fillStyle = i === 0 ? "#C8F03C" : "#F4F7F8"; g.font = '600 104px "Geist Mono"'; g.fillText(String(v), x, 880); g.fillStyle = "#9AABB8"; g.font = '500 26px "Geist"'; g.fillText(l, x, 996); });
     const max = Math.max(1, ...Object.values(st.by));
     Object.entries(TIPOS).forEach(([key, t], i) => {
       const y = 1080 + i * 52, hex = { verde: "#2B8A3E", azul: "#1864AB", roja: "#C92A2A", negra: "#0B0F14" }[key];
@@ -2112,7 +2108,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       g.fillStyle = key === "negra" ? "#E8EDF2" : hex; g.fillRect(240, y + 12, Math.max(6, 640 * st.by[key] / max), 10);
       g.fillStyle = "#F2F6F8"; g.font = '500 28px "Geist Mono"'; g.textAlign = "right"; g.fillText(String(st.by[key]), W - 72, y - 2); g.textAlign = "left";
     });
-    g.fillStyle = "rgba(154,171,184,.7)"; g.font = '500 20px "Geist"'; g.fillText("Pistea · mapa © OpenStreetMap", 72, H - 58);
+    g.fillStyle = "rgba(154,171,184,.7)"; g.font = '500 20px "Geist"'; g.fillText("Vallik · mapa © OpenStreetMap", 72, H - 58);
     const url = c.toDataURL("image/png");
     $("#modal").innerHTML = `<div class="mcard"><img src="${url}" alt="Tarjeta con las pistas ${diarioScope === "hoy" ? "de hoy" : "del viaje"}"><p>Mantén pulsada la imagen para guardarla o compartirla.</p><button class="btn dark" data-act="modal-close">Cerrar</button></div>`;
     $("#modal").hidden = false;
@@ -2169,7 +2165,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       : `<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`;
     const G = window.PISTEA_GROUP;
     const invite = G ? `<div class="codebox"><span><small>Código del grupo</small><b>${esc(G.code)}</b></span><button class="btn go" data-act="copy-code">Copiar código</button></div>
-      <p class="quiet">Si añades Pistea a la pantalla de inicio del iPhone, al abrirla pega este código.</p>
+      <p class="quiet">Si añades Vallik a la pantalla de inicio del iPhone, al abrirla pega este código.</p>
       <button class="btn dark wide" data-act="invite">Invitar al grupo</button>
       <button class="btn ghost wide danger" data-act="leave">${confirmAct === "leave" ? "Toca otra vez para salir" : "Salir del grupo"}</button>
       ${G.isOwner ? `<p class="quiet">Creaste este grupo. Para quitar a alguien, toca su nombre.</p>` : ""}` : "";
@@ -2636,12 +2632,12 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   /* Antes del primer directo en la app nativa: explicar por qué pedimos «Permitir siempre». */
   function permisoAsk() {
     $("#modal").innerHTML = `<div class="permiso" role="dialog" aria-labelledby="perm-t">
-      <svg width="220" height="190" viewBox="0 0 220 190" role="img" aria-label="Un móvil bloqueado que sigue enviando tu posición al grupo" style="margin:0 auto"><circle cx="110" cy="95" r="88" fill="rgba(91,231,242,.06)"/><circle cx="110" cy="95" r="62" fill="none" stroke="rgba(91,231,242,.25)" stroke-width="2" stroke-dasharray="4 7"/><rect x="78" y="40" width="64" height="112" rx="14" fill="#111F2B" stroke="rgba(255,255,255,.25)" stroke-width="2"/><rect x="100" y="48" width="20" height="5" rx="2.5" fill="rgba(255,255,255,.25)"/><rect x="99" y="86" width="22" height="18" rx="4" fill="none" stroke="#9AABB8" stroke-width="3"/><path d="M103 86v-5a7 7 0 0 1 14 0v5" fill="none" stroke="#9AABB8" stroke-width="3"/><circle cx="176" cy="46" r="14" fill="#FFD23F"/><circle cx="40" cy="132" r="14" fill="#FFD23F"/><path d="M145 70 Q160 58 164 56M76 120 Q62 126 54 128" fill="none" stroke="#5BE7F2" stroke-width="2.5" stroke-linecap="round"/><circle cx="110" cy="128" r="6" fill="#FF4D4F"/></svg>
+      <svg width="220" height="190" viewBox="0 0 220 190" role="img" aria-label="Un móvil bloqueado que sigue enviando tu posición al grupo" style="margin:0 auto"><circle cx="110" cy="95" r="88" fill="rgba(200,240,60,.06)"/><circle cx="110" cy="95" r="62" fill="none" stroke="rgba(200,240,60,.25)" stroke-width="2" stroke-dasharray="4 7"/><rect x="78" y="40" width="64" height="112" rx="14" fill="#111F2B" stroke="rgba(255,255,255,.25)" stroke-width="2"/><rect x="100" y="48" width="20" height="5" rx="2.5" fill="rgba(255,255,255,.25)"/><rect x="99" y="86" width="22" height="18" rx="4" fill="none" stroke="#9AABB8" stroke-width="3"/><path d="M103 86v-5a7 7 0 0 1 14 0v5" fill="none" stroke="#9AABB8" stroke-width="3"/><circle cx="176" cy="46" r="14" fill="#FFD23F"/><circle cx="40" cy="132" r="14" fill="#FFD23F"/><path d="M145 70 Q160 58 164 56M76 120 Q62 126 54 128" fill="none" stroke="#C8F03C" stroke-width="2.5" stroke-linecap="round"/><circle cx="110" cy="128" r="6" fill="#FF4D4F"/></svg>
       <h1 id="perm-t">Que el grupo te vea con el móvil en el bolsillo</h1>
       <p>Para el directo, iPhone te pedirá permiso. Elige la opción que deja seguir tu ubicación con la pantalla bloqueada.</p>
       <div class="opts">
-        <div class="opt on"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A1620" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></i><span><b>Permitir siempre</b><small>Te siguen aunque bloquees el móvil</small></span></div>
-        <div class="opt"><i></i><span><b>Al usar la app</b><small>Solo con Pistea abierta</small></span></div>
+        <div class="opt on"><i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E2A47" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></i><span><b>Permitir siempre</b><small>Te siguen aunque bloquees el móvil</small></span></div>
+        <div class="opt"><i></i><span><b>Al usar la app</b><small>Solo con Vallik abierta</small></span></div>
       </div>
       <p class="fine">Solo se comparte mientras el directo está encendido. Lo apagas cuando quieras.</p>
       <div class="end"><button class="btn" data-act="permiso-ok">Continuar</button><button class="btn ghost" data-act="modal-close">Ahora no</button></div>
@@ -2653,7 +2649,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     if (!window.PISTEA_GROUP) return;
     if (NATIVE) { let seen = false; try { seen = localStorage.getItem("pistea.permiso") === "1"; } catch (e) {} if (!seen) { permisoAsk(); return; } }
     LIVE.on = true; LIVE.last = null; liveSave(true);
-    liveWatch(); wakeOn(); toast(NATIVE ? "En directo. Tu grupo te ve aunque bloquees el móvil." : "En directo. El grupo te sigue mientras tengas Pistea abierta."); ui();
+    liveWatch(); wakeOn(); toast(NATIVE ? "En directo. Tu grupo te ve aunque bloquees el móvil." : "En directo. El grupo te sigue mientras tengas Vallik abierta."); ui();
   }
   function liveStop(quiet) {
     const was = LIVE.on;
@@ -2690,7 +2686,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   });
   function inviteGroup() {
     const g = window.PISTEA_GROUP; if (!g) return;
-    if (navigator.share) { navigator.share({ title: "Pistea", text: "Únete a mi grupo en Pistea", url: g.link }).catch(() => {}); return; }
+    if (navigator.share) { navigator.share({ title: "Vallik", text: "Únete a mi grupo en Vallik", url: g.link }).catch(() => {}); return; }
     (navigator.clipboard ? navigator.clipboard.writeText(g.link) : Promise.reject()).then(() => toast("Enlace copiado. Envíalo al grupo."), () => toast(g.link));
   }
   function copyCode() {
