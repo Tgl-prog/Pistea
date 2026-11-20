@@ -319,6 +319,20 @@ body.has-dock #smore { padding-bottom: 20px; }
 .av.big { width: 48px; height: 48px; font-size: 19px; }
 .av.img { padding: 2px; background: var(--c); }
 .av.img img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.avbtn { border: 0; background: none; padding: 0; border-radius: 50%; flex: 0 0 auto; }
+.profrow { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin: 2px 0 6px; border: 0; border-radius: 16px; background: rgba(255,255,255,.06); color: var(--tx); text-align: left; }
+.profrow .ptx { flex: 1; display: grid; gap: 2px; }
+.profrow b { font: 600 15px/1.2 var(--font); }
+.profrow small { font-size: 13px; color: var(--tx-2); }
+.profrow > svg { color: var(--tx-2); }
+.profhead { display: flex; align-items: center; gap: 16px; margin: 10px 0 4px; }
+.profhead .quiet { margin: 0 0 6px; }
+.profav { position: relative; flex: 0 0 76px; width: 76px; height: 76px; border-radius: 50%; cursor: pointer; }
+.profav img, .profav > span { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; object-fit: cover; box-shadow: 0 0 0 3px var(--acc); }
+.profav > span { background: var(--c); color: #0E2A47; font: 700 28px/1 var(--font); }
+.profav i { position: absolute; right: -2px; bottom: -2px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--acc); color: var(--acc-ink); box-shadow: 0 0 0 3px var(--bg); }
+.proflegal { margin-top: 18px; }
+.proflegal a { color: var(--tx-2); }
 .fotorow { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
 .fotorow .quiet { margin: 0; }
 
@@ -1102,7 +1116,7 @@ if (EN) (function () {
     return {
       idioma: EN ? "en" : "es",
       hora: new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Paris", weekday: "long", hour: "2-digit", minute: "2-digit" }).format(new Date()),
-      donde: mp ? (mp.en || (EN?"on the map":"en el mapa")) : (EN?"no position marked":"sin posición marcada"),
+      donde: mp ? (placeOf(mp) || (EN?"on the map":"en el mapa")) : (EN?"no position marked":"sin posición marcada"),
       sitios_cerca: near.length ? near : far,
       estado_oficial: cl ? { actualizado: agoMin(OFI.at), cerrados } : (EN?"no data (the official site can only be read from the app)":"sin datos (la web oficial solo se lee desde la app)"),
       quedada: mt ? { donde: mt.en, hora: mt.hora || null } : null,
@@ -1227,9 +1241,9 @@ if (EN) (function () {
   }
   function bannerHtml(b) {
     const x = `<button class="x" data-act="banner-x" data-k="${esc(b.k)}${EN?`" aria-label="Close alert">×</button>`:`" aria-label="Cerrar aviso">×</button>`}`;
-    if (b.q) return `<div class="banner" role="status"><span class="flag" aria-hidden="true"></span><div><b>${esc(who(b.q.uid))}${EN?` suggests meeting up`:` propone quedar`}${b.q.hora ? (EN?" at ":" a las ") + esc(b.q.hora) : ""}</b><small>${esc(cap(b.q.en))}</small></div><button class="btn go" data-act="banner-meet" data-k="${esc(b.k)}${EN?`">View</button>`:`">Ver</button>`}${x}</div>`;
+    if (b.q) return `<div class="banner" role="status"><span class="flag" aria-hidden="true"></span><div><b>${esc(who(b.q.uid))}${EN?` suggests meeting up`:` propone quedar`}${b.q.hora ? (EN?" at ":" a las ") + esc(b.q.hora) : ""}</b><small>${esc(cap(placeOf(b.q)))}</small></div><button class="btn go" data-act="banner-meet" data-k="${esc(b.k)}${EN?`">View</button>`:`">Ver</button>`}${x}</div>`;
     const m = b.m;
-    return `<div class="banner${b.help ? " help" : ""}" role="${b.help ? "alert" : "status"}">${av(m.uid)}<div><b>${esc(who(m.uid))}${b.help ? (EN?" needs help":" necesita ayuda") : ": «" + esc(MSGS[m.tipo]) + "»"}</b><small>${m.en ? esc(m.en) + " · " : ""}${esc(ago(m.at))}</small></div>${b.help || m.tipo === "espero" ? `<button class="btn go" data-act="banner-go" data-uid="${esc(m.uid)}" data-k="${esc(b.k)}">${EN ? "Go" : "Ir"}</button>` : ""}${x}</div>`;
+    return `<div class="banner${b.help ? " help" : ""}" role="${b.help ? "alert" : "status"}">${av(m.uid)}<div><b>${esc(who(m.uid))}${b.help ? (EN?" needs help":" necesita ayuda") : ": «" + esc(MSGS[m.tipo]) + "»"}</b><small>${m.en ? esc(placeOf(m)) + " · " : ""}${esc(ago(m.at))}</small></div>${b.help || m.tipo === "espero" ? `<button class="btn go" data-act="banner-go" data-uid="${esc(m.uid)}" data-k="${esc(b.k)}">${EN ? "Go" : "Ir"}</button>` : ""}${x}</div>`;
   }
   const msgOf = uid => { const m = S.mensajes.get(uid); return m && MSGS[m.tipo] && Date.now() - m.at < HIDE_MS ? m : null; };
 
@@ -2359,6 +2373,17 @@ if (EN) (function () {
       <figcaption>${EN ? "Measured on the terrain model (about 90 m resolution), so short steep pitches can be steeper than shown." : "Medido sobre el modelo del terreno (unos 90 m de detalle): un tramo corto puede ser más empinado de lo que marca."}</figcaption></figure>`;
   }
 
+  /* Descripción del sitio en el idioma de quien mira (lo guardado va en el idioma de quien lo marcó) */
+  const PLACE = new Map();
+  function placeOf(o) {
+    if (!o) return "";
+    if (M.ok && typeof o.lat === "number" && typeof o.lon === "number") {
+      const k = o.lat + "," + o.lon; let v = PLACE.get(k);
+      if (v == null) { const [x, y] = toXY(o.lon, o.lat), n = nearestNode(x, y, 400); v = n >= 0 ? describeNode(n) : describeOff(x, y); PLACE.set(k, v); }
+      return v;
+    }
+    return o.en || "";
+  }
   /* ================= Tu recorrido: se graba con el directo y se vuelve a ver ================= */
   /* Solo graba mientras compartes en directo: usa las mismas lecturas de GPS, así que no gasta más
      batería. Se guarda solo en este móvil (unos 15 días) y no se envía a nadie. */
@@ -2523,7 +2548,7 @@ if (EN) (function () {
   /* ================= Interfaz: hoja inferior ================= */
   let snap = "peek", gotoOpen = false, diario = false, diarioScope = "hoy", filtOpen = false, markCand = null, offline = !navigator.onLine, dq = "";
   let meetSheet = false, meetDraft = null;
-  function sheetMode() { return marking ? "mark" : RP ? "replay" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : gotoOpen ? "goto" : juntar ? "juntar" : "home"; }
+  function sheetMode() { return marking ? "mark" : RP ? "replay" : profOpen ? "prof" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : gotoOpen ? "goto" : juntar ? "juntar" : "home"; }
   function updateMapUI() { ui(); }
 
   /* Datos para el diario: desnivel y longitud de cada pista registrada */
@@ -2565,15 +2590,15 @@ if (EN) (function () {
       <div class="acts one"><button class="btn" data-act="retry">Reintentar</button></div>`}`, smore: `${EN?`<p class="quiet">The map and routes work offline. You'll join the group as soon as there is signal.</p>`:`<p class="quiet">El mapa y las rutas funcionan sin conexión. En cuanto haya cobertura entras en el grupo.</p>`}` };
     const mt = meet();
     const meetCard = mt ? (() => { const et = meetEtas(mt).filter(e => e.t != null).slice(0, 4);
-      return `${EN?`<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Meet-up`:`<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Quedada`}${mt.hora ? (EN?" at ":" a las ") + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}${et.length ? " · " + et.map(e => esc(e.p.uid === me ? (EN?"You":"Tú") : who(e.p.uid)) + " " + etaTxt(e.t)).join(", ") : ""}</small></span><span class="chev" aria-hidden="true">›</span></button>`; })() : "";
+      return `${EN?`<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Meet-up`:`<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Quedada`}${mt.hora ? (EN?" at ":" a las ") + esc(mt.hora) : ""}</b><small>${esc(cap(placeOf(mt)))}${et.length ? " · " + et.map(e => esc(e.p.uid === me ? (EN?"You":"Tú") : who(e.p.uid)) + " " + etaTxt(e.t)).join(", ") : ""}</small></span><span class="chev" aria-hidden="true">›</span></button>`; })() : "";
     const speek = meetCard + `
-      <div class="me-line${LIVE.on ? " is-live" : ""}">${mp ? `${av(me)}${EN?`<div><b>You're `:`<div><b>Estás `}${esc(mp.en || (EN?"on the map":"en el mapa"))}</b><small${LIVE.on ? ` class="live"` : ""}>${LIVE.on ? `${EN?`<span class="live-dot"></span>Live · `:`<span class="live-dot"></span>En directo · `}` : ""}${pendingLong("aqui") ? (EN?"waiting to send":"pendiente de enviar") : LIVE.on ? esc(ago(mp.at)) : (EN?"Marked ":"Marcado ") + esc(ago(mp.at))}</small></div>` : LIVE.on ? `${EN?`<span class="dot-off"></span><div><b>Finding your location…</b><small class="live"><span class="live-dot"></span>Live</small></div>`:`<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small class="live"><span class="live-dot"></span>En directo</small></div>`}` : `${EN?`<span class="dot-off"></span><div><b>You haven't marked where you are</b><small>The group can't see you yet</small></div>`:`<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}`}${liveAvailable() ? `<button class="liveswitch" data-act="live" aria-pressed="${LIVE.on}${EN?`" aria-label="Share live"><span class="sw2"></span>Live</button>`:`" aria-label="Compartir en directo"><span class="sw2"></span>Directo</button>`}` : ""}</div>
+      <div class="me-line${LIVE.on ? " is-live" : ""}">${mp ? `<button class="avbtn" data-act="profile" aria-label="${EN ? "Your profile" : "Tu perfil"}">${av(me)}</button>${EN?`<div><b>You're `:`<div><b>Estás `}${esc(placeOf(mp) || (EN?"on the map":"en el mapa"))}</b><small${LIVE.on ? ` class="live"` : ""}>${LIVE.on ? `${EN?`<span class="live-dot"></span>Live · `:`<span class="live-dot"></span>En directo · `}` : ""}${pendingLong("aqui") ? (EN?"waiting to send":"pendiente de enviar") : LIVE.on ? esc(ago(mp.at)) : (EN?"Marked ":"Marcado ") + esc(ago(mp.at))}</small></div>` : LIVE.on ? `${EN?`<span class="dot-off"></span><div><b>Finding your location…</b><small class="live"><span class="live-dot"></span>Live</small></div>`:`<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small class="live"><span class="live-dot"></span>En directo</small></div>`}` : `${EN?`<span class="dot-off"></span><div><b>You haven't marked where you are</b><small>The group can't see you yet</small></div>`:`<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}`}${liveAvailable() ? `<button class="liveswitch" data-act="live" aria-pressed="${LIVE.on}${EN?`" aria-label="Share live"><span class="sw2"></span>Live</button>`:`" aria-label="Compartir en directo"><span class="sw2"></span>Directo</button>`}` : ""}</div>
 ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me), on = mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS;
         return `<button class="btn wide sos${on ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${!!on}">${MSG_IC.ayuda}${on ? (EN?"Help alert sent · Remove":"Aviso de ayuda enviado · Quitar") : confirmAct === "msg:ayuda" ? (EN?"Tap again to alert the group":"Toca otra vez para avisar al grupo") : (EN?"I have a problem":"Tengo un problema")}</button>`; })() : ""}${LIVE.on && WAKE.ok && !NATIVE ? `
       <button class="toggle wake" data-act="wake" aria-pressed="${WAKE.want}${EN?`"><span class="sw2"></span><span>Keep screen on<small>Keeps sending with the phone in your pocket. Uses more battery.</small></span></button>`:`"><span class="sw2"></span><span>Pantalla encendida<small>Sigue enviando con el móvil en el bolsillo. Gasta más batería.</small></span></button>`}` : ""}`;
     const people = others.length ? `<ul class="people">${others.map(p => { const m = msgOf(p.uid), mNew = m && Date.now() - m.at < MSG_HELP_MS, help = mNew && m.tipo === "ayuda"; return `
         <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}${help ? " help" : ""}">
-          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b>${mNew ? `<small class="pmsg">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</small>` : ""}<small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(p.en || "")} · ${esc(isLive(p) ? (EN?"live":"en directo") : ago(p.at))}</small></span></button>
+          <button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b>${mNew ? `<small class="pmsg">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</small>` : ""}<small>${isLive(p) ? `<span class="live-dot"></span>` : ""}${esc(placeOf(p) || "")} · ${esc(isLive(p) ? (EN?"live":"en directo") : ago(p.at))}</small></span></button>
           <button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">${EN ? "Go" : "Ir"}</button>
         </li>`; }).join("")}</ul>`
       : `${EN?`<p class="quiet">When someone in the group marks where they are, they'll show up here with a button to get to them.</p>`:`<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`}`;
@@ -2601,14 +2626,14 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       <ul class="avs">`}${avs.map(a => `<li><button data-act="aviso-go" data-ref="${esc(a.ref)}"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><span><b>${esc(a.nombre || (EN?"No name":"Sin nombre"))}</b><small>${esc(a.uid === me ? (EN?"You":"Tú") : who(a.uid))} · ${esc(ago(a.at))}${EN?` · until `:` · hasta las `}${hhmm(a.exp)}</small></span></button></li>`).join("")}</ul>` : "";
     const smore = `${EN?`
       <h3 class="sec" id="grupo">Your group`:`
-      <h3 class="sec" id="grupo">Tu grupo`}${others.length ? ` <small>${others.length + 1} ${EN ? "people" : "personas"}</small>` : ""}</h3>${people}${others.length ? `${EN?`<button class="btn ghost wide juntbtn" data-act="juntar">Where shall we meet?</button>`:`<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>`}` : ""}${msgs}${avList}
+      <h3 class="sec" id="grupo">Tu grupo`}${others.length ? ` <small>${others.length + 1} ${EN ? "people" : "personas"}</small>` : ""}</h3>${profRow()}${people}${others.length ? `${EN?`<button class="btn ghost wide juntbtn" data-act="juntar">Where shall we meet?</button>`:`<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>`}` : ""}${msgs}${avList}
       ${casaHtml()}${EN?`
       <h3 class="sec">Go to area</h3>
       <div class="zones">`:`
       <h3 class="sec">Ir a la zona</h3>
       <div class="zones">`}${ZONES.map((z, i) => `<button data-act="zone" data-i="${i}">${esc(z.n)}</button>`).join("")}${EN?`<button data-act="zfit">All 3 Vallées</button></div>
       <h3 class="sec">Invite</h3>`:`<button data-act="zfit">Las 3 Vallées</button></div>
-      <h3 class="sec">Invitar</h3>`}${invite}${fotoHtml()}${accHtml()}${langHtml()}${EN?`
+      <h3 class="sec">Invitar</h3>`}${invite}${EN?`
       <h3 class="sec">Today</h3>
       <button class="board mini" data-act="diario">
         <span><b>`:`
@@ -2789,6 +2814,23 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const b = (v, t) => `<button class="${VLANG === v ? "on" : ""}" data-act="lang" data-v="${v}" aria-pressed="${VLANG === v}">${t}</button>`;
     return `<div class="langrow"><span>${EN ? "Language" : "Idioma"}</span><div class="lp-seg">${b("es", "Español")}${b("en", "English")}</div></div>`;
   }
+  let profOpen = false;
+  const CHEV = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
+  function profRow() {
+    if (!me || !(mode === "live" || mode === "demo")) return "";
+    const n = (S.perfiles.get(me) || {}).name || names[me] || "";
+    return `<button class="profrow" data-act="profile">${av(me)}<span class="ptx"><b>${esc(n || (EN ? "Your profile" : "Tu perfil"))}</b><small>${EN ? "Photo, account and language" : "Foto, cuenta e idioma"}</small></span>${CHEV}</button>`;
+  }
+  function profHtml() {
+    const n = (S.perfiles.get(me) || {}).name || names[me] || "", has = !!fotoSrc(me);
+    const speek = `
+      <div class="headrow"><div><small class="kicker">${EN ? "Your profile" : "Tu perfil"}</small><h2 class="title md">${esc(n || (EN ? "You" : "Tú"))}</h2></div><button class="x" data-act="prof-close" aria-label="${EN ? "Close" : "Cerrar"}">×</button></div>
+      <div class="profhead"><label class="profav" aria-label="${has ? (EN ? "Change photo" : "Cambiar foto") : (EN ? "Add a photo" : "Poner una foto")}">${fotoSrc(me) ? `<img src="${fotoSrc(me)}" alt="">` : `<span style="--c:${colorOf(me)}">${esc(initial(me))}</span>`}<i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></i><input type="file" accept="image/*" id="fotoin" hidden></label>
+        <div><p class="quiet">${EN ? "Your group sees your photo on the map instead of your initial." : "Tu grupo ve tu foto en el mapa en lugar de tu inicial."}</p>${has ? `<button class="link" data-act="foto-del">${EN ? "Remove photo" : "Quitar foto"}</button>` : ""}</div></div>
+      ${langHtml()}`;
+    const smore = `${accHtml()}<p class="quiet proflegal"><a href="privacidad/">${EN ? "Privacy" : "Privacidad"}</a> · <a href="condiciones/">${EN ? "Terms" : "Condiciones"}</a></p>`;
+    return { speek, smore };
+  }
   function fotoHtml() {
     if (!me) return "";
     const has = !!fotoSrc(me);
@@ -2832,9 +2874,9 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     if (!mp) more += `${EN?`<p class="quiet">First mark where you are with the Here button, so the route starts from your spot.</p>`:`<p class="quiet">Marca primero dónde estás con el botón Aquí. Así se calcula la ruta desde tu sitio.</p>`}`;
     if (others0.length) more += `${EN?`<button class="btn ghost wide juntbtn" data-act="juntar">Where shall we meet?</button>`:`<button class="btn ghost wide juntbtn" data-act="juntar">¿Dónde nos juntamos?</button>`}`;
     if (CASA) { const n = casaNode(); if (n >= 0) more += `${EN?`<h3 class="sec">Back home</h3><ul class="people"><li class="person"><button class="pbtn" data-act="casa-route"><span><b>`:`<h3 class="sec">Vuelta a casa</h3><ul class="people"><li class="person"><button class="pbtn" data-act="casa-route"><span><b>`}${esc(CASA.n)}</b><small>${(pl => pl && pl.leave != null ? (EN?"Leave before ":"Sal antes de las ") + hm24(pl.leave) : (EN?"Where you're staying":"Tu alojamiento"))(casaPlan())}</small></span></button><button class="btn go" data-act="casa-route">${EN ? "Go" : "Ir"}</button></li></ul>`; }
-    if (mt) more += `${EN?`<h3 class="sec">Meeting point</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Meet-up`:`<h3 class="sec">Punto de encuentro</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Quedada`}${mt.hora ? (EN?" at ":" a las ") + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}</small></span></button>`;
+    if (mt) more += `${EN?`<h3 class="sec">Meeting point</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Meet-up`:`<h3 class="sec">Punto de encuentro</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Quedada`}${mt.hora ? (EN?" at ":" a las ") + esc(mt.hora) : ""}</b><small>${esc(cap(placeOf(mt)))}</small></span></button>`;
     more += `${EN?`<h3 class="sec">Your group</h3>`:`<h3 class="sec">Tu grupo</h3>`}` + (others.length ? `<ul class="people">${others.map(p => `
-        <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}"><button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${esc(p.en || "")} · ${esc(ago(p.at))}</small></span></button><button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">${EN ? "Go" : "Ir"}</button></li>`).join("")}</ul>`
+        <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}"><button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${esc(placeOf(p) || "")} · ${esc(ago(p.at))}</small></span></button><button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">${EN ? "Go" : "Ir"}</button></li>`).join("")}</ul>`
       : `${EN?`<p class="quiet">When someone in the group marks where they are, you can get to them from here.</p>`:`<p class="quiet">Cuando alguien del grupo marque dónde está, podrás ir hasta él desde aquí.</p>`}`);
     const near = mp ? POIS.map(p => ({ p, m: minsTo(poiNode(p)) })).filter(o => o.m != null).sort((a, b) => a.m - b.m).slice(0, 6) : [];
     if (near.length) more += `${EN?`<h3 class="sec">Food and drinks nearby</h3><ul class="people">`:`<h3 class="sec">Para comer o tomar algo cerca</h3><ul class="people">`}${near.map(({ p, m }) => `
@@ -2848,7 +2890,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const speek = `
       <div class="headrow"><div class="title-wrap">${av(p.uid, true)}<div><small class="kicker">${isLive(p) ? `${EN?`<span class="live-dot"></span>Live`:`<span class="live-dot"></span>En directo`}` : esc(ago(p.at))}</small><h2 class="title">${esc(mine ? (EN?"You":"Tú") : who(p.uid))}${EN?`</h2></div></div><button class="x" data-act="close-sel" aria-label="Close">×</button></div>
       <p class="facts">`:`</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
-      <p class="facts">`}${esc(p.en || "")}</p>${msgOf(p.uid) ? (m => `
+      <p class="facts">`}${esc(placeOf(p) || "")}</p>${msgOf(p.uid) ? (m => `
       <p class="msgline${m.tipo === "ayuda" ? " help" : ""}">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</p>`)(msgOf(p.uid)) : ""}
       ${!mine && msgOf(p.uid) && msgOf(p.uid).tipo === "ayuda" ? `<div class="helpacts"><button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}${EN?`">Go to `:`">Ir hasta `}${esc(who(p.uid))}${EN?`</button><a class="btn ghost danger" href="tel:112">Call 112</a></div>
       <button class="btn dark wide" data-act="msg" data-t="voy">I'll go · tell the group</button>`:`</button><a class="btn ghost danger" href="tel:112">Llamar al 112</a></div>
@@ -2864,7 +2906,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const canDel = canEditMeet(mt), mine = mt.uid === me;
     const speek = `${EN?`
       <div class="headrow"><div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Meeting point · `:`
-      <div class="headrow"><div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Punto de encuentro · `}${mine ? (EN?"you set it":"lo pusiste tú") : (EN ? "set by " : "lo puso ") + esc(who(mt.uid))}</small><h2 class="title md">${esc(cap(mt.en))}</h2></div></div>${mt.hora ? `<span class="meethora"><b>${esc(mt.hora)}</b><small>${esc(untilTxt(mt.hora))}</small></span>` : ""}${EN?`<button class="x" data-act="close-sel" aria-label="Close">×</button></div>
+      <div class="headrow"><div class="title-wrap"><span class="flag big" aria-hidden="true"></span><div><small class="kicker">Punto de encuentro · `}${mine ? (EN?"you set it":"lo pusiste tú") : (EN ? "set by " : "lo puso ") + esc(who(mt.uid))}</small><h2 class="title md">${esc(cap(placeOf(mt)))}</h2></div></div>${mt.hora ? `<span class="meethora"><b>${esc(mt.hora)}</b><small>${esc(untilTxt(mt.hora))}</small></span>` : ""}${EN?`<button class="x" data-act="close-sel" aria-label="Close">×</button></div>
       <div class="acts `:`<button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
       <div class="acts `}${canDel ? "two" : "one"}${EN?`"><button class="btn" data-act="meet-route">Directions</button>`:`"><button class="btn" data-act="meet-route">Cómo llegar</button>`}${canDel ? `${EN?`<button class="btn ghost danger" data-act="meet-del">Remove meet-up</button>`:`<button class="btn ghost danger" data-act="meet-del">Quitar quedada</button>`}` : ""}</div>`;
     const et = meetEtas(mt), hT = mt.hora ? (() => { const [h, m] = mt.hora.split(":").map(Number), d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); })() : null;
@@ -2873,7 +2915,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       `:`
       <h3 class="sec">Cuánto le falta a cada uno</h3>
       `}${et.length ? `<ul class="people">${et.map(e => { const arr = e.t != null ? Date.now() + e.t * 1000 : null, late = hT && arr && arr > hT + 60000; return `
-        <li class="person"><button class="pbtn" data-act="person" data-uid="${esc(e.p.uid)}">${av(e.p.uid)}<span><b>${esc(e.p.uid === me ? (EN?"You":"Tú") : who(e.p.uid))}</b><small>${esc(e.p.en || "")} · ${esc(ago(e.p.at))}</small></span></button>
+        <li class="person"><button class="pbtn" data-act="person" data-uid="${esc(e.p.uid)}">${av(e.p.uid)}<span><b>${esc(e.p.uid === me ? (EN?"You":"Tú") : who(e.p.uid))}</b><small>${esc(placeOf(e.p) || "")} · ${esc(ago(e.p.at))}</small></span></button>
           <span class="eta${late ? " late" : ""}"><b>${etaTxt(e.t)}</b>${arr && e.t >= 60 ? `<small>${late ? (EN?"late, ":"llega tarde, ") : (EN?"arrives ":"llega ")}${hhmm(arr)}</small>` : ""}</span></li>`; }).join("")}</ul>` : `${EN?`<p class="quiet">Nobody has marked where they are yet.</p>`:`<p class="quiet">Nadie ha marcado dónde está todavía.</p>`}`}${EN?`
       <p class="quiet">Approximate time on the fastest route, including lift waits. Only people who have marked where they are show up.`:`
       <p class="quiet">Tiempo aproximado por la ruta más rápida, con la espera de los remontes. Solo sale quien ha marcado dónde está.`}${canDel ? "" : (EN?" Only whoever set it or whoever created the group can remove it.":" Solo quien la puso o quien creó el grupo puede quitarla.")}</p>`;
@@ -3064,7 +3106,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   function ui() {
     if (!$("#sheet")) return;
     if (ptrDown && !dragging) { uiLater = true; drawSoon(); return; }
-    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, juntar: juntarHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml, replay: replayHtml }[m]();
+    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, juntar: juntarHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml, replay: replayHtml, prof: profHtml }[m]();
     const sb = $("#sheet");
     const ae = document.activeElement, fid = ae && ae.id && sb.contains(ae) ? ae.id : null;
     let selr = null; try { if (fid && ae.selectionStart != null) selr = [ae.selectionStart, ae.selectionEnd]; } catch (e) {}
@@ -3146,7 +3188,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     res.sort((a, b) => a.sc - b.sc);
     if (!res.length) return `${EN?`<li class="none">Nothing with that name</li>`:`<li class="none">Nada con ese nombre</li>`}`;
     return res.slice(0, 25).map(r => {
-      if (r.person) return `<li><button data-act="res-person" data-uid="${esc(r.person.uid)}">${av(r.person.uid)}<span><b>${esc(who(r.person.uid))}</b><small>${esc(r.person.en || "")}</small></span></button></li>`;
+      if (r.person) return `<li><button data-act="res-person" data-uid="${esc(r.person.uid)}">${av(r.person.uid)}<span><b>${esc(who(r.person.uid))}</b><small>${esc(placeOf(r.person) || "")}</small></span></button></li>`;
       if (r.poi) return `<li><button data-act="res-poi" data-id="${esc(r.poi.id)}"><span class="poiic" style="--c:${POI_CAT[r.poi.cat].c};width:36px;height:36px;flex-basis:36px">${POI_ICON[r.poi.cat]}</span><span><b>${esc(r.poi.name)}</b><small>${esc(poiKind(r.poi))}${r.poi.z ? " · " + fmtNum(r.poi.z) + " m" : ""}</small></span></button></li>`;
       if (r.pl) return `<li><button data-act="res-place" data-i="${M.places.indexOf(r.pl)}"><span class="plate town" aria-hidden="true"></span><span><b>${esc(r.pl[0])}${EN?`</b><small>Resort</small></span></button></li>`:`</b><small>Estación</small></span></button></li>`}`;
       const g = r.g, isL = g.k === "L";
@@ -3341,7 +3383,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   document.addEventListener("focusin", e => { if (e.target.id === "q") { document.body.classList.add("searching"); $("#results").innerHTML = resultsHtml(); } if (e.target.id === "dq" && snap !== "full") setSnap("full"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.id === "q") closeSearch(); });
   document.addEventListener("pointerdown", e => { if (!e.target.closest(".topbar")) { const r = $("#results"); if (r && r.innerHTML) { r.innerHTML = ""; document.body.classList.remove("searching"); } } });
-  function clearModes() { RP = null; sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; gotoOpen = false; juntar = null; }
+  function clearModes() { RP = null; profOpen = false; sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; gotoOpen = false; juntar = null; }
   document.addEventListener("click", e => {
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
     const act = el.dataset.act, id = el.dataset.id;
@@ -3476,6 +3518,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "pista-del": del("pistas", id); break;
       case "zone": closeSearch(); goZone(+el.dataset.i); if (snap !== "peek") setSnap("peek"); break;
       case "foto-del": { const b = S.perfiles.get(me); if (!b) break; const n = Object.assign({}, b); delete n.foto; put("perfiles", me, n); break; }
+      case "profile": clearModes(); rt = null; diario = false; profOpen = true; setSnap("half"); break;
+      case "prof-close": profOpen = false; break;
       case "replay": replayStart(el.dataset.d || today()); break;
       case "replay-close": replayStop(); break;
       case "replay-play": if (RP) { if (!RP.playing && RP.cur >= RP.end) RP.cur = 0; RP.playing = !RP.playing; RP.follow = true; ui(); } break;
