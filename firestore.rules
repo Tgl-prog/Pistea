@@ -37,8 +37,10 @@ service cloud.firestore {
     // Perfil: el nombre con el que te ven. Para crearlo, el grupo tiene que existir
     // (existsAfter: vale también si se crea en el mismo lote que el grupo).
     function perfilOk(d) {
-      return campos(d, ['name'], ['name', 'at']) && texto(d.name, 1, 40)
-        && (!('at' in d) || d.at is number);
+      return campos(d, ['name'], ['name', 'at', 'foto']) && texto(d.name, 1, 40)
+        && (!('at' in d) || d.at is number)
+        // foto: JPEG pequeño (unos 160 px) guardado como texto; máximo 40 KB
+        && (!('foto' in d) || (d.foto is string && d.foto.size() <= 40000 && d.foto.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')));
     }
     match /grupos/{g}/perfiles/{uid} {
       allow read: if signedIn() && noExpulsado(g);

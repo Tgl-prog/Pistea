@@ -168,6 +168,19 @@ body.searching .peterbtn { display: none; }
 .fchip.lift i { background: transparent; box-shadow: inset 0 0 0 2px #fff; }
 .chips { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
 .chips:empty { display: none; }
+.slopeleg { grid-column: 1 / -1; justify-self: start; display: grid; gap: 5px; padding: 8px 12px 7px; border-radius: 14px; background: rgba(14,42,71,.82); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: var(--tx); }
+.slopeleg[hidden] { display: none; }
+.slopeleg b { font: 600 12px/1 var(--font); }
+.slopeleg .bar { display: grid; grid-template-columns: repeat(8, 26px); height: 6px; border-radius: 3px; overflow: hidden; }
+.slopeleg .lbl { display: grid; grid-template-columns: repeat(8, 26px); font: 500 10px/1 var(--mono); color: var(--tx-2); }
+.pstats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin: 10px 0 2px; }
+.pstats div { display: grid; gap: 3px; }
+.pstats b { font: 600 17px/1.1 var(--font); color: var(--tx); }
+.pstats small { font-size: 12px; color: var(--tx-2); }
+.pprof { margin: 14px 0 6px; }
+.pprof svg { width: 100%; height: auto; display: block; }
+.pprof .pt { font: 500 10px var(--mono); fill: var(--tx-2); }
+.pprof figcaption { font-size: 12px; color: var(--tx-2); margin-top: 4px; }
 .chip { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 16px; font: 500 13px/1 var(--font); color: var(--tx); background: var(--glass); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); }
 .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 10px var(--acc); }
 .chip.warn::before { background: var(--warn); box-shadow: 0 0 10px var(--warn); }
@@ -291,6 +304,10 @@ body.has-dock #smore { padding-bottom: 20px; }
 .av { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: var(--c); color: #0E2A47; display: grid; place-items: center; font: 700 14px/1 var(--font); }
 .person.old .av { background: var(--raised); color: var(--tx-2); box-shadow: 0 0 0 2px var(--sol); }
 .av.big { width: 48px; height: 48px; font-size: 19px; }
+.av.img { padding: 2px; background: var(--c); }
+.av.img img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.fotorow { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.fotorow .quiet { margin: 0; }
 
 .codebox { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 10px 10px 16px; border-radius: var(--r-md); background: var(--raised); border: 1px solid var(--line); }
 .codebox small { display: block; font: 500 12px/16px var(--font); color: var(--tx-2); }
@@ -525,12 +542,14 @@ body.has-dock #smore { padding-bottom: 20px; }
   <div class="filters" id="filters" role="group" aria-label="Filtrar por color" hidden></div>
   <div class="chips" id="chips"></div>
   <div class="banners" id="banners" aria-live="polite"></div>
+  <div class="slopeleg" id="slopeleg" hidden></div>
 </header>
 <div class="mapctl" id="mapctl">
   <button data-act="zin" aria-label="Acercar"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
   <button data-act="zout" aria-label="Alejar"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10h12"/></svg></button>
   <button data-act="north" aria-label="Orientar al norte"><svg id="compass" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.2"/><path d="M12 3.5l3.2 8.5h-6.4z" fill="#C8F03C"/><path d="M12 20.5L8.8 12h6.4z" fill="rgba(244,247,248,.75)"/></svg></button>
   <button id="sunbtn" data-act="sun-toggle" aria-label="Sol y sombra" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7"/></svg></button>
+  <button id="slopebtn" data-act="slope-toggle" aria-label="Pendiente" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19h18L3 6z"/><path d="M3 13.5a5 5 0 0 1 4.2 2.2"/></svg></button>
   <button id="dimbtn" data-act="dim" aria-label="Cambiar entre 3D y plano">2D</button>
   <button data-act="zfit" aria-label="Ver todo el dominio"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/></svg></button>
   <button data-act="zme" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#C8F03C" stroke="none"/><path d="M12 1.8v3M12 19.2v3M1.8 12h3M19.2 12h3"/></svg></button>
@@ -555,7 +574,7 @@ if (EN) (function () {
   var T = { "Cargando la montaña": "Loading the mountain", "Política de privacidad": "Privacy policy", "Condiciones del servicio": "Terms of service",
     "Mapa": "Map", "Grupo": "Group", "Aquí": "Here", "Ir hasta": "Go to", "Mi día": "My day",
     "Buscar o preguntar": "Search or ask", "Buscar en el mapa": "Search the map", "Preguntar a Peter": "Ask Peter", "Filtrar por color": "Filter by colour",
-    "Acercar": "Zoom in", "Alejar": "Zoom out", "Orientar al norte": "Face north", "Sol y sombra": "Sun and shade", "Cambiar entre 3D y plano": "Switch between 3D and flat",
+    "Acercar": "Zoom in", "Alejar": "Zoom out", "Orientar al norte": "Face north", "Sol y sombra": "Sun and shade", "Pendiente": "Slope", "Cambiar entre 3D y plano": "Switch between 3D and flat",
     "Ver todo el dominio": "See the whole ski area", "Centrar en mí": "Centre on me", "Panel": "Panel", "Subir o bajar el panel": "Raise or lower the panel",
     "Navegación principal": "Main navigation", "Información legal": "Legal information", "Vallik: mapa en 3D de pistas y remontes de Les 3 Vallées": "Vallik: 3D map of the pistes and lifts of Les 3 Vallées" };
   var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, k;
@@ -1307,6 +1326,7 @@ if (EN) (function () {
       const camera = new THREE.PerspectiveCamera(FOV, 1, 10, 200000);
       GL = { renderer, scene, camera, mesh };
       if (sunOn) applySunGL();
+      if (slopeOn) { slopeGL(); if (GL.slope) GL.slope.visible = true; }
       sizeCanvas();
     } catch (e) { GLfail = true; GL = null; }
   }
@@ -1848,11 +1868,17 @@ if (EN) (function () {
       ctx.globalAlpha = old ? 0.7 : 1;
       ctx.beginPath(); ctx.ellipse(X, Y, 7, 3, 0, 0, 7); ctx.fillStyle = "rgba(16,33,49,.3)"; ctx.fill();
       ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X - 7, Y - 14); ctx.lineTo(X + 7, Y - 14); ctx.closePath(); ctx.fillStyle = c; ctx.fill();
-      ctx.beginPath(); ctx.arc(X, Y - 24, 16.5, 0, 7); ctx.fillStyle = "#0E2A47"; ctx.fill();
-      ctx.beginPath(); ctx.arc(X, Y - 24, 14.5, 0, 7); ctx.fillStyle = "#fff"; ctx.fill();
-      ctx.beginPath(); ctx.arc(X, Y - 24, 12.5, 0, 7); ctx.fillStyle = c; ctx.fill();
-      ctx.font = `600 16px "Geist", sans-serif`; ctx.fillStyle = "#0E2A47"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(p.uid === me ? (EN?"You":"Tú") : initial(p.uid), X, Y - 23);
+      const fi = fotoImg(p.uid), R = fi ? 19 : 16.5, CY = Y - (fi ? 27 : 24);
+      ctx.beginPath(); ctx.arc(X, CY, R, 0, 7); ctx.fillStyle = "#0E2A47"; ctx.fill();
+      ctx.beginPath(); ctx.arc(X, CY, R - 2, 0, 7); ctx.fillStyle = fi ? c : "#fff"; ctx.fill();
+      if (fi) {
+        ctx.save(); ctx.beginPath(); ctx.arc(X, CY, R - 4.5, 0, 7); ctx.clip(); ctx.drawImage(fi, X - (R - 4.5), CY - (R - 4.5), (R - 4.5) * 2, (R - 4.5) * 2); ctx.restore();
+      } else {
+        ctx.beginPath(); ctx.arc(X, CY, 12.5, 0, 7); ctx.fillStyle = c; ctx.fill();
+        ctx.font = `600 16px "Geist", sans-serif`; ctx.fillStyle = "#0E2A47"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(p.uid === me ? (EN?"You":"Tú") : initial(p.uid), X, Y - 23);
+      }
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
       if (p.uid !== me) {
         ctx.font = `600 13px "Geist", sans-serif`; const t = who(p.uid);
         ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X, Y + 9); ctx.fillStyle = "#0E2A47"; ctx.fillText(t, X, Y + 9);
@@ -2213,6 +2239,112 @@ if (EN) (function () {
     $("#modal").hidden = false;
   }
 
+  /* ================= Pendiente: capa de colores sobre el relieve y datos de cada pista ================= */
+  const SLOPE_C = [[15, "#9BE5A0"], [20, "#3FBF5F"], [25, "#F2DE45"], [30, "#F7A531"], [35, "#F0653A"], [40, "#D9303A"], [45, "#A94BD8"], [50, "#3B5BDB"]];
+  let slopeOn = false, SLOPE = null;
+  /* Grados de pendiente en cada celda del relieve (unos 90 m: suaviza los tramos cortos más duros) */
+  function slopeGrid() {
+    if (SLOPE || !TER.z) return SLOPE;
+    const W = TER.gw, H = TER.gh, Z = TER.z, cx = TER.w / (W - 1), cy = TER.h / (H - 1), out = new Float32Array(W * H);
+    for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) {
+      const c0 = Math.max(0, c - 1), c1 = Math.min(W - 1, c + 1), r0 = Math.max(0, r - 1), r1 = Math.min(H - 1, r + 1);
+      const gx = (Z[r * W + c1] - Z[r * W + c0]) / ((c1 - c0) * cx), gy = (Z[r1 * W + c] - Z[r0 * W + c]) / ((r1 - r0) * cy);
+      out[r * W + c] = Math.atan(Math.hypot(gx, gy)) * 180 / Math.PI;
+    }
+    return (SLOPE = out);
+  }
+  function slopeRGBA(d) {
+    if (d < 12) return null;
+    let i = 0; while (i < SLOPE_C.length - 1 && d >= SLOPE_C[i + 1][0]) i++;
+    const h = SLOPE_C[i][1], a = d < 15 ? (d - 12) / 3 : 1;
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16), Math.round(a * 255)];
+  }
+  function slopeGL() {
+    if (!GL || GL.slope || !slopeGrid()) return;
+    const W = TER.gw, H = TER.gh, K = 3, cw = (W - 1) * K + 1, ch = (H - 1) * K + 1;
+    const c = document.createElement("canvas"); c.width = cw; c.height = ch;
+    const g = c.getContext("2d"), img = g.createImageData(cw, ch), D = img.data, S = SLOPE;
+    for (let y = 0; y < ch; y++) {
+      const gy = y / K, r = Math.min(H - 2, Math.floor(gy)), v = gy - r;
+      for (let x = 0; x < cw; x++) {
+        const gx = x / K, q = Math.min(W - 2, Math.floor(gx)), u = gx - q;
+        const d = (S[r * W + q] * (1 - u) + S[r * W + q + 1] * u) * (1 - v) + (S[(r + 1) * W + q] * (1 - u) + S[(r + 1) * W + q + 1] * u) * v;
+        const col = slopeRGBA(d); if (!col) continue;
+        const o = (y * cw + x) * 4; D[o] = col[0]; D[o + 1] = col[1]; D[o + 2] = col[2]; D[o + 3] = col[3];
+      }
+    }
+    g.putImageData(img, 0, 0);
+    const tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding; tex.minFilter = THREE.LinearFilter;
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.62, depthWrite: false, fog: true, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    GL.slope = new THREE.Mesh(GL.mesh.geometry, mat); GL.slope.renderOrder = 1; GL.slope.visible = false;
+    GL.scene.add(GL.slope);
+  }
+  function setSlope(on) {
+    slopeOn = on;
+    if (on) slopeGL();
+    if (GL && GL.slope) GL.slope.visible = on;
+    const b = $("#slopebtn"); if (b) b.setAttribute("aria-pressed", on);
+    const lg = $("#slopeleg");
+    if (lg) {
+      lg.hidden = !on;
+      lg.innerHTML = on ? `<b>${EN ? "Slope gradient" : "Pendiente del terreno"}</b><span class="bar">${SLOPE_C.map(([, h]) => `<i style="background:${h}"></i>`).join("")}</span><span class="lbl">${SLOPE_C.map(([d], i) => `<span>${d}°${i === SLOPE_C.length - 1 ? "+" : ""}</span>`).join("")}</span>` : "";
+    }
+    drawSoon();
+  }
+  const ASPECT = () => EN ? ["North", "NE", "East", "SE", "South", "SW", "West", "NW"] : ["Norte", "Noreste", "Este", "Sureste", "Sur", "Suroeste", "Oeste", "Noroeste"];
+  /* Perfil, orientación y pendientes de una pista, medidos sobre el relieve */
+  const PISTE_INFO = new Map();
+  function pisteInfo(g) {
+    if (!TER.z || g.k === "L") return null;
+    if (PISTE_INFO.has(g)) return PISTE_INFO.get(g);
+    const feats = g.fis.map(fi => F[fi]).filter(f => f.k === "R" && f.ns.length > 1);
+    if (!feats.length) return null;
+    const STEP = 20, WIN = 60;
+    let ex = 0, no = 0, maxS = 0, sumS = 0, nS = 0, prof = null;
+    feats.forEach(f => {
+      /* puntos cada 20 m a lo largo del trazado */
+      const pts = []; let acc = 0;
+      for (let j = 1; j < f.ns.length; j++) {
+        const a = f.ns[j - 1], b = f.ns[j], L = Math.hypot(NX[b] - NX[a], NY[b] - NY[a]);
+        for (let t = j === 1 ? 0 : (STEP - acc); t < L; t += STEP) { const k = t / L, x = NX[a] + (NX[b] - NX[a]) * k, y = NY[a] + (NY[b] - NY[a]) * k; pts.push({ x, y, z: groundZ(x, y) }); }
+        acc = (acc + L) % STEP;
+      }
+      const lb = f.ns[f.ns.length - 1]; pts.push({ x: NX[lb], y: NY[lb], z: groundZ(NX[lb], NY[lb]) });
+      if (pts.length < 2) return;
+      if (pts[0].z < pts[pts.length - 1].z) pts.reverse();
+      let d = 0; pts.forEach((p, i) => { if (i) d += Math.hypot(p.x - pts[i - 1].x, p.y - pts[i - 1].y); p.d = d; });
+      const w = Math.max(1, Math.round(WIN / STEP));
+      for (let i = 0; i + w < pts.length; i++) {
+        const run = pts[i + w].d - pts[i].d; if (run <= 0) continue;
+        const sl = Math.atan(Math.max(0, pts[i].z - pts[i + w].z) / run) * 180 / Math.PI;
+        if (sl > maxS) maxS = sl; sumS += sl; nS++;
+        pts[i].sl = sl;
+      }
+      /* orientación: hacia dónde cae el terreno a lo largo de la pista (este y norte) */
+      pts.forEach(p => { const gx = (groundZ(p.x + 45, p.y) - groundZ(p.x - 45, p.y)) / 90, gy = (groundZ(p.x, p.y + 45) - groundZ(p.x, p.y - 45)) / 90; ex -= gx; no += gy; });
+      if (!prof || d > prof.len) prof = { pts, len: d };
+    });
+    if (!prof) return null;
+    const az = (Math.atan2(ex, no) * 180 / Math.PI + 360) % 360;
+    const info = { aspect: Math.round(az / 45) % 8, max: Math.round(maxS), avg: nS ? Math.round(sumS / nS) : 0, prof, drop: Math.round(prof.pts[0].z - prof.pts[prof.pts.length - 1].z) };
+    PISTE_INFO.set(g, info); return info;
+  }
+  function pisteProfile(info) {
+    const pts = info.prof.pts, len = info.prof.len; if (pts.length < 3 || !len) return "";
+    const W = 360, H = 120, zs = pts.map(p => p.z), z0 = Math.min(...zs) - 20, z1 = Math.max(...zs) + 20;
+    const X = d => 30 + d / len * (W - 36), Y = z => 8 + (1 - (z - z0) / (z1 - z0)) * (H - 26);
+    const line = pts.map(p => X(p.d).toFixed(1) + "," + Y(p.z).toFixed(1)).join(" ");
+    /* tramos coloreados por pendiente */
+    let segs = "";
+    for (let i = 1; i < pts.length; i++) {
+      const sl = pts[i - 1].sl != null ? pts[i - 1].sl : pts[i - 2] && pts[i - 2].sl || 0, col = slopeRGBA(Math.max(12.5, sl));
+      segs += `<polygon points="${X(pts[i - 1].d).toFixed(1)},${H - 18} ${X(pts[i - 1].d).toFixed(1)},${Y(pts[i - 1].z).toFixed(1)} ${X(pts[i].d).toFixed(1)},${Y(pts[i].z).toFixed(1)} ${X(pts[i].d).toFixed(1)},${H - 18}" fill="rgb(${col[0]},${col[1]},${col[2]})" stroke="rgb(${col[0]},${col[1]},${col[2]})" stroke-width=".8"/>`;
+    }
+    return `<figure class="pprof"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${EN ? "Altitude profile coloured by slope" : "Perfil de altitud coloreado por pendiente"}"><g opacity=".6">${segs}</g><polyline points="${line}" fill="none" stroke="#F6F8FA" stroke-width="2.2" stroke-linejoin="round"/>
+      <text x="2" y="${Y(z1 - 20) + 4}" class="pt">${fmtNum(z1 - 20)}</text><text x="2" y="${Y(z0 + 20) + 4}" class="pt">${fmtNum(z0 + 20)}</text><text x="${W - 4}" y="${H - 3}" class="pt" text-anchor="end">${fmtLen(len)}</text></svg>
+      <figcaption>${EN ? "Measured on the terrain model (about 90 m resolution), so short steep pitches can be steeper than shown." : "Medido sobre el modelo del terreno (unos 90 m de detalle): un tramo corto puede ser más empinado de lo que marca."}</figcaption></figure>`;
+  }
+
   /* ================= Interfaz: hoja inferior ================= */
   let snap = "peek", gotoOpen = false, diario = false, diarioScope = "hoy", filtOpen = false, markCand = null, offline = !navigator.onLine, dq = "";
   let meetSheet = false, meetDraft = null;
@@ -2236,7 +2368,16 @@ if (EN) (function () {
     if (kind === "L") return `<span class="plate lift" aria-hidden="true">▲</span>`;
     return `<span class="plate" style="--c:${DIF[d].hex}" aria-hidden="true"></span>`;
   }
-  const av = (uid, big) => `<span class="av${big ? " big" : ""}" style="--c:${colorOf(uid)}">${esc(uid === me ? (EN?"You":"Tú") : initial(uid))}</span>`;
+  /* Foto de perfil: JPEG pequeño guardado en el perfil del grupo */
+  const fotoSrc = uid => { const p = S.perfiles.get(uid); return p && typeof p.foto === "string" && /^data:image\/jpeg;base64,/.test(p.foto) ? p.foto : null; };
+  const FOTOS = new Map();
+  function fotoImg(uid) {
+    const src = fotoSrc(uid); if (!src) return null;
+    let e = FOTOS.get(uid);
+    if (!e || e.src !== src) { const img = new Image(); img.onload = () => drawSoon(); img.src = src; e = { src, img }; FOTOS.set(uid, e); }
+    return e.img.complete && e.img.naturalWidth ? e.img : null;
+  }
+  const av = (uid, big) => { const f = fotoSrc(uid); return f ? `<span class="av img${big ? " big" : ""}" style="--c:${colorOf(uid)}"><img src="${f}" alt=""></span>` : `<span class="av${big ? " big" : ""}" style="--c:${colorOf(uid)}">${esc(uid === me ? (EN?"You":"Tú") : initial(uid))}</span>`; };
 
   /* ---------- Contenidos por modo ---------- */
   function homeHtml() {
@@ -2292,7 +2433,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       <h3 class="sec">Ir a la zona</h3>
       <div class="zones">`}${ZONES.map((z, i) => `<button data-act="zone" data-i="${i}">${esc(z.n)}</button>`).join("")}${EN?`<button data-act="zfit">All 3 Vallées</button></div>
       <h3 class="sec">Invite</h3>`:`<button data-act="zfit">Las 3 Vallées</button></div>
-      <h3 class="sec">Invitar</h3>`}${invite}${accHtml()}${langHtml()}${EN?`
+      <h3 class="sec">Invitar</h3>`}${invite}${fotoHtml()}${accHtml()}${langHtml()}${EN?`
       <h3 class="sec">Today</h3>
       <button class="board mini" data-act="diario">
         <span><b>`:`
@@ -2342,7 +2483,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   function featHtml() {
     const g = sel.g, isL = g.k === "L";
     const L = isL ? (LIFT[g.t] || LIFT.tsd) : null, D = isL ? null : DIF[g.d];
-    const kind = isL ? L.s : g.d === "e" ? (EN?"Link":"Enlace") : g.d === "s" ? (EN?"Piste with no colour":"Pista sin color") : g.d === "i" ? (EN?"Itinerary":"Itinerario") : (EN?"Piste ":"Pista ") + D.s.toLowerCase();
+    const kind = isL ? L.s : g.d === "e" ? (EN?"Link":"Enlace") : g.d === "s" ? (EN?"Piste with no colour":"Pista sin color") : g.d === "i" ? (EN?"Itinerary":"Itinerario") : (EN ? D.s + " piste" : "Pista " + D.s.toLowerCase());
     const tipoT = !isL && D.tipo;
     const regs = tipoT && g.name ? list("pistas").filter(p => norm(p.nombre) === norm(g.name)) : [];
     const doneToday = regs.some(p => p.day === today() && p.uid === me);
@@ -2350,6 +2491,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const facts = isL
       ? [g.zb && g.zt ? `${fmtNum(g.zb)} → ${fmtNum(g.zt)} m` : "", g.dur ? fmtMin(g.dur) + (EN?" up":" de subida") : "", fmtLen(g.len)]
       : [fmtLen(g.len), g.zt - g.zb > 10 ? fmtNum(g.zt - g.zb) + (EN?" m vertical":" m de desnivel") : ""];
+    const pi = isL ? null : pisteInfo(g);
+    const pstats = pi ? `<div class="pstats"><div><b>${ASPECT()[pi.aspect]}</b><small>${EN ? "faces" : "orientación"}</small></div><div><b>${fmtNum(Math.max(pi.drop, g.zt - g.zb))} m</b><small>${EN ? "vertical" : "desnivel"}</small></div><div><b>${pi.max}°</b><small>${EN ? "max" : "máx."}</small></div><div><b>${pi.avg}°</b><small>${EN ? "avg" : "media"}</small></div></div>` : "";
     const speek = `
       <div class="headrow">
         <div class="title-wrap">${plate(g.k, g.d)}<div><small class="kicker">${esc(kind)}</small><h2 class="title">${esc(g.name || (isL ? (EN?"Unnamed lift":"Remonte sin nombre") : (EN?"Unnamed piste":"Pista sin nombre")))}${EN?`</h2></div></div>
@@ -2358,7 +2501,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       <p class="facts">`:`</h2></div></div>
         <button class="x" data-act="close-sel" aria-label="Cerrar">×</button>
       </div>
-      <p class="facts">`}${facts.filter(Boolean).map(esc).join(" · ")}</p>${(cl => { if (!cl) return ""; const o = g.fis.some(fi => OFI.open.has(fi)), c = !o && g.fis.some(fi => cl.has(fi)); return o || c ? `<p class="ofiline ${c ? "c" : "o"}"><i></i>${c ? (isL ? (EN?"Closed":"Cerrado") : (EN?"Closed":"Cerrada")) : (isL ? (EN?"Open":"Abierto") : (EN?"Open":"Abierta"))}${EN?` according to Les 3 Vallées · `:` según Les 3 Vallées · `}${esc(agoMin(OFI.at))}</p>` : ""; })(ofiClosed())}${avs.map(a => `
+      <p class="facts">`}${facts.filter(Boolean).map(esc).join(" · ")}</p>${pstats}${(cl => { if (!cl) return ""; const o = g.fis.some(fi => OFI.open.has(fi)), c = !o && g.fis.some(fi => cl.has(fi)); return o || c ? `<p class="ofiline ${c ? "c" : "o"}"><i></i>${c ? (isL ? (EN?"Closed":"Cerrado") : (EN?"Closed":"Cerrada")) : (isL ? (EN?"Open":"Abierto") : (EN?"Open":"Abierta"))}${EN?` according to Les 3 Vallées · `:` según Les 3 Vallées · `}${esc(agoMin(OFI.at))}</p>` : ""; })(ofiClosed())}${avs.map(a => `
       <div class="avcard"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><small>${a.uid === me ? (EN?"You reported it":"Lo avisaste tú") : (EN?"Reported by ":"Lo avisó ") + esc(who(a.uid))} · ${esc(ago(a.at))}</small></div>`).join("")}
       <div class="acts ${tipoT && g.name ? "three" : "two"}${EN?`">
         <button class="btn" data-act="here">I'm here</button>
@@ -2373,7 +2516,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       </div>
       <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Quedar aquí con el grupo</button>
       <div role="group" aria-label="Avisar al grupo"><span class="sublabel">Avisar al grupo de `}${isL ? (EN?"this lift":"este remonte") : (EN?"this piste":"esta pista")}</span>${(ks => `<div class="avgrid" style="grid-template-columns:repeat(${ks.length},minmax(0,1fr))">${ks.map(k => `<button data-act="aviso" data-t="${k}" aria-pressed="${mineAv.has(k)}"><i style="--c:${AVISOS[k].c}"></i>${AVISOS[k].s}</button>`).join("")}</div>`)(Object.keys(AVISOS).filter(k => AVISOS[k][g.k]))}${EN?`<small class="avhint">They last 2 hours. `:`<small class="avhint">Duran 2 horas. `}${isL ? (EN?"Routes avoid what's closed and add the queue.":"Las rutas evitan lo cerrado y suman la cola.") : (EN?"Routes avoid what's closed.":"Las rutas evitan lo cerrado.")}</small></div>`;
-    const smore = `
+    const smore = `${pi ? pisteProfile(pi) : ""}
       <dl class="spec">
         ${isL ? `${EN?`<div><dt>Start</dt><dd>`:`<div><dt>Salida</dt><dd>`}${g.zb ? fmtNum(g.zb) + " m" : "?"}${EN?`</dd></div><div><dt>End</dt><dd>`:`</dd></div><div><dt>Llegada</dt><dd>`}${g.zt ? fmtNum(g.zt) + " m" : "?"}${EN?`</dd></div><div><dt>Ride</dt><dd>`:`</dd></div><div><dt>Viaje</dt><dd>`}${g.dur ? fmtMin(g.dur) : "?"}</dd></div>`
         : `${EN?`<div><dt>Top</dt><dd>`:`<div><dt>Arriba</dt><dd>`}${g.zt ? fmtNum(g.zt) + " m" : "?"}${EN?`</dd></div><div><dt>Bottom</dt><dd>`:`</dd></div><div><dt>Abajo</dt><dd>`}${g.zb ? fmtNum(g.zb) + " m" : "?"}${EN?`</dd></div><div><dt>Vertical</dt><dd>`:`</dd></div><div><dt>Desnivel</dt><dd>`}${g.zt - g.zb > 0 ? fmtNum(g.zt - g.zb) + " m" : "?"}</dd></div>`}${EN?`
@@ -2383,7 +2526,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       ${tipoT && g.name ? `${EN?`<h3 class="sec">In your group's log</h3>`:`<h3 class="sec">En vuestro diario</h3>`}${regs.length ? `<p class="quiet">${regs.length === 1 ? (EN?"One run":"Una bajada") : regs.length + (EN ? " runs" : " bajadas")}: ${esc([...new Set(regs.map(p => who(p.uid)))].join(", "))}.</p>` : `${EN?`<p class="quiet">Nobody has logged it yet.</p>`:`<p class="quiet">Nadie la ha apuntado todavía.</p>`}`}` : ""}
       <p class="quiet">${sel.node != null ? (EN?"I'm here and Directions use the point you tapped.":"Estoy aquí y Cómo llegar usan el punto que tocaste.") : isL ? (EN?"I'm here puts you at the top of the lift. Directions take you to its bottom station.":"Estoy aquí te pone arriba del remonte. Cómo llegar te lleva a la salida.") : (EN?"I'm here and Directions use the start of the piste.":"Estoy aquí y Cómo llegar usan el inicio de la pista.")}${EN?`</p>
       <p class="quiet">Alerts (`:`</p>
-      <p class="quiet">Los avisos (`}${Object.keys(AVISOS).filter(k => AVISOS[k][g.k]).map(k => AVISOS[k].s.toLowerCase()).join(", ")}) duran 2 h. ${isL ? (EN?"Routes avoid what's closed and add 10 min if there's a queue.":"Las rutas evitan lo cerrado y suman 10 min si hay cola.") : (EN?"Routes avoid what's closed.":"Las rutas evitan lo cerrado.")}${EN?` Tap yours again to remove it.</p>`:` Toca otra vez el tuyo para quitarlo.</p>`}`;
+      <p class="quiet">Los avisos (`}${Object.keys(AVISOS).filter(k => AVISOS[k][g.k]).map(k => AVISOS[k].s.toLowerCase()).join(", ")}) ${EN ? "last 2 h." : "duran 2 h."} ${isL ? (EN?"Routes avoid what's closed and add 10 min if there's a queue.":"Las rutas evitan lo cerrado y suman 10 min si hay cola.") : (EN?"Routes avoid what's closed.":"Las rutas evitan lo cerrado.")}${EN?` Tap yours again to remove it.</p>`:` Toca otra vez el tuyo para quitarlo.</p>`}`;
     return { speek, smore };
   }
 
@@ -2471,6 +2614,28 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const b = (v, t) => `<button class="${VLANG === v ? "on" : ""}" data-act="lang" data-v="${v}" aria-pressed="${VLANG === v}">${t}</button>`;
     return `<div class="langrow"><span>${EN ? "Language" : "Idioma"}</span><div class="lp-seg">${b("es", "Español")}${b("en", "English")}</div></div>`;
   }
+  function fotoHtml() {
+    if (!me) return "";
+    const has = !!fotoSrc(me);
+    return `<h3 class="sec">${EN ? "Your photo" : "Tu foto"}</h3><div class="fotorow">${av(me, true)}<p class="quiet">${EN ? "Your group sees it on the map instead of your initial." : "Tu grupo la ve en el mapa en lugar de tu inicial."}</p></div>
+      <div class="acts ${has ? "two" : "one"}"><label class="btn dark">${has ? (EN ? "Change photo" : "Cambiar foto") : (EN ? "Add a photo" : "Poner una foto")}<input type="file" accept="image/*" id="fotoin" hidden></label>${has ? `<button class="btn ghost" data-act="foto-del">${EN ? "Remove" : "Quitar"}</button>` : ""}</div>`;
+  }
+  async function setFoto(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    const base = S.perfiles.get(me) || {}, name = base.name || names[me];
+    if (!name) { toast(EN ? "Join a group first." : "Primero entra en un grupo."); return; }
+    try {
+      const url = URL.createObjectURL(file), img = new Image();
+      await new Promise((ok, ko) => { img.onload = ok; img.onerror = ko; img.src = url; });
+      const N = 160, c = document.createElement("canvas"); c.width = c.height = N;
+      const k = Math.min(img.naturalWidth, img.naturalHeight), g = c.getContext("2d");
+      g.drawImage(img, (img.naturalWidth - k) / 2, (img.naturalHeight - k) / 2, k, k, 0, 0, N, N);
+      URL.revokeObjectURL(url);
+      let foto = c.toDataURL("image/jpeg", 0.8); if (foto.length > 38000) foto = c.toDataURL("image/jpeg", 0.55);
+      put("perfiles", me, Object.assign({}, base, { name, at: Date.now(), foto })).then(ok => ok && toast(EN ? "Photo saved. Your group can see it now." : "Foto guardada. Tu grupo ya la ve."));
+    } catch (e) { toast(EN ? "Couldn't read that image. Try another one." : "No se ha podido leer esa imagen. Prueba con otra."); }
+  }
+  document.addEventListener("change", e => { if (e.target && e.target.id === "fotoin") setFoto(e.target.files && e.target.files[0]); });
   function accHtml() {
     const G = window.PISTEA_GROUP; if (!G || !G.account) return "";
     const a = G.account(); if (!a) return "";
@@ -3131,6 +3296,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "tipo-pick": addPista(el.dataset.n, el.dataset.t).then(ok => { if (ok) { toast(el.dataset.n + " apuntada"); dq = ""; ui(); } }); break;
       case "pista-del": del("pistas", id); break;
       case "zone": closeSearch(); goZone(+el.dataset.i); if (snap !== "peek") setSnap("peek"); break;
+      case "foto-del": { const b = S.perfiles.get(me); if (!b) break; const n = Object.assign({}, b); delete n.foto; put("perfiles", me, n); break; }
+      case "slope-toggle": setSlope(!slopeOn); break;
       case "sun-toggle": clearModes(); rt = null; diario = false; setSun(!sunOn); if (sunOn) setSnap("half"); break;
       case "sun-close": setSun(false); setSnap("peek"); break;
       case "sun-now": sunMin = defaultSunMin(); const sr = $("#sunrange"); if (sr) sr.value = sunMin; sunSoon(); break;

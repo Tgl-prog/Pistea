@@ -320,7 +320,7 @@
           owner = uid;
           group.set({ owner: uid, at: Date.now() }).catch(() => group.get().then(s => { if (s.exists && window.PISTEA_GROUP) window.PISTEA_GROUP.isOwner = s.data().owner === uid; }, () => {}));
         }
-        group.collection("perfiles").doc(uid).set({ name: myName, at: Date.now() }).catch(() => {});
+        group.collection("perfiles").doc(uid).set({ name: myName, at: Date.now() }, { merge: true }).catch(() => {});
       }
       // A partir de aquí este es tu grupo, también al abrir la app sin enlace.
       LS.set("pistea.grupo", code); fromLink = false;
