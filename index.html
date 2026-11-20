@@ -167,6 +167,23 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 /* ---------- Hoja inferior ---------- */
 .sheet { position: fixed; z-index: 5; left: 8px; right: 8px; bottom: 8px; max-width: 640px; margin: 0 auto; border-radius: var(--r-lg) var(--r-lg) var(--r-bot) var(--r-bot); display: flex; flex-direction: column; transition: height .32s cubic-bezier(.2,.8,.2,1); overflow: hidden; background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
 .sheet.dragging { transition: none; }
+/* Dock inferior (Vallik): navegación principal con el botón central «Estoy aquí» */
+.dock { position: fixed; z-index: 7; left: 12px; right: 12px; bottom: calc(var(--sab) + 10px); max-width: 624px; margin: 0 auto; height: 64px; border-radius: 32px; display: none; align-items: center; padding: 0 6px; background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
+body.has-dock .dock { display: flex; }
+.dock button { position: relative; flex: 1; height: 56px; border: 0; background: none; color: var(--tx-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font: 600 11px/1 var(--font); }
+.dock button svg { display: block; }
+.dock button[aria-current="page"] { color: var(--acc); }
+.dock button[aria-current="page"]::after { content: ""; position: absolute; bottom: 4px; width: 18px; height: 3px; border-radius: 2px; background: var(--acc); }
+.dock .dock-main { flex: 0 0 64px; width: 64px; height: 64px; margin-top: -26px; border-radius: 50%; background: var(--acc); color: var(--acc-ink); box-shadow: 0 0 0 5px var(--bg), 0 8px 20px rgba(14,42,71,.4); gap: 1px; font-size: 10px; }
+.dock .dock-main:active { transform: scale(.97); }
+.dock .badge { position: absolute; top: 3px; left: calc(50% + 7px); min-width: 17px; height: 17px; padding: 0 5px; border-radius: 9px; background: var(--bad); color: var(--acc-ink); font: 700 10px/17px var(--font); text-align: center; }
+.dock .badge[hidden] { display: none; }
+body.has-dock .sheet { bottom: calc(var(--sab) + 84px); border-radius: var(--r-lg); }
+body.has-dock #smore { padding-bottom: 20px; }
+.btn.sos { background: rgba(255,90,78,.14); color: var(--tx); box-shadow: inset 0 0 0 1px rgba(255,90,78,.55); }
+.btn.sos svg { color: var(--bad); }
+.btn.sos.on { background: var(--bad); color: var(--acc-ink); }
+.btn.sos.on svg { color: var(--acc-ink); }
 #grab { flex: 0 0 auto; height: 24px; width: 100%; border: 0; background: none; display: grid; place-items: center; touch-action: none; }
 #grab span { width: 40px; height: 4px; border-radius: 2px; background: var(--hair-2); }
 #speek { flex: 0 0 auto; padding: 0 16px 6px; display: flex; flex-direction: column; gap: 12px; touch-action: none; }
@@ -465,7 +482,7 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
 </div>
 <div id="cross" hidden aria-hidden="true"><svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="14" fill="none" stroke="#fff" stroke-width="7"/><circle cx="32" cy="32" r="14" fill="none" stroke="#C8F03C" stroke-width="3.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#0E2A47" stroke-width="3" stroke-linecap="round"/></svg></div>
 <header class="topbar" id="topbar">
-  <div class="search"><input type="search" id="q" placeholder="Buscar pista, sitio o amigo" autocomplete="off" enterkeyhint="search" aria-label="Buscar en el mapa"><button class="peterbtn" data-act="peter" aria-label="Preguntar a Peter"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#C8F03C"/><ellipse class="eye" cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse class="eye" cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0E2A47"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0E2A47"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0E2A47" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+  <div class="search"><input type="search" id="q" placeholder="Buscar o preguntar" autocomplete="off" enterkeyhint="search" aria-label="Buscar en el mapa"><button class="peterbtn" data-act="peter" aria-label="Preguntar a Peter"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#C8F03C"/><ellipse class="eye" cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse class="eye" cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0E2A47"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0E2A47"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0E2A47" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
   <button class="iconbtn" id="filtbtn" data-act="filt-toggle" aria-expanded="false" aria-label="Filtrar por color"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h16M6 11h10M9 16h4"/></svg><span class="badge" id="filtbadge" hidden></span></button>
   <ul class="results" id="results"></ul>
   <div class="filters" id="filters" role="group" aria-label="Filtrar por color" hidden></div>
@@ -487,6 +504,13 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
   <div id="speek"></div>
   <div id="smore"></div>
 </section>
+<nav class="dock" id="dock" aria-label="Navegación principal">
+  <button data-act="tab-map" id="tab-map"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Mapa</button>
+  <button data-act="tab-group" id="tab-group"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.6c2.4 0 4 1.3 4.6 3.9"/></svg>Grupo<span class="badge" id="dockbadge" hidden></span></button>
+  <button class="dock-main" data-act="mark" id="tab-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg><span>Aquí</span></button>
+  <button data-act="goto-list" id="tab-go"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c3-1 4-5 7-7s6-2 7-7"/><circle cx="5" cy="19" r="2"/><path d="M15 5h4v4"/></svg>Ir hasta</button>
+  <button data-act="diario" id="tab-day"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18l5-7 4 4 3-5 6 8z"/><circle cx="17" cy="6" r="2"/></svg>Mi día</button>
+</nav>
 <div class="toast" id="toast" role="status" hidden></div>
 <div id="modal" class="modal" hidden></div>
 <script>
@@ -2151,11 +2175,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       return `<button class="meet" data-act="meet-open"><span class="flag" aria-hidden="true"></span><span><b>Quedada${mt.hora ? " a las " + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}${et.length ? " · " + et.map(e => esc(e.p.uid === me ? "Tú" : who(e.p.uid)) + " " + etaTxt(e.t)).join(", ") : ""}</small></span><span class="chev" aria-hidden="true">›</span></button>`; })() : "";
     const speek = meetCard + `
       <div class="me-line${LIVE.on ? " is-live" : ""}">${mp ? `${av(me)}<div><b>Estás ${esc(mp.en || "en el mapa")}</b><small${LIVE.on ? ` class="live"` : ""}>${LIVE.on ? `<span class="live-dot"></span>En directo · ` : ""}${pendingLong("aqui") ? "pendiente de enviar" : LIVE.on ? esc(ago(mp.at)) : "Marcado " + esc(ago(mp.at))}</small></div>` : LIVE.on ? `<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small class="live"><span class="live-dot"></span>En directo</small></div>` : `<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}${liveAvailable() ? `<button class="liveswitch" data-act="live" aria-pressed="${LIVE.on}" aria-label="Compartir en directo"><span class="sw2"></span>Directo</button>` : ""}</div>
-      <div class="acts three">
-        <button class="btn" data-act="mark">${mp ? "Estoy aquí" : "Marcar dónde estoy"}</button>
-        <button class="btn dark" data-act="goto-list">Ir hasta…</button>
-        <button class="btn ghost" data-act="diario">Diario</button>
-      </div>${LIVE.on && WAKE.ok && !NATIVE ? `
+${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me), on = mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS;
+        return `<button class="btn wide sos${on ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${!!on}">${MSG_IC.ayuda}${on ? "Aviso de ayuda enviado · Quitar" : confirmAct === "msg:ayuda" ? "Toca otra vez para avisar al grupo" : "Tengo un problema"}</button>`; })() : ""}${LIVE.on && WAKE.ok && !NATIVE ? `
       <button class="toggle wake" data-act="wake" aria-pressed="${WAKE.want}"><span class="sw2"></span><span>Pantalla encendida<small>Sigue enviando con el móvil en el bolsillo. Gasta más batería.</small></span></button>` : ""}`;
     const people = others.length ? `<ul class="people">${others.map(p => { const m = msgOf(p.uid), mNew = m && Date.now() - m.at < MSG_HELP_MS, help = mNew && m.tipo === "ayuda"; return `
         <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}${help ? " help" : ""}">
@@ -2479,13 +2500,24 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     $("#sunbtn").setAttribute("aria-pressed", sunOn);
     document.body.classList.toggle("marking", marking);
     const r = $("#results"); if (r && document.activeElement === $("#q")) r.innerHTML = resultsHtml();
+    const dk = $("#dock");
+    if (dk) {
+      const showDock = (m === "home" || m === "diario") && !marking;
+      document.body.classList.toggle("has-dock", showDock);
+      const cur = m === "diario" ? "tab-day" : snap === "peek" ? "tab-map" : "tab-group";
+      ["tab-map", "tab-group", "tab-day"].forEach(id => { const b = $("#" + id); if (b) { if (id === cur) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); } });
+      const nNew = positions().filter(p => p.uid !== me).filter(p => { const mm = msgOf(p.uid); return mm && Date.now() - mm.at < MSG_HELP_MS; }).length;
+      const bd = $("#dockbadge"); if (bd) { bd.textContent = nNew || ""; bd.hidden = !nNew; }
+    }
     layoutSheet(); drawSoon();
   }
+  function dockSpace() { return document.body.classList.contains("has-dock") ? safeBottom() + 76 : 0; }
   function setSnap(s) { snap = s; layoutSheet(); }
   function sheetHeights() {
     const vh = window.innerHeight, sp = $("#speek"), gh = $("#grab").offsetHeight;
-    const peek = Math.min(vh * 0.6, gh + (sp ? sp.offsetHeight : 120) + 8 + safeBottom());
-    return { peek, half: Math.max(peek, Math.round(vh * 0.56)), full: vh - topInset() };
+    const ds = dockSpace();
+    const peek = Math.min(vh * 0.6, gh + (sp ? sp.offsetHeight : 120) + 8 + (ds ? 0 : safeBottom()));
+    return { peek, half: Math.max(peek, Math.round(vh * 0.56) - ds), full: vh - topInset() - ds };
   }
   function safeBottom() { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sab")) || 0; }
   function topInset() { const tb = $("#topbar"); return tb ? tb.offsetTop + tb.offsetHeight + 6 : 80; }
@@ -2495,16 +2527,16 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
     const hs = sheetHeights(), vis = h != null ? h : hs[snap];
     sb.style.height = vis + "px";
     sb.classList.toggle("is-full", vis >= hs.full - 4);
-    const pad = Math.min(vis, window.innerHeight * 0.62);
+    const ds = dockSpace(), pad = Math.min(vis + ds, window.innerHeight * 0.62);
     if (Math.abs(pad - V.pad) > 1) { V.pad = pad; drawSoon(); }
     const vis2 = window.innerHeight - pad;
     const cr = $("#cross"); if (cr) cr.style.top = (vis2 / 2) + "px";
     const t = $("#toast");
-    if (t) { if (vis > window.innerHeight * 0.7) { t.style.bottom = "auto"; t.style.top = (topInset() + 8) + "px"; } else { t.style.top = "auto"; t.style.bottom = (vis + 12) + "px"; } }
-    const at = document.querySelector(".attr"); if (at) at.style.bottom = (Math.min(vis, window.innerHeight * 0.62) + 14) + "px";   // atribución justo encima del panel
+    if (t) { if (vis > window.innerHeight * 0.7) { t.style.bottom = "auto"; t.style.top = (topInset() + 8) + "px"; } else { t.style.top = "auto"; t.style.bottom = (vis + ds + 12) + "px"; } }
+    const at = document.querySelector(".attr"); if (at) at.style.bottom = (Math.min(vis + ds, window.innerHeight * 0.62) + 14) + "px";   // atribución justo encima del panel
     const mc = $("#mapctl"), tb = $("#topbar");
     if (mc && tb) mc.style.top = (tb.offsetTop + tb.offsetHeight + 10) + "px";   // los mensajes empujan los controles, no los tapan
-    if (mc) mc.classList.toggle("hide", vis > window.innerHeight - (mc.offsetTop + mc.offsetHeight) - 8);
+    if (mc) mc.classList.toggle("hide", vis + ds > window.innerHeight - (mc.offsetTop + mc.offsetHeight) - 8);
   }
 
   /* ---------- Búsqueda ---------- */
@@ -2769,6 +2801,8 @@ body.marking .mapctl { top: calc(var(--sat) + 74px); }
       }
       case "banner-x": markSeen(el.dataset.k); ui(); break;
       case "banner-go": markSeen(el.dataset.k); clearModes(); diario = false; startRoute({ uid: el.dataset.uid }); break;
+      case "tab-map": clearModes(); diario = false; setSnap("peek"); ui(); break;
+      case "tab-group": { clearModes(); diario = false; setSnap("full"); ui(); requestAnimationFrame(() => { const g = $("#grupo"), sm = $("#smore"); if (g && sm) sm.scrollTop = g.offsetTop - sm.offsetTop - 4; }); break; }
       case "sheet-toggle": setSnap(snap === "peek" ? "half" : snap === "half" ? "full" : "peek"); break;
       case "goto-list": {
         const others = positions().filter(p => p.uid !== me);
