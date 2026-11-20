@@ -178,6 +178,19 @@ body.searching .peterbtn { display: none; }
 .pstats b { font: 600 17px/1.1 var(--font); color: var(--tx); }
 .pstats small { font-size: 12px; color: var(--tx-2); }
 .pprof { margin: 14px 0 6px; }
+.rpgo { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2px 0 12px; }
+.rphint { margin: 0 0 12px; }
+.rpstats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 8px 0 10px; }
+.rpstats div { display: grid; gap: 2px; }
+.rpstats b { font: 600 22px/1.1 var(--mono); color: var(--tx); font-variant-numeric: tabular-nums; }
+.rpstats small { font-size: 12px; color: var(--tx-2); }
+.rptl { position: relative; height: 46px; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,.05); }
+.rptl svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.rptl input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.rpctl { display: grid; grid-template-columns: 1fr auto 1fr auto; align-items: center; gap: 10px; margin: 12px 0 2px; justify-items: center; }
+.rpb { border: 0; background: rgba(255,255,255,.07); color: var(--tx); width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; }
+.rpb.main { width: 60px; height: 60px; background: var(--acc); color: var(--acc-ink); }
+.rpb.spd { width: auto; padding: 0 14px; border-radius: 24px; font: 600 14px/1 var(--mono); }
 .pprof svg { width: 100%; height: auto; display: block; }
 .pprof .pt { font: 500 10px var(--mono); fill: var(--tx-2); }
 .pprof figcaption { font-size: 12px; color: var(--tx-2); margin-top: 4px; }
@@ -1856,6 +1869,7 @@ if (EN) (function () {
       ctx.lineWidth = 4; ctx.strokeStyle = "#fff"; ctx.strokeText(t, X + 30, Y - 28.5); ctx.fillStyle = "#0E2A47"; ctx.fillText(t, X + 30, Y - 28.5);
     }
 
+    drawReplay();
     /* Gente */
     pins.sort((a, b) => b.q[2] - a.q[2]).forEach(p => {
       const [X, Y] = p.q; if (X < -30 || X > V.w + 30 || Y < -30 || Y > V.h + 40) return;
@@ -2345,10 +2359,171 @@ if (EN) (function () {
       <figcaption>${EN ? "Measured on the terrain model (about 90 m resolution), so short steep pitches can be steeper than shown." : "Medido sobre el modelo del terreno (unos 90 m de detalle): un tramo corto puede ser más empinado de lo que marca."}</figcaption></figure>`;
   }
 
+  /* ================= Tu recorrido: se graba con el directo y se vuelve a ver ================= */
+  /* Solo graba mientras compartes en directo: usa las mismas lecturas de GPS, así que no gasta más
+     batería. Se guarda solo en este móvil (unos 15 días) y no se envía a nadie. */
+  const TRK = { day: null, pts: null, dirty: 0, last: null };
+  const trkKey = d => "vallik.track." + d;
+  function trkLoad(d) { try { const v = JSON.parse(localStorage.getItem(trkKey(d)) || "null"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+  function trkSave() { if (!TRK.day || !TRK.dirty) return; try { localStorage.setItem(trkKey(TRK.day), JSON.stringify(TRK.pts)); TRK.dirty = 0; } catch (e) {} }
+  function trkDays() {
+    const out = []; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.indexOf("vallik.track.") === 0) out.push(k.slice(13)); } } catch (e) {}
+    if (mode === "demo" && out.indexOf(today()) < 0) out.push(today());
+    return out.sort().reverse();
+  }
+  function trkPrune() { trkDays().slice(15).forEach(d => { try { localStorage.removeItem(trkKey(d)); } catch (e) {} }); }
+  function trkAdd(x, y, t) {
+    const d = today();
+    if (TRK.day !== d) { trkSave(); TRK.day = d; TRK.pts = trkLoad(d); TRK.last = null; trkPrune(); }
+    const q = TRK.pts[TRK.pts.length - 1], l = TRK.last || (q ? { x: q[1], y: q[2], t: q[0] * 1000 } : null);
+    if (l && (t - l.t < 4000 || (Math.hypot(x - l.x, y - l.y) < 12 && t - l.t < 60000))) return;
+    TRK.pts.push([Math.round(t / 1000), Math.round(x), Math.round(y), Math.round(groundZ(x, y))]);
+    TRK.last = { x, y, t };
+    if (++TRK.dirty >= 6) trkSave();
+  }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) trkSave(); });
+  window.addEventListener("pagehide", trkSave);
+
+  /* Día de ejemplo para el modo demo: unas cuantas bajadas y remontes encadenados */
+  function demoTrack() {
+    if (!M.ok) return [];
+    const a = S.aqui.get(me); let cur = a ? nearestNode(...toXY(a.lon, a.lat), 600) : -1; if (cur < 0) return [];
+    const tops = F.filter(f => f.k === "L" && f.t !== "tapis" && f.t !== "tk").map(f => f.ns[f.ns.length - 1])
+      .filter(n => { const d = Math.hypot(NX[n] - NX[cur], NY[n] - NY[cur]); return d > 900 && d < 5000; });
+    const out = []; let t = new Date(today() + "T09:12:00").getTime() / 1000, seed = 7;
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    const pushN = (n) => out.push([Math.round(t), Math.round(NX[n]), Math.round(NY[n]), Math.round(groundZ(NX[n], NY[n]))]);
+    for (let leg = 0; leg < 5 && tops.length; leg++) {
+      const dst = tops.splice(Math.floor(rnd() * tops.length), 1)[0], r = route(cur, dst, false); if (!r) continue;
+      r.steps.forEach(st => {
+        const v = st.ty === 1 || st.ty === 3 ? ((LIFT[st.f && st.f.t] || LIFT.tsd).spd) : st.ty === 2 ? 1.3 : 7 + rnd() * 6;
+        if (st.ty === 1) t += 90 + rnd() * 240;
+        for (let j = 0; j < st.nodes.length; j++) {
+          const n = st.nodes[j]; if (j) { const p = st.nodes[j - 1]; t += Math.hypot(NX[n] - NX[p], NY[n] - NY[p]) / v; }
+          const q = out[out.length - 1]; if (!q || t - q[0] >= 6) pushN(n);
+        }
+      });
+      cur = dst; t += 300 + rnd() * 900;
+    }
+    return out;
+  }
+
+  let RP = null;
+  function replayPrep(raw) {
+    const P = raw.map(r => ({ t: r[0], x: r[1], y: r[2], z: r[3] }));
+    let pt = 0;
+    P.forEach((p, i) => {
+      if (i) { const q = P[i - 1], dt = Math.max(1, p.t - q.t); pt += Math.min(dt, 45); p.v = Math.hypot(p.x - q.x, p.y - q.y) / dt * 3.6; p.dz = (p.z - q.z) / dt; }
+      else { p.v = 0; p.dz = 0; }
+      p.pt = pt;
+    });
+    /* subida en remonte: gana altura de forma sostenida */
+    P.forEach((p, i) => { let up = 0, n = 0; for (let k = Math.max(1, i - 3); k <= Math.min(P.length - 1, i + 3); k++) { up += P[k].dz; n++; } p.up = n && up / n > 0.6; });
+    /* bajadas: tramos que pierden al menos 40 m sin subir */
+    const runs = []; let s = null;
+    P.forEach((p, i) => {
+      if (!p.up && i && p.z <= P[i - 1].z + 2) { if (!s) s = { i0: i - 1, z0: P[i - 1].z }; s.i1 = i; }
+      else if (s) { if (s.z0 - P[s.i1].z > 40) runs.push(s); s = null; }
+    });
+    if (s && s.z0 - P[s.i1].z > 40) runs.push(s);
+    let km = 0, vmax = 0, drop = 0;
+    runs.forEach(r => { for (let i = r.i0 + 1; i <= r.i1; i++) { km += Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y) / 1000; vmax = Math.max(vmax, Math.min(P[i].v, 120)); } drop += r.z0 - P[r.i1].z; });
+    return { P, runs, end: pt, km, vmax, drop };
+  }
+  function replayAt(T) {
+    const P = RP.P; let lo = 0, hi = P.length - 1;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (P[m].pt <= T) lo = m; else hi = m; }
+    const a = P[lo], b = P[hi], k = b.pt > a.pt ? Math.max(0, Math.min(1, (T - a.pt) / (b.pt - a.pt))) : 0;
+    return { i: lo, x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k, z: a.z + (b.z - a.z) * k, t: a.t + (b.t - a.t) * k, v: b.v, up: b.up };
+  }
+  const RP_SPEEDS = [30, 60, 120, 240];
+  function replayStart(day) {
+    const raw = mode === "demo" && day === today() && !(TRK.day === day && TRK.pts.length) ? demoTrack() : (TRK.day === day ? TRK.pts : trkLoad(day));
+    if (!raw || raw.length < 8) { toast(EN ? "There's no recorded route for that day yet." : "Todavía no hay recorrido grabado ese día."); return; }
+    clearModes(); rt = null; diario = false;
+    RP = Object.assign(replayPrep(raw), { day, cur: 0, playing: true, speed: 60, last: 0, follow: true });
+    const p = replayAt(0); flyTo({ x: p.x, y: p.y, d: 2600, t: 60 }, 900);
+    setSnap("peek"); ui(); requestAnimationFrame(replayTick);
+  }
+  function replayStop() { RP = null; ui(); drawSoon(); }
+  function replayTick(ts) {
+    if (!RP) return;
+    const dt = RP.last ? Math.min(0.1, (ts - RP.last) / 1000) : 0; RP.last = ts;
+    if (RP.playing) { RP.cur = Math.min(RP.end, RP.cur + dt * RP.speed); if (RP.cur >= RP.end) { RP.playing = false; replayCard(true); } }
+    const p = replayAt(RP.cur);
+    if (RP.follow && !anim && !dragging && !inertia) { CAM.x += (p.x - CAM.x) * 0.2; CAM.y += (p.y - CAM.y) * 0.2; }
+    replayCard(); drawSoon();
+    requestAnimationFrame(replayTick);
+  }
+  function replayName(p) { const n = nearestNode(p.x, p.y, 120); return n >= 0 ? cap(describeNode(n)) : (EN ? "Off piste" : "Fuera de pistas"); }
+  function replayCard(full) {
+    if (full) { ui(); return; }
+    const p = replayAt(RP.cur), set = (id, v) => { const el = document.getElementById(id); if (el && el.textContent !== v) el.textContent = v; };
+    set("rp-time", hhmm(p.t * 1000)); set("rp-speed", p.up ? "–" : String(Math.round(Math.min(p.v, 120))));
+    set("rp-alt", fmtNum(p.z));
+    if (!RP.nameAt || Math.abs(RP.nameAt - RP.cur) > 8) { RP.nameAt = RP.cur; set("rp-name", replayName(p)); }
+    const r = document.getElementById("rp-range"); if (r && document.activeElement !== r) r.value = Math.round(RP.cur);
+    const mk = document.getElementById("rp-mark"); if (mk) mk.setAttribute("x", (RP.cur / RP.end * 340).toFixed(1));
+  }
+  function replayHtml() {
+    const P = RP.P, W = 340, H = 46, zs = P.map(p => p.z), z0 = Math.min(...zs), z1 = Math.max(...zs) + 1;
+    const X = T => T / RP.end * W, Y = z => 4 + (1 - (z - z0) / (z1 - z0)) * (H - 8);
+    const step = Math.max(1, Math.floor(P.length / 300)); let line = "";
+    for (let i = 0; i < P.length; i += step) line += X(P[i].pt).toFixed(1) + "," + Y(P[i].z).toFixed(1) + " ";
+    const runsSvg = RP.runs.map(r => `<rect x="${X(P[r.i0].pt).toFixed(1)}" y="0" width="${Math.max(1.5, X(P[r.i1].pt) - X(P[r.i0].pt)).toFixed(1)}" height="${H}" fill="rgba(200,240,60,.16)"/>`).join("");
+    const p = replayAt(RP.cur);
+    const play = RP.playing ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>` : `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>`;
+    const speek = `
+      <div class="headrow"><div><small class="kicker">${EN ? "Your day" : "Tu día"} · ${esc(fmtDay(RP.day))}</small><h2 class="title md" id="rp-name">${esc(replayName(p))}</h2></div><button class="x" data-act="replay-close" aria-label="${EN ? "Close" : "Cerrar"}">×</button></div>
+      <div class="rpstats"><div><b id="rp-time">${hhmm(p.t * 1000)}</b><small>${EN ? "time" : "hora"}</small></div><div><b id="rp-speed">${p.up ? "–" : Math.round(Math.min(p.v, 120))}</b><small>km/h</small></div><div><b id="rp-alt">${fmtNum(p.z)}</b><small>${EN ? "m altitude" : "m de altitud"}</small></div></div>
+      <div class="rptl"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${runsSvg}<polyline points="${line}" fill="none" stroke="#A9BCD0" stroke-width="1.6" vector-effect="non-scaling-stroke"/><rect id="rp-mark" x="${X(RP.cur).toFixed(1)}" y="0" width="2" height="${H}" fill="#C8F03C"/></svg>
+        <input type="range" id="rp-range" min="0" max="${Math.round(RP.end)}" step="1" value="${Math.round(RP.cur)}" aria-label="${EN ? "Position in the day" : "Momento del día"}"></div>
+      <div class="rpctl"><button class="rpb" data-act="replay-prev" aria-label="${EN ? "Previous run" : "Bajada anterior"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="2.5" height="14" rx="1"/><path d="M19 5v14L8.5 12z"/></svg></button>
+        <button class="rpb main" data-act="replay-play" aria-label="${RP.playing ? (EN ? "Pause" : "Pausa") : (EN ? "Play" : "Reproducir")}">${play}</button>
+        <button class="rpb" data-act="replay-next" aria-label="${EN ? "Next run" : "Bajada siguiente"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="16.5" y="5" width="2.5" height="14" rx="1"/><path d="M5 5v14l10.5-7z"/></svg></button>
+        <button class="rpb spd" data-act="replay-speed">${RP.speed}×</button></div>`;
+    const smore = `<h3 class="sec">${EN ? "Summary" : "Resumen"}</h3>
+      <div class="pstats"><div><b>${RP.runs.length}</b><small>${EN ? (RP.runs.length === 1 ? "run" : "runs") : (RP.runs.length === 1 ? "bajada" : "bajadas")}</small></div><div><b>${RP.km.toLocaleString(EN ? "en-GB" : "es-ES", { maximumFractionDigits: 1 })}</b><small>${EN ? "km skied" : "km bajados"}</small></div><div><b>${fmtNum(RP.drop)}</b><small>${EN ? "m vertical" : "m de desnivel"}</small></div><div><b>${Math.round(RP.vmax)}</b><small>${EN ? "max km/h" : "km/h máx."}</small></div></div>
+      <p class="quiet">${EN ? "Recorded while you were sharing live. It stays on this phone only and is not sent to anyone. Speed is approximate." : "Grabado mientras compartías en directo. Se queda solo en este móvil y no se envía a nadie. La velocidad es aproximada."}</p>`;
+    return { speek, smore };
+  }
+  function replayJump(dir) {
+    const starts = RP.runs.map(r => RP.P[r.i0].pt);
+    const t = dir > 0 ? starts.find(s => s > RP.cur + 1) : [...starts].reverse().find(s => s < RP.cur - 3);
+    RP.cur = t != null ? t : dir > 0 ? RP.end : 0; RP.follow = true; replayCard();
+  }
+  document.addEventListener("input", e => { if (RP && e.target && e.target.id === "rp-range") { RP.cur = +e.target.value; RP.follow = true; replayCard(); } });
+  function drawReplay() {
+    if (!RP) return;
+    const P = RP.P, Q = new Array(P.length);
+    for (let i = 0; i < P.length; i++) Q[i] = proj(P[i].x, P[i].y, hOf(P[i].x, P[i].y) + 4);
+    const cur = replayAt(RP.cur);
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    /* todo el día, tenue */
+    ctx.beginPath(); let pen = false;
+    for (let i = 0; i < P.length; i++) { const q = Q[i]; if (!q) { pen = false; continue; } pen ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); pen = true; }
+    ctx.lineWidth = 6; ctx.strokeStyle = "rgba(14,42,71,.35)"; ctx.stroke(); ctx.lineWidth = 3; ctx.strokeStyle = "rgba(255,255,255,.75)"; ctx.stroke();
+    /* lo recorrido: remontes en lima discontinuo, bajadas por velocidad */
+    const col = v => v < 20 ? "#3FBF5F" : v < 35 ? "#F2DE45" : v < 50 ? "#F7A531" : "#E03131";
+    for (let i = 1; i <= cur.i + 1 && i < P.length; i++) {
+      const a = Q[i - 1]; let b = Q[i]; if (!a || !b) continue;
+      if (i === cur.i + 1) { const c = proj(cur.x, cur.y, hOf(cur.x, cur.y) + 4); if (!c) continue; b = c; }
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+      ctx.setLineDash(P[i].up ? [7, 6] : []); ctx.lineWidth = 5; ctx.strokeStyle = P[i].up ? "#C8F03C" : col(P[i].v); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    const c = proj(cur.x, cur.y, hOf(cur.x, cur.y) + 4); if (!c) return;
+    const fi = fotoImg(me), X = c[0], Y = c[1];
+    ctx.beginPath(); ctx.arc(X, Y, 15, 0, 7); ctx.fillStyle = "rgba(200,240,60,.25)"; ctx.fill();
+    ctx.beginPath(); ctx.arc(X, Y, 10, 0, 7); ctx.fillStyle = "#0E2A47"; ctx.fill();
+    if (fi) { ctx.save(); ctx.beginPath(); ctx.arc(X, Y, 8, 0, 7); ctx.clip(); ctx.drawImage(fi, X - 8, Y - 8, 16, 16); ctx.restore(); }
+    else { ctx.beginPath(); ctx.arc(X, Y, 7.5, 0, 7); ctx.fillStyle = "#C8F03C"; ctx.fill(); }
+  }
+
   /* ================= Interfaz: hoja inferior ================= */
   let snap = "peek", gotoOpen = false, diario = false, diarioScope = "hoy", filtOpen = false, markCand = null, offline = !navigator.onLine, dq = "";
   let meetSheet = false, meetDraft = null;
-  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : gotoOpen ? "goto" : juntar ? "juntar" : "home"; }
+  function sheetMode() { return marking ? "mark" : RP ? "replay" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : gotoOpen ? "goto" : juntar ? "juntar" : "home"; }
   function updateMapUI() { ui(); }
 
   /* Datos para el diario: desnivel y longitud de cada pista registrada */
@@ -2846,7 +3021,10 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       <div class="headrow center"><button class="back" data-act="diario-close" style="justify-self:start">‹ Mapa</button><h2 class="title">Diario</h2><span></span></div>
       <div class="seg" role="tablist"><button role="tab" data-act="scope" data-s="hoy" aria-selected="`}${diarioScope === "hoy"}${EN?`">Today</button><button role="tab" data-act="scope" data-s="viaje" aria-selected="`:`">Hoy</button><button role="tab" data-act="scope" data-s="viaje" aria-selected="`}${diarioScope === "viaje"}${EN?`">Whole trip</button></div>`:`">Todo el viaje</button></div>`}`;
     const sugg = dq ? suggestions(dq) : "";
-    const smore = `
+    const tdays = trkDays(), rdays = diarioScope === "hoy" ? tdays.filter(d => d === today()) : tdays;
+    const rbtn = rdays.length ? rdays.map(d => `<button class="btn wide rpgo" data-act="replay" data-d="${d}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>${diarioScope === "hoy" ? (EN ? "Replay your day" : "Vuelve a ver tu día") : esc(cap(fmtDay(d)))}</button>`).join("")
+      : `<p class="quiet rphint">${EN ? "With live sharing on, Vallik records your route so you can replay the day here." : "Con el directo encendido, Vallik graba tu recorrido para que puedas volver a ver el día aquí."}</p>`;
+    const smore = `${rbtn}
       <div class="board">
         <div class="bnum"><b>${st.n}</b><small>${st.n === 1 ? (EN?"piste":"pista") : (EN?"pistes":"pistas")}${diarioScope === "viaje" && nDays ? ` ${EN ? "in" : "en"} ${nDays} ${nDays === 1 ? (EN?"day":"día") : (EN?"days":"días")}` : ""}</small></div>
         <div class="bnum"><b>${fmtNum(st.drop)}${EN?`</b><small>m vertical</small></div>
@@ -2886,7 +3064,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   function ui() {
     if (!$("#sheet")) return;
     if (ptrDown && !dragging) { uiLater = true; drawSoon(); return; }
-    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, juntar: juntarHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
+    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, juntar: juntarHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml, replay: replayHtml }[m]();
     const sb = $("#sheet");
     const ae = document.activeElement, fid = ae && ae.id && sb.contains(ae) ? ae.id : null;
     let selr = null; try { if (fid && ae.selectionStart != null) selr = [ae.selectionStart, ae.selectionEnd]; } catch (e) {}
@@ -3056,6 +3234,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const c = pos.coords, now = Date.now();
     if (c.accuracy && c.accuracy > LIVE_MAX_ACC) return;            // lectura mala (túnel, telecabina, recién arrancado)
     const lon = c.longitude, lat = c.latitude, [x, y] = toXY(lon, lat);
+    if (M.ok) trkAdd(x, y, now);                                    // tu recorrido del día (solo en este móvil)
     const l = LIVE.last, moved = l ? Math.hypot(x - l.x, y - l.y) : Infinity, dt = l ? now - l.t : Infinity;
     if (!(dt >= LIVE_BEAT_MS || (moved >= LIVE_MOVE_M && dt >= LIVE_MIN_MS))) return;
     if (!M.ok) return;                                              // el mapa aún está cargando
@@ -3162,7 +3341,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   document.addEventListener("focusin", e => { if (e.target.id === "q") { document.body.classList.add("searching"); $("#results").innerHTML = resultsHtml(); } if (e.target.id === "dq" && snap !== "full") setSnap("full"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.id === "q") closeSearch(); });
   document.addEventListener("pointerdown", e => { if (!e.target.closest(".topbar")) { const r = $("#results"); if (r && r.innerHTML) { r.innerHTML = ""; document.body.classList.remove("searching"); } } });
-  function clearModes() { sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; gotoOpen = false; juntar = null; }
+  function clearModes() { RP = null; sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; gotoOpen = false; juntar = null; }
   document.addEventListener("click", e => {
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
     const act = el.dataset.act, id = el.dataset.id;
@@ -3297,6 +3476,12 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "pista-del": del("pistas", id); break;
       case "zone": closeSearch(); goZone(+el.dataset.i); if (snap !== "peek") setSnap("peek"); break;
       case "foto-del": { const b = S.perfiles.get(me); if (!b) break; const n = Object.assign({}, b); delete n.foto; put("perfiles", me, n); break; }
+      case "replay": replayStart(el.dataset.d || today()); break;
+      case "replay-close": replayStop(); break;
+      case "replay-play": if (RP) { if (!RP.playing && RP.cur >= RP.end) RP.cur = 0; RP.playing = !RP.playing; RP.follow = true; ui(); } break;
+      case "replay-speed": if (RP) { RP.speed = RP_SPEEDS[(RP_SPEEDS.indexOf(RP.speed) + 1) % RP_SPEEDS.length]; ui(); } break;
+      case "replay-prev": if (RP) replayJump(-1); break;
+      case "replay-next": if (RP) replayJump(1); break;
       case "slope-toggle": setSlope(!slopeOn); break;
       case "sun-toggle": clearModes(); rt = null; diario = false; setSun(!sunOn); if (sunOn) setSnap("half"); break;
       case "sun-close": setSun(false); setSnap("peek"); break;
