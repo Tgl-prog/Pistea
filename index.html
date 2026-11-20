@@ -594,6 +594,9 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
 .gl-sos.on svg { color: #fff; }
 .gl-cards { display: flex; gap: 10px; overflow-x: auto; padding: 2px 12px 4px; scroll-snap-type: x mandatory; scrollbar-width: none; max-width: 640px; margin: 0 auto; width: 100%; }
 .gl-cards::-webkit-scrollbar { display: none; }
+#glance .gl-row.gut { padding-right: 76px; }
+#glance .gl-cards.gut { width: auto; margin-right: 64px; margin-left: 0; }
+@media (pointer: coarse) { .mapctl [data-act=zin], .mapctl [data-act=zout] { display: none; } }
 .gl-card { flex: 0 0 148px; height: 128px; scroll-snap-align: start; border-radius: 26px; padding: 13px 14px; display: flex; flex-direction: column; justify-content: space-between; color: var(--tx); text-align: left; }
 .gl-card .top { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .gl-card .top .av { width: 30px; height: 30px; flex: 0 0 30px; font-size: 12px; }
@@ -1460,19 +1463,32 @@ if (EN) (function () {
   }
 
   /* --- Movimiento de cámara --- */
-  const DMIN = 350, DMAX = 70000;
+  const DMIN = 350, DMAX0 = 70000;
+  /* tope de alejamiento: como mucho se ve la estación entera, nunca el borde del relieve */
+  function dmax() {
+    if (!M.bb || !V.h) return DMAX0;
+    const [x0, y0, x1, y1] = M.bb, w = x1 - x0, h = y1 - y0;
+    const vh = Math.max(120, V.h - V.pad), asp = V.w / vh;
+    const side = TER.w * 0.42 / (Math.tan(rad(FOV / 2)) * V.w / V.h);   // en pantallas anchas, que no asomen los lados
+    return Math.max(4000, Math.min(26000, side, Math.max(w / asp, h) * 0.5 / Math.tan(rad(FOV / 2)) * vh / V.h * 1.05));
+  }
   function clampCam() {
+    const DMAX = dmax();
     CAM.d = Math.max(DMIN, Math.min(DMAX, CAM.d));
     CAM.t = Math.max(0, Math.min(GL ? 74 : 0, CAM.t));
     CAM.b = ((CAM.b % 360) + 360) % 360;
-    if (M.bb) { const [x0, y0, x1, y1] = M.bb; CAM.x = Math.max(x0 - 1500, Math.min(x1 + 1500, CAM.x)); CAM.y = Math.max(y0 - 1500, Math.min(y1 + 1500, CAM.y)); }
+    if (M.bb) {   // cuanto más lejos, menos se puede desplazar: el relieve siempre llena la pantalla
+      const [x0, y0, x1, y1] = M.bb, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, m = 1500 - CAM.d * 0.5;
+      const rx = Math.max(0, (x1 - x0) / 2 + m), ry = Math.max(0, (y1 - y0) / 2 + m);
+      CAM.x = Math.max(cx - rx, Math.min(cx + rx, CAM.x)); CAM.y = Math.max(cy - ry, Math.min(cy + ry, CAM.y));
+    }
   }
   const ease = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
   function flyTo(to, ms) {
     inertia = null;
     const from = { x: CAM.x, y: CAM.y, d: CAM.d, b: CAM.b, t: CAM.t };
     const goal = Object.assign({}, from, to);
-    goal.d = Math.max(DMIN, Math.min(DMAX, goal.d)); goal.t = Math.max(0, Math.min(GL ? 74 : 0, goal.t));
+    goal.d = Math.max(DMIN, Math.min(dmax(), goal.d)); goal.t = Math.max(0, Math.min(GL ? 74 : 0, goal.t));
     let db = ((goal.b - from.b) % 360 + 540) % 360 - 180;
     ms = ms == null ? 850 : ms;
     if (ms <= 0) { Object.assign(CAM, goal); clampCam(); drawSoon(); return; }
@@ -1493,7 +1509,7 @@ if (EN) (function () {
   function zoomAround(X, Y, k) {
     camUpdate();
     const g = ground(X, Y) || { x: CAM.x, y: CAM.y };
-    const nd = Math.max(DMIN, Math.min(DMAX, CAM.d / k)), kk = CAM.d / nd;
+    const nd = Math.max(DMIN, Math.min(dmax(), CAM.d / k)), kk = CAM.d / nd;
     CAM.x = g.x + (CAM.x - g.x) / kk; CAM.y = g.y + (CAM.y - g.y) / kk; CAM.d = nd;
     clampCam(); drawSoon();
   }
@@ -1503,7 +1519,7 @@ if (EN) (function () {
     const b = rad(CAM.b), cw = Math.abs(w * Math.cos(b)) + Math.abs(h * Math.sin(b)), ch = Math.abs(w * Math.sin(b)) + Math.abs(h * Math.cos(b));
     let d = Math.max(cw / 2 / (tanH * asp), ch / 2 / tanH * (1 - 0.35 * Math.sin(rad(CAM.t)))) * 1.18;
     if (maxS) d = Math.max(d, V.fpx / maxS);
-    d = Math.min(d, DMAX);
+    d = Math.min(d, dmax());
     return d;
   }
   function fitBB(bb, opt) {
@@ -3276,6 +3292,12 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     const on = sheetMode() === "home" && snap === "peek" && (mode === "live" || mode === "demo") && !marking;
     document.body.classList.toggle("glance", on);
     const g = $("#glance"); if (g) setHtml(g, on ? glanceHtml() : "");
+    if (on) gutSync();
+  }
+  function gutSync() {   // con el grupo flotante los controles siempre se ven: las filas que caen a su altura les dejan sitio a la derecha
+    const mc = $("#mapctl"), g = $("#glance"); if (!mc || !g) return;
+    const bot = mc.offsetTop + mc.offsetHeight + 8;
+    g.querySelectorAll(".gl-row, .gl-cards").forEach(r => r.classList.toggle("gut", r.getBoundingClientRect().top < bot));
   }
   (function () {   /* deslizar hacia arriba sobre las tarjetas abre el panel */
     let y0 = null;
@@ -3307,8 +3329,9 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     const at = document.querySelector(".attr"); if (at) at.style.bottom = (Math.min(vis + ds, window.innerHeight * 0.62) + 14) + "px";   // atribución justo encima del panel
     const mc = $("#mapctl"), tb = $("#topbar");
     if (mc && tb) mc.style.top = (tb.offsetTop + tb.offsetHeight + 10) + "px";   // los mensajes empujan los controles, no los tapan
-    const gl = document.body.classList.contains("glance") ? $("#glance") : null, occ = gl ? window.innerHeight - gl.getBoundingClientRect().top : vis + ds;
-    if (mc) mc.classList.toggle("hide", occ > window.innerHeight - (mc.offsetTop + mc.offsetHeight) - 8);
+    const gl = document.body.classList.contains("glance") ? $("#glance") : null;
+    if (mc && gl) { mc.classList.remove("hide"); gutSync(); if (at) at.style.bottom = (window.innerHeight - gl.getBoundingClientRect().top + 8) + "px"; }
+    else if (mc) mc.classList.toggle("hide", vis + ds > window.innerHeight - (mc.offsetTop + mc.offsetHeight) - 8);
   }
 
   /* ---------- Búsqueda ---------- */
