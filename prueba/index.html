@@ -1909,7 +1909,7 @@ body.has-dock #smore { padding-bottom: 20px; }
   }
 
   /* ================= Ruta ================= */
-  function startRoute(to) { ofiRefresh(); marking = false; diario = false; rt = { to, noBlack: rt ? rt.noBlack : false, res: null, cur: 0 }; setSnap("peek"); recalc(true); }
+  function startRoute(to) { ofiRefresh(); marking = false; diario = false; gotoOpen = false; rt = { to, noBlack: rt ? rt.noBlack : false, res: null, cur: 0 }; setSnap("peek"); recalc(true); }
   function recalc(fit) {
     if (!rt) return;
     const mp = myPos(); rt.err = null;
@@ -2140,9 +2140,9 @@ body.has-dock #smore { padding-bottom: 20px; }
   }
 
   /* ================= Interfaz: hoja inferior ================= */
-  let snap = "peek", diario = false, diarioScope = "hoy", filtOpen = false, markCand = null, offline = !navigator.onLine, dq = "";
+  let snap = "peek", gotoOpen = false, diario = false, diarioScope = "hoy", filtOpen = false, markCand = null, offline = !navigator.onLine, dq = "";
   let meetSheet = false, meetDraft = null;
-  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : "home"; }
+  function sheetMode() { return marking ? "mark" : rt ? "route" : sel ? "feat" : poiSheet ? "poi" : personSheet ? "person" : meetSheet ? "meet" : sunOn ? "sun" : diario ? "diario" : gotoOpen ? "goto" : "home"; }
   function updateMapUI() { ui(); }
 
   /* Datos para el diario: desnivel y longitud de cada pista registrada */
@@ -2274,6 +2274,22 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     return { speek, smore };
   }
 
+  /* «Ir hasta»: elegir destino. Amigos, la quedada, sitios cerca y la búsqueda. */
+  function gotoHtml() {
+    const mp = myPos(), others = positions().filter(p => p.uid !== me), mt = meet();
+    const speek = `<div class="headrow"><div class="title-wrap"><div><small class="kicker">Ir hasta</small><h2 class="title md">¿A dónde vas?</h2></div></div><button class="x" data-act="tab-map" aria-label="Cerrar">×</button></div>
+      <button class="btn dark wide" data-act="goto-search">Buscar una pista, un remonte o un sitio</button>`;
+    let more = "";
+    if (!mp) more += `<p class="quiet">Marca primero dónde estás con el botón Aquí. Así se calcula la ruta desde tu sitio.</p>`;
+    if (mt) more += `<h3 class="sec">Punto de encuentro</h3><button class="meet" data-act="meet-route"><span class="flag" aria-hidden="true"></span><span><b>Quedada${mt.hora ? " a las " + esc(mt.hora) : ""}</b><small>${esc(cap(mt.en))}</small></span></button>`;
+    more += `<h3 class="sec">Tu grupo</h3>` + (others.length ? `<ul class="people">${others.map(p => `
+        <li class="person${Date.now() - p.at > 4 * 3600e3 ? " old" : ""}"><button class="pbtn" data-act="person" data-uid="${esc(p.uid)}">${av(p.uid)}<span><b>${esc(who(p.uid))}</b><small>${esc(p.en || "")} · ${esc(ago(p.at))}</small></span></button><button class="btn go" data-act="route-friend" data-uid="${esc(p.uid)}">Ir</button></li>`).join("")}</ul>`
+      : `<p class="quiet">Cuando alguien del grupo marque dónde está, podrás ir hasta él desde aquí.</p>`);
+    const near = mp ? POIS.map(p => ({ p, m: minsTo(poiNode(p)) })).filter(o => o.m != null).sort((a, b) => a.m - b.m).slice(0, 6) : [];
+    if (near.length) more += `<h3 class="sec">Para comer o tomar algo cerca</h3><ul class="people">${near.map(({ p, m }) => `
+        <li class="person"><button class="pbtn" data-act="res-poi" data-id="${esc(p.id)}"><span class="poiic" style="--c:${POI_CAT[p.cat].c};width:36px;height:36px;flex-basis:36px">${POI_ICON[p.cat]}</span><span><b>${esc(p.name)}</b><small>${esc(poiKind(p))} · ${m} min</small></span></button><button class="btn go" data-act="poi-go" data-id="${esc(p.id)}">Ir</button></li>`).join("")}</ul>`;
+    return { speek, smore: more };
+  }
   function personHtml() {
     const p = positions().find(q => q.uid === personSheet);
     if (!p) { personSheet = null; return homeHtml(); }
@@ -2470,7 +2486,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   function ui() {
     if (!$("#sheet")) return;
     if (ptrDown && !dragging) { uiLater = true; drawSoon(); return; }
-    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
+    const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml }[m]();
     const sb = $("#sheet");
     const ae = document.activeElement, fid = ae && ae.id && sb.contains(ae) ? ae.id : null;
     let selr = null; try { if (fid && ae.selectionStart != null) selr = [ae.selectionStart, ae.selectionEnd]; } catch (e) {}
@@ -2503,10 +2519,10 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
     const r = $("#results"); if (r && document.activeElement === $("#q")) r.innerHTML = resultsHtml();
     const dk = $("#dock");
     if (dk) {
-      const showDock = (m === "home" || m === "diario") && !marking;
+      const showDock = (m === "home" || m === "diario" || m === "goto") && !marking;
       document.body.classList.toggle("has-dock", showDock);
-      const cur = m === "diario" ? "tab-day" : snap === "peek" ? "tab-map" : "tab-group";
-      ["tab-map", "tab-group", "tab-day"].forEach(id => { const b = $("#" + id); if (b) { if (id === cur) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); } });
+      const cur = m === "diario" ? "tab-day" : m === "goto" ? "tab-go" : snap === "peek" ? "tab-map" : "tab-group";
+      ["tab-map", "tab-group", "tab-go", "tab-day"].forEach(id => { const b = $("#" + id); if (b) { if (id === cur) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); } });
       const nNew = positions().filter(p => p.uid !== me).filter(p => { const mm = msgOf(p.uid); return mm && Date.now() - mm.at < MSG_HELP_MS; }).length;
       const bd = $("#dockbadge"); if (bd) { bd.textContent = nNew || ""; bd.hidden = !nNew; }
     }
@@ -2735,7 +2751,7 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
   document.addEventListener("focusin", e => { if (e.target.id === "q") { document.body.classList.add("searching"); $("#results").innerHTML = resultsHtml(); } if (e.target.id === "dq" && snap !== "full") setSnap("full"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.id === "q") closeSearch(); });
   document.addEventListener("pointerdown", e => { if (!e.target.closest(".topbar")) { const r = $("#results"); if (r && r.innerHTML) { r.innerHTML = ""; document.body.classList.remove("searching"); } } });
-  function clearModes() { sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; }
+  function clearModes() { sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; gotoOpen = false; }
   document.addEventListener("click", e => {
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
     const act = el.dataset.act, id = el.dataset.id;
@@ -2805,12 +2821,8 @@ ${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me),
       case "tab-map": clearModes(); diario = false; setSnap("peek"); ui(); break;
       case "tab-group": { clearModes(); diario = false; setSnap("full"); ui(); requestAnimationFrame(() => { const g = $("#grupo"), sm = $("#smore"); if (g && sm) sm.scrollTop = g.offsetTop - sm.offsetTop - 4; }); break; }
       case "sheet-toggle": setSnap(snap === "peek" ? "half" : snap === "half" ? "full" : "peek"); break;
-      case "goto-list": {
-        const others = positions().filter(p => p.uid !== me);
-        if (!others.length) { toast("Nadie más del grupo ha marcado dónde está."); break; }
-        if (others.length === 1) { startRoute({ uid: others[0].uid }); break; }
-        setSnap("half"); const g = $("#grupo"); if (g) $("#smore").scrollTop = g.offsetTop - 8; break;
-      }
+      case "goto-list": closeSearch(); clearModes(); diario = false; gotoOpen = true; setSnap("half"); ui(); break;
+      case "goto-search": { clearModes(); diario = false; setSnap("peek"); ui(); const q = $("#q"); if (q) q.focus(); break; }
       case "mark": {
         clearModes(); marking = true; markCand = null; setSnap("peek");
         const mp = myPos(); if (mp && CAM.d > 6000) centerOn(mp.x, mp.y, 0.12);
