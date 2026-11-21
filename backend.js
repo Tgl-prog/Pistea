@@ -48,7 +48,8 @@
   // Idioma de la landing: el del móvil, salvo que se haya elegido otro con ES/EN.
   const LANG = window.VLANG || "es";
   const LFR = {"Nobody gets lost from the group": "Personne ne se perd du groupe", "See your friends and family on the piste map, get to them in a few turns and head home together before the lifts close.": "Vois tes amis et ta famille sur le plan des pistes, rejoins-les en quelques virages et rentrez ensemble avant la fermeture des remontées.", "You have been invited to a group. Join and you will all be on the map in a moment.": "Tu as été invité dans un groupe. Rejoins-le et vous serez tous sur la carte en un instant.", "Continue with Google": "Continuer avec Google", "Continue with Apple": "Continuer avec Apple", "With Google your profile follows you if you change phones. Or just use your name below.": "Avec Google, ton profil te suit si tu changes de téléphone. Sinon, entre juste avec ton prénom ci-dessous.", "Join your group": "Rejoins ton groupe", "This is the name your friends will see.": "C'est le nom que verront tes amis.", "Your name": "Ton prénom", "Group link or code": "Lien ou code du groupe", "Paste": "Coller", "Ask whoever created the group.": "Demande-le à qui a créé le groupe.", "Join": "Rejoindre", "or": "ou", "Create a new group": "Créer un nouveau groupe", "What it does for your group": "Ce que ça fait pour ton groupe", "Live": "En direct", "Your group, live": "Ton groupe, en direct", "Every friend is a dot on the 3D resort map. You know where they are without calling anyone.": "Chaque ami est un point sur la carte 3D de la station. Tu sais où il est sans appeler personne.", "3 on the slopes · 1 min ago": "3 sur les pistes · il y a 1 min", "Route": "Itinéraire", "Get to anyone": "Rejoins qui tu veux", "Step by step route over pistes and lifts to a friend, a bar or a lift. Skip the blacks if you like.": "Itinéraire étape par étape par les pistes et les remontées jusqu'à un ami, un bar ou une remontée. Sans noires, si tu préfères.", "Home": "Retour", "Make it home in time": "Rentre à temps", "It tells you when to head back so you are not stuck in the wrong valley when the lifts close.": "Il te dit quand repartir pour ne pas rester bloqué dans la mauvaise vallée à la fermeture des remontées.", "leave here · lifts close 16:45": "pars d'ici · fermeture 16:45", "Meet up": "Rendez-vous", "Meet up without wasting the morning": "Retrouvez-vous sans perdre la matinée", "Vallik picks the spot that is fairest for everyone. And if someone has a problem, the rest see how to reach them.": "Vallik choisit l'endroit le plus juste pour tous. Et si quelqu'un a un problème, les autres voient comment le rejoindre.", "Summit bar": "Bar du sommet", "6 min for everyone": "6 min pour tous", "Privacy": "Confidentialité", "Terms": "Conditions", "Contact": "Contact", "Map": "Carte", "Signed in with": "Connecté avec"};
-  const L = (es, en) => `<span lang="es">${es}</span><span lang="en">${en}</span><span lang="fr">${LFR[en] || en}</span>`;
+  const LCA = {"Nobody gets lost from the group": "Que ningú es perdi del grup", "See your friends and family on the piste map, get to them in a few turns and head home together before the lifts close.": "Veus els teus amics i la teva família al mapa de pistes, hi arribes en quatre girs i torneu junts abans que tanquin els remuntadors.", "You have been invited to a group. Join and you will all be on the map in a moment.": "T'han convidat a un grup. Entra i en un moment us veureu tots al mapa.", "Continue with Google": "Continuar amb Google", "Continue with Apple": "Continuar amb Apple", "With Google your profile follows you if you change phones. Or just use your name below.": "Amb Google el teu perfil et segueix encara que canviïs de mòbil. Si ho prefereixes, entra només amb el teu nom aquí sota.", "Join your group": "Entra al teu grup", "This is the name your friends will see.": "Els teus amics et veuran amb aquest nom.", "Your name": "El teu nom", "Group link or code": "Enllaç o codi del grup", "Paste": "Enganxar", "Ask whoever created the group.": "Demana-ho a qui va crear el grup.", "Join": "Entrar", "or": "o", "Create a new group": "Crear un grup nou", "What it does for your group": "Què fa pel teu grup", "Live": "En directe", "Your group, live": "El teu grup, en directe", "Every friend is a dot on the 3D resort map. You know where they are without calling anyone.": "Cada amic és un punt al mapa 3D de l'estació. Saps on és sense trucar a ningú.", "3 on the slopes · 1 min ago": "3 a pistes · fa 1 min", "Route": "Ruta", "Get to anyone": "Arriba fins a qui vulguis", "Step by step route over pistes and lifts to a friend, a bar or a lift. Skip the blacks if you like.": "Ruta pas a pas per pistes i remuntadors fins a un amic, un bar o un remuntador. Sense negres, si ho prefereixes.", "Home": "Tornada", "Make it home in time": "Torna a casa a temps", "It tells you when to head back so you are not stuck in the wrong valley when the lifts close.": "T'avisa de quan sortir per no quedar-te atrapat en una altra vall quan tanquin els remuntadors.", "leave here · lifts close 16:45": "surt d'aquí · tanca 16:45", "Meet up": "Quedada", "Meet up without wasting the morning": "Quedeu sense perdre mig matí", "Vallik picks the spot that is fairest for everyone. And if someone has a problem, the rest see how to reach them.": "Vallik tria el punt que us va millor a tots. I si algú té un problema, la resta veu com arribar-hi.", "Summit bar": "Bar del cim", "6 min for everyone": "6 min per a tothom", "Privacy": "Privacitat", "Terms": "Condicions", "Contact": "Contacte", "Map": "Mapa", "Signed in with": "Has entrat amb"};
+  const L = (es, en) => `<span lang="es">${es}</span><span lang="en">${en}</span><span lang="fr">${LFR[en] || en}</span><span lang="ca">${LCA[en] || es}</span>`;
   function askJoin() {
     const note = LS.get("pistea.aviso") || ""; LS.del("pistea.aviso");
     return new Promise(resolve => {
@@ -57,7 +58,7 @@
       el.innerHTML = `
         <div class="lp-snow" aria-hidden="true"></div>
         <div class="lp" data-lang="${LANG}">
-        <div class="lp-lang" role="group" aria-label="Idioma / Language"><button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button></div>
+        <div class="lp-lang" role="group" aria-label="Idioma / Language"><button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button><button type="button" data-lang="ca">CA</button></div>
         <header class="lp-hero">
           <div class="lp-logo"><svg class="lp-mark" width="48" height="48" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#14355A" stroke-width="4.5" stroke-linecap="round"/></svg><svg class="lp-wm" viewBox="0 0 331 100" width="122" height="37" role="img" aria-label="Vallik"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg></div>
           <h1>${L("Que nadie se pierda del grupo","Nobody gets lost from the group")}</h1>
@@ -74,7 +75,7 @@
           <p class="join-note" role="status" hidden></p>
           <p>${L("Tus amigos te verán con este nombre.","This is the name your friends will see.")}</p>
           <label>${L("Tu nombre","Your name")}<input name="n" maxlength="24" value="${myName.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" autocapitalize="words" enterkeyhint="next"></label>
-          ${code ? "" : `<label>${L("Enlace o código del grupo","Group link or code")}<span class="join-row"><input name="c" maxlength="400" placeholder="${LANG==="fr"?"Colle le lien ou le code":LANG==="en"?"Paste the link or code":"Pega el enlace o el código"}" data-ph-es="Pega el enlace o el código" data-ph-en="Paste the link or code" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go">${navigator.clipboard && navigator.clipboard.readText ? `<button class="btn dark" type="button" data-paste>${L("Pegar","Paste")}</button>` : ""}</span><small>${L("Pídeselo a quien creó el grupo.","Ask whoever created the group.")}</small></label>`}
+          ${code ? "" : `<label>${L("Enlace o código del grupo","Group link or code")}<span class="join-row"><input name="c" maxlength="400" placeholder="${LANG==="ca"?"Enganxa l'enllaç o el codi":LANG==="fr"?"Colle le lien ou le code":LANG==="en"?"Paste the link or code":"Pega el enlace o el código"}" data-ph-es="Pega el enlace o el código" data-ph-en="Paste the link or code" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go">${navigator.clipboard && navigator.clipboard.readText ? `<button class="btn dark" type="button" data-paste>${L("Pegar","Paste")}</button>` : ""}</span><small>${L("Pídeselo a quien creó el grupo.","Ask whoever created the group.")}</small></label>`}
           <button class="btn wide" type="submit">${L("Entrar","Join")}</button>
           ${code ? "" : `<div class="join-or">${L("o","or")}</div><button class="btn ghost wide" type="button" data-new>${L("Crear un grupo nuevo","Create a new group")}</button>`}
         </form>
@@ -90,7 +91,7 @@
             <div class="lf-ro"><span class="lf-pin"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>${L("Bar de la cima","Summit bar")}</span><em>${L("6 min para todos","6 min for everyone")}</em></div></li>
         </ul>
         <footer class="lp-end">
-          <nav><a href="${LANG !== "es" ? "privacy/" : "privacidad/"}">${L("Privacidad","Privacy")}</a><a href="${LANG !== "es" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a><a href="mailto:vallik-soporte@googlegroups.com">${L("Contacto","Contact")}</a></nav>
+          <nav><a href="${LANG === "en" || LANG === "fr" ? "privacy/" : "privacidad/"}">${L("Privacidad","Privacy")}</a><a href="${LANG === "en" || LANG === "fr" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a><a href="mailto:vallik-soporte@googlegroups.com">${L("Contacto","Contact")}</a></nav>
           <small>${L("Mapa","Map")} © OpenStreetMap · Copernicus DEM</small>
         </footer>
         </div>`;
@@ -102,7 +103,7 @@
       .lp-hero h1{margin:6px 0 0;font:800 34px/36px var(--font);letter-spacing:-.035em;color:var(--tx)}
       .lp-hero p{margin:0;font-size:17px;line-height:24px;color:var(--tx-2)}
       .lp-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px!important}.lp-tags span{padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.07);color:var(--tx);font:500 12px/1 var(--mono);letter-spacing:.01em}.lp-h2{margin:14px 0 -2px;font:700 13px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--tx-2)}.lp-made{margin:6px 0 0;text-align:center;color:var(--tx-2);font-size:14px}
-      .lp{position:relative}.lp-lang{position:absolute;top:10px;right:4px;display:flex;padding:3px;border-radius:99px;background:rgba(255,255,255,.07);z-index:1}.lp-lang button{all:unset;cursor:pointer;padding:6px 10px;border-radius:99px;font:600 12px/1 var(--mono);color:var(--tx-2)}.lp[data-lang=es] .lp-lang [data-lang=es],.lp[data-lang=en] .lp-lang [data-lang=en],.lp[data-lang=fr] .lp-lang [data-lang=fr]{background:var(--tx);color:var(--bg)}.lp[data-lang=es] [lang=en],.lp[data-lang=es] [lang=fr],.lp[data-lang=en] [lang=es],.lp[data-lang=en] [lang=fr],.lp[data-lang=fr] [lang=es],.lp[data-lang=fr] [lang=en]{display:none}
+      .lp{position:relative}.lp-lang{position:absolute;top:10px;right:4px;display:flex;padding:3px;border-radius:99px;background:rgba(255,255,255,.07);z-index:1}.lp-lang button{all:unset;cursor:pointer;padding:6px 10px;border-radius:99px;font:600 12px/1 var(--mono);color:var(--tx-2)}.lp[data-lang=es] .lp-lang [data-lang=es],.lp[data-lang=en] .lp-lang [data-lang=en],.lp[data-lang=fr] .lp-lang [data-lang=fr],.lp[data-lang=ca] .lp-lang [data-lang=ca]{background:var(--tx);color:var(--bg)}.lp[data-lang=es] [lang=en],.lp[data-lang=es] [lang=fr],.lp[data-lang=es] [lang=ca],.lp[data-lang=en] [lang=es],.lp[data-lang=en] [lang=fr],.lp[data-lang=en] [lang=ca],.lp[data-lang=fr] [lang=es],.lp[data-lang=fr] [lang=en],.lp[data-lang=fr] [lang=ca],.lp[data-lang=ca] [lang=es],.lp[data-lang=ca] [lang=en],.lp[data-lang=ca] [lang=fr]{display:none}
       .lp-inv{margin:0;padding:12px 14px;border-radius:14px;background:rgba(200,240,60,.12);box-shadow:inset 0 0 0 1px rgba(200,240,60,.35);font-size:15px}
       .lp-auth{display:grid;gap:10px}
       .lp-auth small{color:var(--tx-2);font-size:13px;line-height:18px;padding:0 4px}
@@ -165,7 +166,7 @@
       const busy = on => btns.forEach(b => { b.disabled = on; });
       say(note);
       (myName && f.c ? f.c : f.n).focus({ preventScroll: true });
-      const nameOk = () => { myName = f.n.value.trim().slice(0, 24); if (!myName) { say((EN?(FR?"Écris ton nom.":"Type your name."):"Escribe tu nombre.")); f.n.focus(); } return !!myName; };
+      const nameOk = () => { myName = f.n.value.trim().slice(0, 24); if (!myName) { say((EN?((CA?"Escriu el teu nom.":FR?"Écris ton nom.":"Type your name.")):"Escribe tu nombre.")); f.n.focus(); } return !!myName; };
       const finish = () => {
         LS.set("pistea.nombre", myName);
         try { history.replaceState(null, "", location.pathname + location.search + "#g=" + code); } catch (e2) {}
@@ -176,14 +177,14 @@
         if (!nameOk()) return;
         if (code) { finish(); return; }                 // vino en el enlace: se comprueba al arrancar
         const raw = f.c.value.trim(), c = codeFromPaste(raw);
-        if (!raw) { say((EN?(FR?"Colle le lien ou le code qu'on t'a envoyé. Si tu es le premier, crée un nouveau groupe.":"Paste the link or code you were sent. If you're the first, create a new group."):"Pega el enlace o el código que te han enviado. Si eres el primero, crea un grupo nuevo.")); f.c.focus(); return; }
-        if (!c) { say((EN?(FR?"Je ne trouve pas le code dans ce que tu as collé. Copie à nouveau le lien en entier.":"I can't find the code in what you pasted. Copy the whole link again."):"No encuentro el código en lo que has pegado. Copia otra vez el enlace entero.")); f.c.focus(); return; }
-        busy(true); say((EN?(FR?"Vérification du groupe…":"Checking the group…"):"Comprobando el grupo…"));
+        if (!raw) { say((EN?((CA?"Enganxa l'enllaç o el codi que t'han enviat. Si ets el primer, crea un grup nou.":FR?"Colle le lien ou le code qu'on t'a envoyé. Si tu es le premier, crée un nouveau groupe.":"Paste the link or code you were sent. If you're the first, create a new group.")):"Pega el enlace o el código que te han enviado. Si eres el primero, crea un grupo nuevo.")); f.c.focus(); return; }
+        if (!c) { say((EN?((CA?"No trobo el codi en el que has enganxat. Torna a copiar l'enllaç sencer.":FR?"Je ne trouve pas le code dans ce que tu as collé. Copie à nouveau le lien en entier.":"I can't find the code in what you pasted. Copy the whole link again.")):"No encuentro el código en lo que has pegado. Copia otra vez el enlace entero.")); f.c.focus(); return; }
+        busy(true); say((EN?((CA?"Comprovant el grup…":FR?"Vérification du groupe…":"Checking the group…")):"Comprobando el grupo…"));
         let ok = null;
         try { await ensureAuth(); ok = await groupExists(c); } catch (er) { ok = null; }
         busy(false);
-        if (ok === null) { say((EN?(FR?"Pas de connexion. Il faut du réseau pour rejoindre un groupe. Réessaie.":"No connection. You need signal to join a group. Try again."):"Sin conexión. Hace falta cobertura para entrar en un grupo. Prueba otra vez.")); return; }
-        if (!ok) { say((EN?(FR?"Il n'y a aucun groupe avec ce code. Vérifie le lien ou redemande-le.":"There's no group with that code. Check the link or ask for it again."):"No hay ningún grupo con ese código. Revisa el enlace o pide que te lo envíen otra vez.")); f.c.focus(); return; }
+        if (ok === null) { say((EN?((CA?"Sense connexió. Necessites cobertura per entrar en un grup. Torna-ho a provar.":FR?"Pas de connexion. Il faut du réseau pour rejoindre un groupe. Réessaie.":"No connection. You need signal to join a group. Try again.")):"Sin conexión. Hace falta cobertura para entrar en un grupo. Prueba otra vez.")); return; }
+        if (!ok) { say((EN?((CA?"No hi ha cap grup amb aquest codi. Revisa l'enllaç o demana'l una altra vegada.":FR?"Il n'y a aucun groupe avec ce code. Vérifie le lien ou redemande-le.":"There's no group with that code. Check the link or ask for it again.")):"No hay ningún grupo con ese código. Revisa el enlace o pide que te lo envíen otra vez.")); f.c.focus(); return; }
         code = c; fromLink = false; finish();
       });
       el.querySelectorAll("[data-login]").forEach(b => b.addEventListener("click", async () => {
@@ -193,7 +194,7 @@
           const box = el.querySelector("#lpauth"), nm = (u.displayName || "").split(" ")[0];
           if (nm && !f.n.value.trim()) f.n.value = nm.slice(0, 24);
           if (box) box.innerHTML = `<div class="lp-done">${k === "apple" ? A_ICON : G_ICON}<span><b>${L("Has entrado con","Signed in with")} ${k === "apple" ? "Apple" : "Google"}</b>${(u.email || "").replace(/</g, "&lt;")}</span></div>`;
-          say(code ? (EN?(FR?"C'est fait. Vérifie ton nom et appuie sur Rejoindre.":"Done. Check your name and press Join."):"Ya está. Revisa tu nombre y pulsa Entrar.") : (EN?(FR?"C'est fait. Colle maintenant le lien de ton groupe ou crées-en un nouveau.":"Done. Now paste your group link or create a new one."):"Ya está. Ahora pega el enlace de tu grupo o crea uno nuevo."));
+          say(code ? (EN?((CA?"Fet. Revisa el teu nom i prem Entrar.":FR?"C'est fait. Vérifie ton nom et appuie sur Rejoindre.":"Done. Check your name and press Join.")):"Ya está. Revisa tu nombre y pulsa Entrar.") : (EN?((CA?"Fet. Ara enganxa l'enllaç del teu grup o crea'n un de nou.":FR?"C'est fait. Colle maintenant le lien de ton groupe ou crées-en un nouveau.":"Done. Now paste your group link or create a new one.")):"Ya está. Ahora pega el enlace de tu grupo o crea uno nuevo."));
           (f.c || f.n).focus();
         } catch (er) { const t = loginErr(er); if (t) say(t); }
         busy(false);
@@ -210,8 +211,8 @@
       const nb = el.querySelector("[data-new]");
       if (nb) nb.addEventListener("click", async () => {
         if (!nameOk()) return;
-        busy(true); say((EN?(FR?"Création du groupe…":"Creating the group…"):"Creando el grupo…"));
-        try { await ensureAuth(); } catch (er) { busy(false); say((EN?(FR?"Pas de connexion. Il faut du réseau pour créer le groupe.":"No connection. You need signal to create the group."):"Sin conexión. Hace falta cobertura para crear el grupo.")); return; }
+        busy(true); say((EN?((CA?"Creant el grup…":FR?"Création du groupe…":"Creating the group…")):"Creando el grupo…"));
+        try { await ensureAuth(); } catch (er) { busy(false); say((EN?((CA?"Sense connexió. Necessites cobertura per crear el grup.":FR?"Pas de connexion. Il faut du réseau pour créer le groupe.":"No connection. You need signal to create the group.")):"Sin conexión. Hace falta cobertura para crear el grupo.")); return; }
         code = newCode(); creating = true; fromLink = false; finish();
       });
     });
@@ -254,12 +255,12 @@
   function loginErr(e) {
     const c = (e && e.code) || "";
     if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return "";
-    if (c === "auth/operation-not-allowed") return (EN?(FR?"La connexion avec ce compte n'est pas encore activée. Utilise ton nom pour l'instant.":"Signing in with that account isn't switched on yet. Use your name for now."):"El acceso con esa cuenta aún no está activado. Entra con tu nombre de momento.");
-    if (c === "auth/unauthorized-domain") return (EN?(FR?"Cette adresse doit encore être autorisée dans Firebase. Utilise ton nom pour l'instant.":"This address still needs to be authorised in Firebase. Use your name for now."):"Falta autorizar esta dirección en Firebase. Entra con tu nombre de momento.");
-    if (c === "auth/popup-blocked") return (EN?(FR?"Le navigateur a bloqué la fenêtre. Touche encore le bouton.":"The browser blocked the window. Tap the button again."):"El navegador ha bloqueado la ventana. Toca otra vez el botón.");
-    if (c === "auth/network-request-failed") return (EN?(FR?"Pas de connexion. Il faut du réseau pour te connecter avec ton compte.":"No connection. You need signal to sign in with your account."):"Sin conexión. Hace falta cobertura para entrar con tu cuenta.");
-    if (c === "auth/operation-not-supported-in-this-environment" || c === "auth/web-storage-unsupported") return (EN?(FR?"La fenêtre de connexion ne peut pas s'ouvrir ici. Ouvre vallik.app dans Safari.":"The sign-in window can't open here. Open vallik.app in Safari."):"Aquí no se puede abrir la ventana de inicio de sesión. Abre vallik.app en Safari.");
-    return (EN?(FR?"Impossible de te connecter avec ce compte. Réessaie ou utilise ton nom.":"Couldn't sign in with that account. Try again or use your name."):"No se ha podido entrar con la cuenta. Prueba otra vez o entra con tu nombre.");
+    if (c === "auth/operation-not-allowed") return (EN?((CA?"L'accés amb aquest compte encara no està activat. De moment, fes servir el teu nom.":FR?"La connexion avec ce compte n'est pas encore activée. Utilise ton nom pour l'instant.":"Signing in with that account isn't switched on yet. Use your name for now.")):"El acceso con esa cuenta aún no está activado. Entra con tu nombre de momento.");
+    if (c === "auth/unauthorized-domain") return (EN?((CA?"Aquesta adreça encara s'ha d'autoritzar a Firebase. De moment, fes servir el teu nom.":FR?"Cette adresse doit encore être autorisée dans Firebase. Utilise ton nom pour l'instant.":"This address still needs to be authorised in Firebase. Use your name for now.")):"Falta autorizar esta dirección en Firebase. Entra con tu nombre de momento.");
+    if (c === "auth/popup-blocked") return (EN?((CA?"El navegador ha bloquejat la finestra. Torna a tocar el botó.":FR?"Le navigateur a bloqué la fenêtre. Touche encore le bouton.":"The browser blocked the window. Tap the button again.")):"El navegador ha bloqueado la ventana. Toca otra vez el botón.");
+    if (c === "auth/network-request-failed") return (EN?((CA?"Sense connexió. Necessites cobertura per entrar amb el teu compte.":FR?"Pas de connexion. Il faut du réseau pour te connecter avec ton compte.":"No connection. You need signal to sign in with your account.")):"Sin conexión. Hace falta cobertura para entrar con tu cuenta.");
+    if (c === "auth/operation-not-supported-in-this-environment" || c === "auth/web-storage-unsupported") return (EN?((CA?"La finestra d'accés no es pot obrir aquí. Obre vallik.app a Safari.":FR?"La fenêtre de connexion ne peut pas s'ouvrir ici. Ouvre vallik.app dans Safari.":"The sign-in window can't open here. Open vallik.app in Safari.")):"Aquí no se puede abrir la ventana de inicio de sesión. Abre vallik.app en Safari.");
+    return (EN?((CA?"No s'ha pogut entrar amb aquest compte. Torna-ho a provar o fes servir el teu nom.":FR?"Impossible de te connecter avec ce compte. Réessaie ou utilise ton nom.":"Couldn't sign in with that account. Try again or use your name.")):"No se ha podido entrar con la cuenta. Prueba otra vez o entra con tu nombre.");
   }
   // allowSwitch: en la pantalla de entrada se puede pasar a una cuenta que ya existía; dentro de la app, no
   // (cambiaría el usuario y perderías el perfil de este grupo).
@@ -310,10 +311,10 @@
   // Enlace que no lleva a ningún grupo: si ya tenías uno, sigues en él.
   function badLink() {
     if (fromLink && savedCode) {
-      LS.set("pistea.aviso", (EN?(FR?"Ce lien ne mène à aucun groupe. Tu restes dans ton groupe habituel.":"That link doesn't lead to any group. You're still in your usual group."):"Ese enlace no lleva a ningún grupo. Sigues en tu grupo de siempre."));
+      LS.set("pistea.aviso", (EN?((CA?"Aquest enllaç no porta a cap grup. Continues al teu grup de sempre.":FR?"Ce lien ne mène à aucun groupe. Tu restes dans ton groupe habituel.":"That link doesn't lead to any group. You're still in your usual group.")):"Ese enlace no lleva a ningún grupo. Sigues en tu grupo de siempre."));
       try { history.replaceState(null, "", location.pathname + location.search + "#g=" + savedCode); } catch (e) {}
       setTimeout(() => location.reload(), 50);
-    } else goOut((EN?(FR?"Ce lien ne mène à aucun groupe. Colle le bon code ou crée un nouveau groupe.":"That link doesn't lead to any group. Paste the right code or create a new group."):"Ese enlace no lleva a ningún grupo. Pega el código correcto o crea un grupo nuevo."));
+    } else goOut((EN?((CA?"Aquest enllaç no porta a cap grup. Enganxa el codi correcte o crea un grup nou.":FR?"Ce lien ne mène à aucun groupe. Colle le bon code ou crée un nouveau groupe.":"That link doesn't lead to any group. Paste the right code or create a new group.")):"Ese enlace no lleva a ningún grupo. Pega el código correcto o crea un grupo nuevo."));
   }
   function boot() {
     if (ready) return ready;
@@ -326,7 +327,7 @@
       }
       const uid = (await ensureAuth()).uid;
       const group = fs.collection("grupos").doc(code);
-      const kicked = () => goOut((EN?(FR?"Tu as été retiré de ce groupe. Tu peux en créer un nouveau ou en rejoindre un autre avec son code.":"You were removed from that group. You can create a new one or join another with its code."):"Te han quitado de ese grupo. Puedes crear uno nuevo o entrar en otro con su código."));
+      const kicked = () => goOut((EN?((CA?"T'han tret d'aquell grup. Pots crear-ne un de nou o entrar en un altre amb el seu codi.":FR?"Tu as été retiré de ce groupe. Tu peux en créer un nouveau ou en rejoindre un autre avec son code.":"You were removed from that group. You can create a new one or join another with its code.")):"Te han quitado de ese grupo. Puedes crear uno nuevo o entrar en otro con su código."));
 
       // ¿Me han quitado? ¿Quién creó el grupo? Las dos lecturas a la vez y como mucho 2,5 s
       // (las escrituras nunca se esperan).
@@ -370,12 +371,12 @@
         canLogin,
         async signIn(k) {
           try { await login(k, false); return { ok: true }; }
-          catch (e) { return { ok: false, msg: e && e.code === "vallik/en-uso" ? (EN?(FR?"Ce compte est déjà utilisé sur un autre téléphone. Pour l'utiliser ici, quitte le groupe et connecte-toi avec depuis l'écran d'accueil.":"That account is already used on another phone. To use it here, leave the group and sign in with it from the start screen."):"Esa cuenta ya se usa en otro móvil. Para usarla aquí, sal del grupo y entra con ella desde la pantalla de inicio.") : loginErr(e) }; }
+          catch (e) { return { ok: false, msg: e && e.code === "vallik/en-uso" ? (EN?((CA?"Aquest compte ja es fa servir en un altre mòbil. Per fer-lo servir aquí, surt del grup i entra-hi des de la pantalla d'inici.":FR?"Ce compte est déjà utilisé sur un autre téléphone. Pour l'utiliser ici, quitte le groupe et connecte-toi avec depuis l'écran d'accueil.":"That account is already used on another phone. To use it here, leave the group and sign in with it from the start screen.")):"Esa cuenta ya se usa en otro móvil. Para usarla aquí, sal del grupo y entra con ella desde la pantalla de inicio.") : loginErr(e) }; }
         },
         leave() {
           // Sin esperar a la red: se borra al recuperar cobertura.
           ["aqui", "perfiles", "mensajes"].forEach(c => group.collection(c).doc(uid).delete().catch(() => {}));
-          goOut((EN?(FR?"Tu as quitté le groupe.":"You've left the group."):"Has salido del grupo."));
+          goOut((EN?((CA?"Has sortit del grup.":FR?"Tu as quitté le groupe.":"You've left the group.")):"Has salido del grupo."));
         },
         kick(id, onErr) {
           if (!G.isOwner || id === uid) return false;
