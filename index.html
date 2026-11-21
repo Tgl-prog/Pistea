@@ -169,7 +169,7 @@ body.searching .peterbtn { display: none; }
 .chips { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
 .chips:empty { display: none; }
 .slopeleg { grid-column: 1 / -1; justify-self: start; display: grid; gap: 5px; padding: 8px 12px 7px; border-radius: 14px; background: rgba(14,42,71,.82); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: var(--tx); }
-.slopeleg[hidden] { display: none; }
+.slopeleg[hidden], .slopeleg.lhide { display: none; }
 .slopeleg b { font: 600 12px/1 var(--font); }
 .slopeleg .bar { display: grid; grid-template-columns: repeat(8, 26px); height: 6px; border-radius: 3px; overflow: hidden; }
 .slopeleg .lbl { display: grid; grid-template-columns: repeat(8, 26px); font: 500 10px/1 var(--mono); color: var(--tx-2); }
@@ -204,7 +204,7 @@ body.searching .peterbtn { display: none; }
 body.searching .mapctl, body.searching .filters { visibility: hidden; }
 
 /* ---------- Controles del mapa: una cápsula ---------- */
-.mapctl { position: fixed; z-index: 4; right: 12px; top: calc(var(--sat) + 132px); display: flex; flex-direction: column; border-radius: 26px; overflow: hidden; transition: opacity .2s; background: var(--glass); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
+.mapctl { position: fixed; z-index: 6; right: 12px; top: calc(var(--sat) + 132px); display: flex; flex-direction: column; border-radius: 26px; overflow: hidden; transition: opacity .2s; background: var(--glass); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: var(--shadow); }
 .mapctl.hide { opacity: 0; pointer-events: none; }
 .mapctl button { width: 52px; height: 50px; border: 0; background: none; color: var(--tx); display: grid; place-items: center; font: 600 13px/1 var(--mono); letter-spacing: .04em; }
 .mapctl button + button { border-top: 1px solid var(--hair); }
@@ -595,6 +595,7 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
 .gl-cards { display: flex; gap: 10px; overflow-x: auto; padding: 2px 12px 4px; scroll-snap-type: x mandatory; scrollbar-width: none; max-width: 640px; margin: 0 auto; width: 100%; }
 .gl-cards::-webkit-scrollbar { display: none; }
 #glance .gl-row.gut { padding-right: 76px; }
+.mapctl button.fold { display: none !important; }
 #glance .gl-cards.gut { width: auto; margin-right: 64px; margin-left: 0; }
 @media (pointer: coarse) { .mapctl [data-act=zin], .mapctl [data-act=zout] { display: none; } }
 .gl-card { flex: 0 0 148px; height: 128px; scroll-snap-align: start; border-radius: 26px; padding: 13px 14px; display: flex; flex-direction: column; justify-content: space-between; color: var(--tx); text-align: left; }
@@ -3328,10 +3329,32 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     if (t) { if (vis > window.innerHeight * 0.7) { t.style.bottom = "auto"; t.style.top = (topInset() + 8) + "px"; } else { t.style.top = "auto"; t.style.bottom = (vis + ds + 12) + "px"; } }
     const at = document.querySelector(".attr"); if (at) at.style.bottom = (Math.min(vis + ds, window.innerHeight * 0.62) + 14) + "px";   // atribución justo encima del panel
     const mc = $("#mapctl"), tb = $("#topbar");
+    const lgd = $("#slopeleg"); if (lgd) lgd.classList.toggle("lhide", !document.body.classList.contains("glance") && vis > window.innerHeight * 0.35);   // con una ficha abierta, la ficha ya trae los colores
     if (mc && tb) mc.style.top = (tb.offsetTop + tb.offsetHeight + 10) + "px";   // los mensajes empujan los controles, no los tapan
     const gl = document.body.classList.contains("glance") ? $("#glance") : null;
-    if (mc && gl) { mc.classList.remove("hide"); gutSync(); if (at) at.style.bottom = (window.innerHeight - gl.getBoundingClientRect().top + 8) + "px"; }
-    else if (mc) mc.classList.toggle("hide", vis + ds > window.innerHeight - (mc.offsetTop + mc.offsetHeight) - 8);
+    if (mc) mc.classList.remove("hide");
+    if (mc && gl) { ctlFit(Infinity); gutSync(); if (at) at.style.bottom = (window.innerHeight - gl.getBoundingClientRect().top + 8) + "px"; }
+    else if (mc) {
+      const floor = window.innerHeight - (vis + ds) - 8;
+      ctlFit(floor - mc.offsetTop);
+      if (mc.offsetTop + mc.offsetHeight > floor) mc.style.top = Math.max($("#q").getBoundingClientRect().bottom + 10, floor - mc.offsetHeight) + "px";   // si ni así cabe, sube sobre los avisos
+    }
+  }
+
+  /* Los controles del mapa nunca desaparecen enteros: si no caben, se pliegan los menos importantes.
+     Lo que está encendido (sol, pendiente) siempre queda a mano para poder apagarlo. */
+  function ctlFit(room) {
+    const mc = $("#mapctl"); if (!mc) return;
+    const bs = [...mc.querySelectorAll("button")].filter(b => getComputedStyle(b).display !== "none" || b.classList.contains("fold"));
+    bs.forEach(b => b.classList.remove("fold"));
+    if (room === Infinity) return;
+    const order = ["north", "dim", "zme", "zout", "zin", "sun-toggle", "slope-toggle"];
+    const vis = () => bs.filter(b => !b.classList.contains("fold") && getComputedStyle(b).display !== "none");
+    for (const act of order) {
+      if (mc.offsetHeight <= room) break;
+      const b = bs.find(x => x.dataset.act === act);
+      if (b && b.getAttribute("aria-pressed") !== "true" && vis().length > 1) b.classList.add("fold");
+    }
   }
 
   /* ---------- Búsqueda ---------- */
