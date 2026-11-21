@@ -11,7 +11,7 @@ window.PISTEA_FIREBASE = {
 };
 
 /* Peter, el guía con IA: dirección de su servidor (ver peter/README.md). Vacío = Peter avisa de que no está conectado. */
-window.PISTEA_PETER = { url: "" };
+window.PISTEA_PETER = { url: "https://pistea-peter.vercel.app/api/peter" };
 
 /* Iniciar sesión con cuenta (además del acceso solo con nombre). Cada opción hay que activarla
    antes en Firebase › Authentication › Sign-in method, y añadir vallik.app en Settings › Authorized domains. */
