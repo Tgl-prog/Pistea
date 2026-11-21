@@ -18,7 +18,9 @@ service cloud.firestore {
     function texto(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
     function lat(v) { return v is number && v >= -90 && v <= 90; }
     function lon(v) { return v is number && v >= -180 && v <= 180; }
-    function campos(d, obligatorios, permitidos) { return d.keys().hasAll(obligatorios) && d.keys().hasOnly(permitidos); }
+    function campos(d, obligatorios, permitidos) { return d.keys().hasAll(obligatorios) && d.keys().hasOnly(permitidos.concat(['ttl'])) && ttlOk(d); }
+    // ttl: fecha en la que Firestore borra el documento solo (política TTL en la consola, campo "ttl").
+    function ttlOk(d) { return !('ttl' in d) || d.ttl is timestamp; }
 
     // El documento del grupo guarda quién lo creó. Se puede leer (get) pero no listar, se crea una
     // sola vez con tu propio uid como creador y no se puede cambiar. Solo con códigos de 10 letras

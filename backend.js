@@ -337,7 +337,7 @@
         creating = false; owner = uid;
         const b = fs.batch();
         b.set(group, { owner: uid, at: Date.now() });
-        b.set(group.collection("perfiles").doc(uid), { name: myName, at: Date.now() });
+        b.set(group.collection("perfiles").doc(uid), withTtl("perfiles", { name: myName, at: Date.now() }));
         b.commit().catch(() => {});
       } else {
         // Si la red no contesta a tiempo, lo que haya en la copia del móvil.
@@ -353,7 +353,7 @@
           owner = uid;
           group.set({ owner: uid, at: Date.now() }).catch(() => group.get().then(s => { if (s.exists && window.PISTEA_GROUP) window.PISTEA_GROUP.isOwner = s.data().owner === uid; }, () => {}));
         }
-        group.collection("perfiles").doc(uid).set({ name: myName, at: Date.now() }, { merge: true }).catch(() => {});
+        group.collection("perfiles").doc(uid).set(withTtl("perfiles", { name: myName, at: Date.now() }), { merge: true }).catch(() => {});
       }
       // A partir de aquí este es tu grupo, también al abrir la app sin enlace.
       LS.set("pistea.grupo", code); fromLink = false;
@@ -378,6 +378,32 @@
           ["aqui", "perfiles", "mensajes"].forEach(c => group.collection(c).doc(uid).delete().catch(() => {}));
           goOut((EN?((CA?"Has sortit del grup.":FR?"Tu as quitté le groupe.":"You've left the group.")):"Has salido del grupo."));
         },
+        // Borrar mi cuenta (lo pide Apple): todo lo mío en este grupo y el usuario de Firebase. Necesita red.
+        async deleteAccount() {
+          const T = (es, en, fr, ca) => EN ? (CA ? ca : FR ? fr : en) : es;
+          if (navigator.onLine === false) return { ok: false, msg: T("Necesitas conexión para borrar tu cuenta.", "You need a connection to delete your account.", "Il te faut du réseau pour supprimer ton compte.", "Necessites connexió per esborrar el teu compte.") };
+          try {
+            const mine = async c => { const q = got(await within(group.collection(c).where("uid", "==", uid).get({ source: "server" }), 10000)); if (!q) throw new Error("red"); await Promise.all(q.docs.map(d => d.ref.delete())); };
+            await mine("pistas"); await mine("avisos"); await mine("quedada");
+            await Promise.all(["aqui", "mensajes", "perfiles"].map(c => group.collection(c).doc(uid).delete()));
+            const u = auth.currentUser;
+            if (u) {
+              try { await u.delete(); }
+              catch (e) {
+                if (e && e.code === "auth/requires-recent-login") {
+                  const pd = (u.providerData || [])[0], k = pd && pd.providerId === "apple.com" ? "apple" : "google";
+                  await u.reauthenticateWithPopup(provider(k)); await u.delete();
+                } else throw e;
+              }
+            }
+          } catch (e) {
+            if (e && (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request")) return { ok: false, msg: "" };
+            return { ok: false, msg: T("No se ha podido borrar tu cuenta. Revisa la conexión y vuelve a probar, o escríbenos a vallik-soporte@googlegroups.com.", "Couldn't delete your account. Check your connection and try again, or write to vallik-soporte@googlegroups.com.", "Impossible de supprimer ton compte. Vérifie ta connexion et réessaie, ou écris-nous à vallik-soporte@googlegroups.com.", "No s'ha pogut esborrar el teu compte. Revisa la connexió i torna-ho a provar, o escriu-nos a vallik-soporte@googlegroups.com.") };
+          }
+          try { Object.keys(localStorage).filter(k => /^(pistea|vallik)\./.test(k) && k !== "vallik.lang").forEach(k => localStorage.removeItem(k)); } catch (e) {}
+          goOut(T("Hemos borrado tu cuenta y todo lo tuyo en el grupo.", "We've deleted your account and everything of yours in the group.", "Nous avons supprimé ton compte et tout ce qui était à toi dans le groupe.", "Hem esborrat el teu compte i tot el que era teu al grup."));
+          return { ok: true };
+        },
         kick(id, onErr) {
           if (!G.isOwner || id === uid) return false;
           const fail = e => { if (onErr) onErr(e); };
@@ -392,13 +418,22 @@
     return ready;
   }
 
+  /* Borrado automático: cada documento lleva "ttl", la fecha en que Firestore lo borra solo
+     (política TTL activada en la consola para cada colección). Posiciones y mensajes duran 2 días;
+     avisos y punto de encuentro, un día después de caducar; perfil y pistas, 60 días desde la última vez. */
+  const DAY = 86400000, TTL_DAYS = { aqui: 2, mensajes: 2, perfiles: 60, pistas: 60 };
+  function withTtl(c, data) {
+    let t = TTL_DAYS[c] ? Date.now() + TTL_DAYS[c] * DAY : (data && typeof data.exp === "number" ? data.exp + DAY : Date.now() + 2 * DAY);
+    return Object.assign({}, data, { ttl: firebase.firestore.Timestamp.fromMillis(t) });
+  }
+
   /* Misma forma que usa la app: db.collection(c).doc(id).set / delete, query.onSnapshot */
   function dbFacade() {
     const col = name => {
       const pending = boot().then(b => b.group.collection(name));
       return {
         doc: id => ({
-          set: async data => (await pending).doc(id).set(data),
+          set: async data => (await pending).doc(id).set(withTtl(name, data)),
           delete: async () => (await pending).doc(id).delete()
         }),
         onSnapshot(ok, err) {

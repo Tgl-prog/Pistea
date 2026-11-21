@@ -32,10 +32,15 @@
 var VLANG = (function () { try { var v = localStorage.getItem("vallik.lang"); if (v === "es" || v === "en" || v === "fr" || v === "ca") return v; } catch (e) {} var n = navigator.language || "es"; return /^ca\b/i.test(n) ? "ca" : /^es\b/i.test(n) ? "es" : /^fr\b/i.test(n) ? "fr" : "en"; })();
 var EN = VLANG !== "es", FR = VLANG === "fr", CA = VLANG === "ca"; document.documentElement.lang = VLANG;
 </script>
-<script src="three.min.js"></script>
-<script src="LineSegmentsGeometry.js"></script>
-<script src="LineMaterial.js"></script>
-<script src="LineSegments2.js"></script>
+<script>
+/* El motor 3D se baja en paralelo y sin frenar el primer dibujo: la landing no lo necesita.
+   async=false mantiene el orden de ejecución. El mapa espera a THREE_READY antes de arrancar. */
+window.THREE_READY = new Promise(function (res) {
+  var L = ["three.min.js", "LineSegmentsGeometry.js", "LineMaterial.js", "LineSegments2.js"], left = L.length;
+  L.forEach(function (src) { var s = document.createElement("script"); s.src = src; s.async = false;
+    s.onload = function () { if (!--left) res(true); }; s.onerror = function () { res(false); }; document.head.appendChild(s); });
+});
+</script>
 <script src="firebase-app-compat.js"></script>
 <script src="firebase-auth-compat.js"></script>
 <script src="firebase-firestore-compat.js"></script>
@@ -445,7 +450,7 @@ body.has-dock #smore { padding-bottom: 20px; }
 .avs li:last-child button { border-bottom: 0; }
 .avs b { display: block; font-weight: 600; font-size: 16px; }
 .avs small { display: block; color: var(--tx-2); font-size: 13px; }
-.msgbtns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.msgbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .msgbtns .btn { font-size: 15px; padding: 6px 8px; line-height: 1.15; }
 .msgbtns .btn.on { box-shadow: inset 0 0 0 2px var(--acc); background: var(--acc-dim); }
 .msgbtns .btn.danger.on { box-shadow: inset 0 0 0 2px #FF8A80; background: rgba(255,77,79,.15); }
@@ -763,7 +768,7 @@ if (EN) (function () {
   const AVISO_MS = 2 * 3600e3, COLA_S = 600;
   /* Mensajes de un toque. Salen como aviso a los demás si son de hace menos de 10 min (ayuda: 30 min) */
   const MSGS = { espero: (EN?((CA?"T'espero aquí":FR?"Je t'attends ici":"I'm waiting here")):"Os espero aquí"), bar: (EN?((CA?"Anem al bar":FR?"On va au bar":"Heading to the bar")):"Bajo al bar"), ayuda: (EN?((CA?"Necessito ajuda":FR?"J'ai besoin d'aide":"I need help")):"Necesito ayuda"), voy: (EN?((CA?"Vinc a ajudar":FR?"J'arrive pour aider":"I'm coming to help")):"Voy a ayudar") };
-  const MSG_HOME = ["espero", "bar", "ayuda"];
+  const MSG_HOME = ["espero", "bar"];   // la ayuda tiene su propio botón grande, arriba
   const MSG_IC = {
     espero: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`,
     bar: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12l-1 6a5 5 0 0 1-10 0z"/><path d="M12 15v5M8 20h8"/></svg>`,
@@ -2750,7 +2755,7 @@ if (EN) (function () {
     const speek = meetCard + `
       <div class="me-line${LIVE.on ? " is-live" : ""}">${mp ? `<button class="avbtn" data-act="profile" aria-label="${EN ? ((CA?"El teu perfil":FR?"Ton profil":"Your profile")) : "Tu perfil"}">${av(me)}</button>${EN?((CA?`<div><b>Ets `:FR?`<div><b>Tu es `:`<div><b>You're `)):`<div><b>Estás `}${esc(placeOf(mp) || (EN?((CA?"al mapa":FR?"sur la carte":"on the map")):"en el mapa"))}</b><small${LIVE.on ? ` class="live"` : ""}>${LIVE.on ? `${EN?((CA?`<span class="live-dot"></span>En directe i gravant · `:FR?`<span class="live-dot"></span>En direct et en enregistrement · `:`<span class="live-dot"></span>Live and recording · `)):`<span class="live-dot"></span>En directo y grabando · `}` : ""}${pendingLong("aqui") ? (EN?((CA?"pendent d'enviar":FR?"en attente d'envoi":"waiting to send")):"pendiente de enviar") : LIVE.on ? esc(ago(mp.at)) : (EN?((CA?"Marcat ":FR?"Indiqué ":"Marked ")):"Marcado ") + esc(ago(mp.at))}</small></div>` : LIVE.on ? `${EN?((CA?`<span class="dot-off"></span><div><b>Buscant la teva ubicació…</b><small class="live"><span class="live-dot"></span>En directe</small></div>`:FR?`<span class="dot-off"></span><div><b>Recherche de ta position…</b><small class="live"><span class="live-dot"></span>En direct</small></div>`:`<span class="dot-off"></span><div><b>Finding your location…</b><small class="live"><span class="live-dot"></span>Live</small></div>`)):`<span class="dot-off"></span><div><b>Buscando tu ubicación…</b><small class="live"><span class="live-dot"></span>En directo</small></div>`}` : `${EN?((CA?`<span class="dot-off"></span><div><b>No has marcat on ets</b><small>El grup encara no et veu</small></div>`:FR?`<span class="dot-off"></span><div><b>Tu n'as pas indiqué où tu es</b><small>Le groupe ne te voit pas encore</small></div>`:`<span class="dot-off"></span><div><b>You haven't marked where you are</b><small>The group can't see you yet</small></div>`)):`<span class="dot-off"></span><div><b>No has marcado dónde estás</b><small>El grupo no te ve todavía</small></div>`}`}${liveAvailable() ? `<button class="liveswitch" data-act="live" aria-pressed="${LIVE.on}${EN?((CA?`" aria-label="Compartir en directe"><span class="sw2"></span>En directe</button>`:FR?`" aria-label="Partager en direct"><span class="sw2"></span>En direct</button>`:`" aria-label="Share live"><span class="sw2"></span>Live</button>`)):`" aria-label="Compartir en directo"><span class="sw2"></span>Directo</button>`}` : ""}</div>
 ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.mensajes.get(me), on = mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS;
-        return `<button class="btn wide sos${on ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${!!on}">${MSG_IC.ayuda}${on ? (EN?((CA?"Avís d'ajuda enviat · Treure":FR?"Alerte d'aide envoyée · Retirer":"Help alert sent · Remove")):"Aviso de ayuda enviado · Quitar") : confirmAct === "msg:ayuda" ? (EN?((CA?"Torna a tocar per avisar el grup":FR?"Touche encore pour alerter le groupe":"Tap again to alert the group")):"Toca otra vez para avisar al grupo") : (EN?((CA?"Tinc un problema":FR?"J'ai un problème":"I have a problem")):"Tengo un problema")}</button>`; })() : ""}${LIVE.on && WAKE.ok && !NATIVE ? `
+        return `<button class="btn wide sos${on ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${!!on}">${MSG_IC.ayuda}${on ? (EN?((CA?"Avís d'ajuda enviat · Treure":FR?"Alerte d'aide envoyée · Retirer":"Help alert sent · Remove")):"Aviso de ayuda enviado · Quitar") : confirmAct === "msg:ayuda" ? (EN?((CA?"Torna a tocar per avisar el grup":FR?"Touche encore pour alerter le groupe":"Tap again to alert the group")):"Toca otra vez para avisar al grupo") : (EN?((CA?"Necessito ajuda":FR?"J'ai besoin d'aide":"I need help")):"Necesito ayuda")}</button>`; })() : ""}${LIVE.on && WAKE.ok && !NATIVE ? `
       <button class="toggle wake" data-act="wake" aria-pressed="${WAKE.want}${EN?((CA?`"><span class="sw2"></span><span>Pantalla sempre encesa<small>Continua enviant amb el mòbil a la butxaca. Gasta més bateria.</small></span></button>`:FR?`"><span class="sw2"></span><span>Écran toujours allumé<small>Continue d'envoyer avec le téléphone dans la poche. Consomme plus de batterie.</small></span></button>`:`"><span class="sw2"></span><span>Keep screen on<small>Keeps sending with the phone in your pocket. Uses more battery.</small></span></button>`)):`"><span class="sw2"></span><span>Pantalla encendida<small>Sigue enviando con el móvil en el bolsillo. Gasta más batería.</small></span></button>`}` : ""}`;
     const people = others.length ? ftilesHtml(friendList())
       : `${EN?((CA?`<p class="quiet">Quan algú del grup marqui on és, apareixerà aquí amb un botó per arribar-hi.</p>`:FR?`<p class="quiet">Quand quelqu'un du groupe indique où il est, il apparaît ici avec un bouton pour le rejoindre.</p>`:`<p class="quiet">When someone in the group marks where they are, they'll show up here with a button to get to them.</p>`)):`<p class="quiet">Cuando alguien del grupo marque dónde está, aparecerá aquí con un botón para ir hasta él.</p>`}`;
@@ -3061,7 +3066,8 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <div class="profhead"><label class="profav" aria-label="${has ? (EN ? ((CA?"Canviar la foto":FR?"Changer la photo":"Change photo")) : "Cambiar foto") : (EN ? ((CA?"Afegir una foto":FR?"Ajouter une photo":"Add a photo")) : "Poner una foto")}">${fotoSrc(me) ? `<img src="${fotoSrc(me)}" alt="">` : `<span style="--c:${colorOf(me)}">${esc(initial(me))}</span>`}<i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></i><input type="file" accept="image/*" id="fotoin" hidden></label>
         <div><p class="quiet">${EN ? ((CA?"El teu grup veu la teva foto al mapa en lloc de la inicial.":FR?"Ton groupe voit ta photo sur la carte au lieu de ton initiale.":"Your group sees your photo on the map instead of your initial.")) : "Tu grupo ve tu foto en el mapa en lugar de tu inicial."}</p>${has ? `<button class="link" data-act="foto-del">${EN ? ((CA?"Treure la foto":FR?"Retirer la photo":"Remove photo")) : "Quitar foto"}</button>` : ""}</div></div>
       ${langHtml()}`;
-    const smore = `${accHtml()}<p class="quiet proflegal"><a href="${EN ? (CA?"privacidad/":FR?"fr/confidentialite/":"privacy/") : "privacidad/"}">${EN ? ((CA?"Privacitat":FR?"Confidentialité":"Privacy")) : "Privacidad"}</a> · <a href="${EN ? (CA?"condiciones/":FR?"fr/conditions/":"terms/") : "condiciones/"}">${EN ? ((CA?"Condicions":FR?"Conditions":"Terms")) : "Condiciones"}</a></p>`;
+    const delAcc = window.PISTEA_GROUP && window.PISTEA_GROUP.deleteAccount ? `<button class="btn ghost wide danger delacc" data-act="delacc">${confirmAct === "delacc" ? (EN ? ((CA?"Torna a tocar per esborrar-ho tot":FR?"Touche encore pour tout supprimer":"Tap again to delete everything")) : "Toca otra vez para borrarlo todo") : (EN ? ((CA?"Esborrar el meu compte":FR?"Supprimer mon compte":"Delete my account")) : "Borrar mi cuenta")}</button><p class="quiet">${EN ? ((CA?"S'esborren el teu perfil, la teva foto, la teva posició, els teus missatges i les teves pistes en aquest grup, i el teu compte. No es pot desfer.":FR?"Cela supprime ton profil, ta photo, ta position, tes messages et tes pistes dans ce groupe, ainsi que ton compte. C'est définitif.":"This deletes your profile, photo, position, messages and runs in this group, and your account. It can't be undone.")) : "Se borran tu perfil, tu foto, tu posición, tus mensajes y tus pistas en este grupo, y tu cuenta. No se puede deshacer."}</p>` : "";
+    const smore = `${accHtml()}${delAcc}<p class="quiet proflegal"><a href="${EN ? (CA?"privacidad/":FR?"fr/confidentialite/":"privacy/") : "privacidad/"}">${EN ? ((CA?"Privacitat":FR?"Confidentialité":"Privacy")) : "Privacidad"}</a> · <a href="${EN ? (CA?"condiciones/":FR?"fr/conditions/":"terms/") : "condiciones/"}">${EN ? ((CA?"Condicions":FR?"Conditions":"Terms")) : "Condiciones"}</a></p>`;
     return { speek, smore };
   }
   function fotoHtml() {
@@ -3469,7 +3475,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     const mm = S.mensajes.get(me), helpOn = !!(mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS);
     const title = mp ? cap(placeOf(mp) || (EN ? ((CA?"Al mapa":FR?"Sur la carte":"On the map")) : "En el mapa")) : (EN ? ((CA?"Marca on ets":FR?"Indique où tu es":"Mark where you are")) : "Marca dónde estás");
     const sub = LIVE.on ? (EN ? ((CA?"En directe · gravant":FR?"En direct · enregistrement":"Live · recording")) : "En directo · grabando") : mp ? (EN ? ((CA?"Marcat ":FR?"Indiqué ":"Marked ")) : "Marcado ") + ago(mp.at) : (EN ? ((CA?"El grup encara no et veu":FR?"Le groupe ne te voit pas encore":"The group can't see you yet")) : "El grupo no te ve todavía");
-    const sos = `<button class="gl-sos glass2${helpOn ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${helpOn}">${MSG_IC.ayuda}<span>${helpOn ? (EN ? ((CA?"Ajuda enviada":FR?"Aide envoyée":"Help sent")) : "Aviso enviado") : confirmAct === "msg:ayuda" ? (EN ? ((CA?"Torna a tocar":FR?"Touche encore":"Tap again")) : "Toca otra vez") : (EN ? ((CA?"Problema":FR?"Problème":"Problem")) : "Problema")}</span></button>`;
+    const sos = `<button class="gl-sos glass2${helpOn ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${helpOn}">${MSG_IC.ayuda}<span>${helpOn ? (EN ? ((CA?"Ajuda enviada":FR?"Aide envoyée":"Help sent")) : "Aviso enviado") : confirmAct === "msg:ayuda" ? (EN ? ((CA?"Torna a tocar":FR?"Touche encore":"Tap again")) : "Toca otra vez") : (EN ? ((CA?"Ajuda":FR?"Aide":"Help")) : "Ayuda")}</span></button>`;
     const cards = fl.length ? fl.map(({ p, help, t }) => `<button class="gl-card glass2${help ? " help" : ""}" data-act="person" data-uid="${esc(p.uid)}"><span class="top">${av(p.uid)}<b>${esc(who(p.uid))}</b>${isLive(p) ? `<span class="ld" aria-label="${EN ? ((CA?"en directe":FR?"en direct":"live")) : "en directo"}"></span>` : ""}</span><span class="n">${minsHtml(t)}</span><span class="w">${help ? (EN ? ((CA?"Necessita ajuda":FR?"A besoin d'aide":"Needs help")) : "Necesita ayuda") : esc(cap(placeOf(p) || ""))}</span></button>`).join("")
       : `<button class="gl-card glass2 invite" data-act="invite"><b style="font:600 15px/1.2 var(--font)">${EN ? ((CA?"Convida el teu grup":FR?"Invite ton groupe":"Invite your group")) : "Invita a tu grupo"}</b><span class="w">${EN ? ((CA?"Envia'ls l'enllaç i els veuràs aquí.":FR?"Envoie-leur le lien et tu les verras ici.":"Send them the link and you'll see them here.")) : "Mándales el enlace y los verás aquí."}</span></button>`;
     return `<div class="gl-row"><button class="gl-me glass2" data-act="glance-open">${av(me)}<span><b>${esc(title)}</b><small${LIVE.on ? ` class="live"` : ""}>${esc(sub)}</small></span></button>${sos}</div><div class="gl-cards">${cards}</div>`;
@@ -3937,6 +3943,13 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       case "wake": wakeSet(!WAKE.want); break;
       case "invite": inviteGroup(); break;
       case "copy-code": copyCode(); break;
+      case "delacc": {
+        if (confirmAct !== "delacc") { confirmAct = "delacc"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 5000); ui(); break; }
+        confirmAct = null; el.disabled = true; el.textContent = EN ? ((CA?"Esborrant…":FR?"Suppression…":"Deleting…")) : "Borrando…";
+        if (LIVE.on) { LIVE.on = false; liveUnwatch(); liveSave(false); wakeOff(); }   // sin volver a escribir la posición
+        window.PISTEA_GROUP.deleteAccount().then(r => { if (!r.ok) { if (r.msg) toast(r.msg); ui(); } });
+        break;
+      }
       case "leave": {
         if (confirmAct !== "leave") { confirmAct = "leave"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
         confirmAct = null; window.PISTEA_GROUP.leave(); break;
@@ -4137,7 +4150,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     mapSetup();
     if ((location.hash || "") === "#pistas") { diario = true; snap = "full"; }
     ui();
-    mapReady = Promise.all([loadMap(), loadTerrain().catch(() => {}), loadPois()]).then(() => {
+    mapReady = Promise.all([loadMap(), loadTerrain().catch(() => {}), loadPois(), window.THREE_READY]).then(() => {
       NH = new Float32Array(M.n);
       for (let i = 0; i < M.n; i++) NH[i] = (NZ[i] > 0 ? NZ[i] : groundZ(NX[i], NY[i])) * EXAG + 4;
       POLY3 = M.polys.map(p => { const out = []; for (let i = 0; i < p.flat.length; i += 2) out.push(p.flat[i], p.flat[i + 1], groundZ(p.flat[i], p.flat[i + 1]) * EXAG + 2); return { d: p.d, pts: out }; });
