@@ -422,7 +422,9 @@
      (política TTL activada en la consola para cada colección). Posiciones y mensajes duran 2 días;
      avisos y punto de encuentro, un día después de caducar; perfil y pistas, 60 días desde la última vez. */
   const DAY = 86400000, TTL_DAYS = { aqui: 2, mensajes: 2, perfiles: 60, pistas: 60 };
+  // Se activa (PISTEA_TTL en firebase-config.js) después de publicar las reglas que aceptan "ttl".
   function withTtl(c, data) {
+    if (!window.PISTEA_TTL) return data;
     let t = TTL_DAYS[c] ? Date.now() + TTL_DAYS[c] * DAY : (data && typeof data.exp === "number" ? data.exp + DAY : Date.now() + 2 * DAY);
     return Object.assign({}, data, { ttl: firebase.firestore.Timestamp.fromMillis(t) });
   }

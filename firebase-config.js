@@ -16,3 +16,6 @@ window.PISTEA_PETER = { url: "https://pistea-peter.vercel.app/api/peter" };
 /* Iniciar sesión con cuenta (además del acceso solo con nombre). Cada opción hay que activarla
    antes en Firebase › Authentication › Sign-in method, y añadir vallik.app en Settings › Authorized domains. */
 window.PISTEA_LOGIN = { google: true, apple: false };
+
+/* Borrado automático: true solo cuando las reglas de firestore.rules que aceptan "ttl" estén publicadas en Firebase. */
+window.PISTEA_TTL = false;
