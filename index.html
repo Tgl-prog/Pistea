@@ -595,6 +595,10 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
 .gl-cards { display: flex; gap: 10px; overflow-x: auto; padding: 2px 12px 4px; scroll-snap-type: x mandatory; scrollbar-width: none; max-width: 640px; margin: 0 auto; width: 100%; }
 .gl-cards::-webkit-scrollbar { display: none; }
 #glance .gl-row.gut { padding-right: 76px; }
+.hbtns { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.vozbtn { height: 40px; padding: 0 12px 0 10px; border: 0; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; background: var(--glass-hi); color: var(--tx); font: 600 13px/1 var(--font); }
+.vozbtn[aria-pressed=true] { background: var(--acc); color: var(--acc-ink); }
+
 .mapctl button.fold { display: none !important; }
 #glance .gl-cards.gut { width: auto; margin-right: 64px; margin-left: 0; }
 @media (pointer: coarse) { .mapctl [data-act=zin], .mapctl [data-act=zout] { display: none; } }
@@ -2149,7 +2153,8 @@ if (EN) (function () {
     rt.res = routeBest(mp.near, dst, rt.noBlack);
     if (!rt.res) rt.err = "noroute";
     if (fit || !old) rt.cur = 0; else if (rt.res) rt.cur = Math.min(rt.cur, rt.res.steps.length);
-    ui();
+    ui(); navSync();
+    if (rt.res && (fit || !old)) { VOZ.warned = -1; sayStart(); }
     if (rt.res && fit) { rt.drawT = performance.now() + 500; setTimeout(routeAll, 30); }
   }
 
@@ -3095,7 +3100,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
   }
   function routeHtml() {
     const toName = rt.to.uid ? who(rt.to.uid) : rt.to.label;
-    const head = (sub) => `${EN?`<div class="headrow"><div><small class="kicker">Directions `:`<div class="headrow"><div><small class="kicker">Cómo llegar `}${rt.to.uid ? (EN?"to":"hasta") : "a"}</small><h2 class="title">${esc(toName)}</h2>${sub ? `<small class="sub">${sub}</small>` : ""}${EN?`</div><button class="x" data-act="route-close" aria-label="Close route">×</button></div>`:`</div><button class="x" data-act="route-close" aria-label="Cerrar ruta">×</button></div>`}`;
+    const head = (sub) => `${EN?`<div class="headrow"><div><small class="kicker">Directions `:`<div class="headrow"><div><small class="kicker">Cómo llegar `}${rt.to.uid ? (EN?"to":"hasta") : "a"}</small><h2 class="title">${esc(toName)}</h2>${sub ? `<small class="sub">${sub}</small>` : ""}${EN?`</div><span class="hbtns">${rt.res ? vozBtn() : ""}<button class="x" data-act="route-close" aria-label="Close route">×</button></span></div>`:`</div><span class="hbtns">${rt.res ? vozBtn() : ""}<button class="x" data-act="route-close" aria-label="Cerrar ruta">×</button></span></div>`}`;
     const tog = `<button class="toggle" data-act="noblack" aria-pressed="${rt.noBlack}${EN?`"><span class="sw2"></span><span>No blacks or itineraries</span></button>`:`"><span class="sw2"></span><span>Sin negras ni itinerarios</span></button>`}`;
     if (rt.err === "nopos") return { speek: head() + `${EN?`<p class="facts">First mark where you are so I know where to start from.</p><div class="acts one"><button class="btn" data-act="mark">Mark where I am</button></div>`:`<p class="facts">Primero marca dónde estás, así sé desde dónde calcular.</p><div class="acts one"><button class="btn" data-act="mark">Marcar dónde estoy</button></div>`}`, smore: "" };
     if (rt.err === "nofriend") return { speek: head() + `<p class="facts">${esc(toName)}${EN?` hasn't marked where they are yet.</p>`:` todavía no ha marcado dónde está.</p>`}`, smore: "" };
@@ -3380,6 +3385,80 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
   }
   function closeSearch() { const q = $("#q"); if (q) { q.value = ""; q.blur(); } query = ""; const r = $("#results"); if (r) r.innerHTML = ""; document.body.classList.remove("searching"); }
 
+  /* ---------- Guía por voz (estilo Waze) ----------
+     Con la ruta abierta y la guía encendida, el móvil sigue tu GPS, pasa solo al siguiente paso al llegar
+     y lo dice en voz alta. En la web solo habla con la pantalla encendida: se pide mantenerla despierta. */
+  const VOZ = { on: false, watch: null, warned: -1, lock: null };
+  try { VOZ.on = localStorage.getItem("vallik.voz") === "1"; } catch (e) {}
+  const vozOk = () => !!(window.speechSynthesis && window.SpeechSynthesisUtterance);
+  function speak(t) {
+    if (!VOZ.on || !vozOk() || !t) return;
+    try {
+      const u = new SpeechSynthesisUtterance(t), lang = EN ? "en" : "es";
+      u.lang = EN ? "en-GB" : "es-ES"; u.rate = 1.02;
+      const vs = speechSynthesis.getVoices(), v = vs.find(x => x.lang && x.lang.toLowerCase().startsWith(lang) && /enhanced|premium|natural/i.test(x.name)) || vs.find(x => x.lang && x.lang.toLowerCase().startsWith(u.lang.toLowerCase())) || vs.find(x => x.lang && x.lang.toLowerCase().startsWith(lang));
+      if (v) u.voice = v;
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  const lowFirst = t => t ? t.charAt(0).toLowerCase() + t.slice(1) : t;
+  function stepSay(i) {
+    if (!rt || !rt.res) return "";
+    const N = rt.res.steps.length;
+    if (i >= N) return (EN ? "You're there" : "Llegaste") + (rt.to.uid ? (EN ? ". " : ". ") + who(rt.to.uid) + (EN ? " should be close." : " tiene que estar cerca.") : ".");
+    const st = rt.res.steps[i], si = stepInfo(st);
+    return si.t1 + (st.ty === 1 || st.ty === 3 ? ". " + si.t2 : "") + ".";
+  }
+  function sayStep() { if (VOZ.on && rt && rt.res) speak(stepSay(rt.cur)); }
+  function sayStart() {
+    if (!VOZ.on || !rt || !rt.res) return;
+    const r = rt.res, m = Math.max(1, Math.round(r.time / 60)), nL = r.steps.filter(s => s.ty === 1 || s.ty === 3).length;
+    speak((EN ? `About ${m} minutes, ${nL} ${nL === 1 ? "lift" : "lifts"}. First: ` : `Unos ${m} minutos, ${nL} ${nL === 1 ? "remonte" : "remontes"}. Primero: `) + lowFirst(stepSay(rt.cur)));
+  }
+  function navFix(x, y) {
+    if (!VOZ.on || !rt || !rt.res) return;
+    const steps = rt.res.steps, N = steps.length; if (rt.cur >= N) return;
+    const st = steps[rt.cur], end = st.nodes[st.nodes.length - 1], d = Math.hypot(x - NX[end], y - NY[end]);
+    if (d < 40) {   // llegaste al final de este paso
+      rt.cur++; VOZ.warned = -1; ui(); sayStep(); return;
+    }
+    if (d < 180 && VOZ.warned !== rt.cur && rt.cur + 1 < N) {
+      VOZ.warned = rt.cur;
+      const m = Math.max(50, Math.round(d / 50) * 50);
+      speak((EN ? `In ${m} metres, ` : `En ${m} metros, `) + lowFirst(stepSay(rt.cur + 1)));
+    }
+  }
+  async function navLock(on) {
+    try {
+      if (on && !VOZ.lock && navigator.wakeLock && !document.hidden) { VOZ.lock = await navigator.wakeLock.request("screen"); VOZ.lock.addEventListener("release", () => { VOZ.lock = null; }); }
+      if (!on && VOZ.lock) { const l = VOZ.lock; VOZ.lock = null; l.release(); }
+    } catch (e) {}
+  }
+  function navSync() {
+    const want = VOZ.on && rt && rt.res && !document.hidden;
+    navLock(!!want);
+    // Si compartes en directo, el GPS ya está encendido y liveFix avisa a la guía.
+    const own = want && !(LIVE.on && LIVE.watch != null) && !NATIVE && navigator.geolocation;
+    if (own && VOZ.watch == null) {
+      VOZ.watch = navigator.geolocation.watchPosition(p => {
+        const c = p.coords; if (c.accuracy && c.accuracy > 60) return;
+        const [x, y] = toXY(c.longitude, c.latitude); navFix(x, y);
+      }, () => {}, { enableHighAccuracy: true, timeout: 30000, maximumAge: 5000 });
+    } else if (!own && VOZ.watch != null) { navigator.geolocation.clearWatch(VOZ.watch); VOZ.watch = null; }
+    if (!want && vozOk() && !VOZ.on) try { speechSynthesis.cancel(); } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", () => navSync());
+  function vozToggle() {
+    VOZ.on = !VOZ.on; try { localStorage.setItem("vallik.voz", VOZ.on ? "1" : "0"); } catch (e) {}
+    if (VOZ.on) { if (!vozOk()) { VOZ.on = false; toast(EN ? "This browser can't speak. Try Safari or Chrome." : "Este navegador no puede hablar. Prueba con Safari o Chrome."); ui(); return; } speak(EN ? "Voice guidance on. Keep the screen on and I'll tell you each step." : "Guía por voz activada. Deja la pantalla encendida y te iré diciendo cada paso."); setTimeout(sayStart, 3200); }
+    else try { speechSynthesis.cancel(); } catch (e) {}
+    navSync(); ui();
+  }
+  function vozBtn() {
+    const ic = VOZ.on ? '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>' : '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/>';
+    return `<button class="vozbtn" data-act="voz" aria-pressed="${VOZ.on}" aria-label="${EN ? (VOZ.on ? "Turn voice guidance off" : "Turn voice guidance on") : (VOZ.on ? "Apagar la guía por voz" : "Activar la guía por voz")}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg><span>${EN ? "Voice" : "Voz"}</span></button>`;
+  }
+
   /* ---------- Ruta paso a paso ---------- */
   function focusStep() {
     if (!rt || !rt.res) return;
@@ -3459,7 +3538,8 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     const c = pos.coords, now = Date.now();
     if (c.accuracy && c.accuracy > LIVE_MAX_ACC) return;            // lectura mala (túnel, telecabina, recién arrancado)
     const lon = c.longitude, lat = c.latitude, [x, y] = toXY(lon, lat);
-    if (M.ok) trkAdd(x, y, now);                                    // tu recorrido del día (solo en este móvil)
+    if (M.ok) trkAdd(x, y, now);
+    if (M.ok) navFix(x, y);                                         // guía por voz: avanza el paso al llegar                                    // tu recorrido del día (solo en este móvil)
     const l = LIVE.last, moved = l ? Math.hypot(x - l.x, y - l.y) : Infinity, dt = l ? now - l.t : Infinity;
     if (!(dt >= LIVE_BEAT_MS || (moved >= LIVE_MOVE_M && dt >= LIVE_MIN_MS))) return;
     if (!M.ok) return;                                              // el mapa aún está cargando
@@ -3680,11 +3760,12 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
         break;
       }
       case "route-friend": personSheet = null; sel = null; diario = false; startRoute({ uid: el.dataset.uid }); break;
-      case "route-close": rt = null; setSnap("peek"); ui(); break;
+      case "route-close": rt = null; try { speechSynthesis.cancel(); } catch (e) {} setSnap("peek"); ui(); navSync(); break;
       case "noblack": rt.noBlack = !rt.noBlack; recalc(true); break;
-      case "step-next": if (rt && rt.res) { rt.cur = Math.min(rt.res.steps.length, rt.cur + 1); ui(); focusStep(); } break;
-      case "step-prev": if (rt && rt.res) { rt.cur = Math.max(0, rt.cur - 1); ui(); focusStep(); } break;
-      case "step-go": if (rt && rt.res) { rt.cur = +el.dataset.i; setSnap("peek"); ui(); focusStep(); } break;
+      case "step-next": if (rt && rt.res) { rt.cur = Math.min(rt.res.steps.length, rt.cur + 1); VOZ.warned = -1; ui(); focusStep(); sayStep(); } break;
+      case "step-prev": if (rt && rt.res) { rt.cur = Math.max(0, rt.cur - 1); VOZ.warned = -1; ui(); focusStep(); sayStep(); } break;
+      case "step-go": if (rt && rt.res) { rt.cur = +el.dataset.i; VOZ.warned = -1; setSnap("peek"); ui(); focusStep(); sayStep(); } break;
+      case "voz": vozToggle(); break;
       case "route-all": setSnap("peek"); routeAll(); break;
       case "route-log": { const rr = routeRuns(); Promise.all(rr.map(r => addPista(r.nombre, r.tipo))).then(oks => { if (oks.every(Boolean)) toast(rr.length === 1 ? (EN?"Logged in your day":"Apuntada en el diario") : rr.length + (EN?" pistes logged in your day":" pistas apuntadas en el diario")); rt = null; ui(); }); break; }
       case "sel-add": {
