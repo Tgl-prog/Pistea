@@ -79,13 +79,20 @@
         </form>
         <h2 class="lp-h2">${L("Lo que hace por tu grupo","What it does for your group")}</h2>
         <ul class="lp-feat">
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.6c2.4 0 4 1.3 4.6 3.9"/></svg></span><div><b>${L("Tu grupo, en directo","Your group, live")}</b><small>${L("Cada amigo es un punto en el mapa 3D de la estación. Sabes dónde está sin llamar a nadie.","Every friend is a dot on the 3D resort map. You know where they are without calling anyone.")}</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c3-1 4-5 7-7s6-2 7-7"/><circle cx="5" cy="19" r="2"/><path d="M15 5h4v4"/></svg></span><div><b>${L("Llega hasta quien sea","Get to anyone")}</b><small>${L("Ruta paso a paso por pistas y remontes hasta un amigo, un bar o un remonte. Sin negras, si lo prefieres.","Step by step route over pistes and lifts to a friend, a bar or a lift. Skip the blacks if you like.")}</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><div><b>${L("Vuelve a casa a tiempo","Make it home in time")}</b><small>${L("Te avisa de cuándo salir para no quedarte atrapado en otro valle cuando cierran los remontes.","It tells you when to head back so you are not stuck in the wrong valley when the lifts close.")}</small></div></li>
-          <li><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></span><div><b>${L("Quedad sin perder media mañana","Meet up without wasting the morning")}</b><small>${L("Vallik elige el punto que os queda a todos más a mano. Y si alguien tiene un problema, el resto ve cómo llegar.","Vallik picks the spot that is fairest for everyone. And if someone has a problem, the rest see how to reach them.")}</small></div></li>
+          <li><p class="lf-k"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.6c2.4 0 4 1.3 4.6 3.9"/></svg><span class="lf-n">01</span>${L("En directo","Live")}</p><b>${L("Tu grupo, en directo","Your group, live")}</b><small>${L("Cada amigo es un punto en el mapa 3D de la estación. Sabes dónde está sin llamar a nadie.","Every friend is a dot on the 3D resort map. You know where they are without calling anyone.")}</small>
+            <div class="lf-ro"><span class="lf-av"><i>A</i><i>P</i><i class="on">J</i></span><em>${L("3 en pista · hace 1 min","3 on the slopes · 1 min ago")}</em></div></li>
+          <li><p class="lf-k"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c3-1 4-5 7-7s6-2 7-7"/><circle cx="5" cy="19" r="2"/><path d="M15 5h4v4"/></svg><span class="lf-n">02</span>${L("Ruta","Route")}</p><b>${L("Llega hasta quien sea","Get to anyone")}</b><small>${L("Ruta paso a paso por pistas y remontes hasta un amigo, un bar o un remonte. Sin negras, si lo prefieres.","Step by step route over pistes and lifts to a friend, a bar or a lift. Skip the blacks if you like.")}</small>
+            <div class="lf-ro"><span class="lf-rt"><i style="flex:2;background:#F6F8FA"></i><i style="flex:3;background:#E5484D"></i><i style="flex:2;background:#3B82F6"></i></span><em>14 min</em></div></li>
+          <li><p class="lf-k"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg><span class="lf-n">03</span>${L("Vuelta","Home")}</p><b>${L("Vuelve a casa a tiempo","Make it home in time")}</b><small>${L("Te avisa de cuándo salir para no quedarte atrapado en otro valle cuando cierran los remontes.","It tells you when to head back so you are not stuck in the wrong valley when the lifts close.")}</small>
+            <div class="lf-ro"><strong>16:05</strong><em>${L("sal de aquí · cierra 16:45","leave here · lifts close 16:45")}</em></div></li>
+          <li><p class="lf-k"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg><span class="lf-n">04</span>${L("Quedada","Meet up")}</p><b>${L("Quedad sin perder media mañana","Meet up without wasting the morning")}</b><small>${L("Vallik elige el punto que os queda a todos más a mano. Y si alguien tiene un problema, el resto ve cómo llegar.","Vallik picks the spot that is fairest for everyone. And if someone has a problem, the rest see how to reach them.")}</small>
+            <div class="lf-ro"><span class="lf-pin"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>${L("Bar de la cima","Summit bar")}</span><em>${L("6 min para todos","6 min for everyone")}</em></div></li>
         </ul>
-        <p class="lp-made">${L("Hecha por un grupo de amigos que esquía junto.","Made by a group of friends who ski together.")}</p>
-        <p class="lp-foot">vallik.app · <a href="${LANG === "en" ? "privacy/" : "privacidad/"}" style="color:inherit">${L("Privacidad","Privacy")}</a> · <a href="${LANG === "en" ? "terms/" : "condiciones/"}" style="color:inherit">${L("Condiciones","Terms")}</a> · ${L("mapa","map")} © OpenStreetMap</p>
+        <footer class="lp-end">
+          <p>${L("Hecha por un grupo de amigos que esquía junto.","Made by a group of friends who ski together.")}</p>
+          <nav><a href="${LANG === "en" ? "privacy/" : "privacidad/"}">${L("Privacidad","Privacy")}</a><a href="${LANG === "en" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a><a href="mailto:vallik-soporte@googlegroups.com">${L("Contacto","Contact")}</a></nav>
+          <small>${L("Mapa","Map")} © OpenStreetMap · Copernicus DEM</small>
+        </footer>
         </div>`;
       const st = document.createElement("style");
       st.textContent = `.join{position:fixed;inset:0;z-index:30;display:block;padding:calc(var(--sat,0px) + 28px) 16px calc(var(--sab,0px) + 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(14,42,71,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
@@ -133,7 +140,24 @@
       .lp-hero{padding:8px 0 4px!important}.lp-auth small{padding:0!important}.lp-wm{width:92px;height:28px}
       .lp-hero h1{margin-top:44px!important;font-size:44px!important;line-height:44px!important;text-shadow:0 2px 24px rgba(14,42,71,.6)}
       .lp-lang{background:rgba(14,42,71,.55)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-      .lp-logo .lp-wm{filter:drop-shadow(0 2px 12px rgba(14,42,71,.45))}`;
+      .lp-logo .lp-wm{filter:drop-shadow(0 2px 12px rgba(14,42,71,.45))}
+      .lp-h2{margin:22px 0 0!important;font:500 12px/1 var(--mono)!important;letter-spacing:.12em!important}
+      .lp-feat{gap:10px!important;margin:4px 0 0!important}
+      .lp-feat li{display:block!important;position:relative;padding:16px 16px 14px;border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 0 0 1px rgba(255,255,255,.07)}
+      .lf-k{display:flex;align-items:center;gap:8px;margin:0 0 10px!important;color:var(--acc);font:500 11px/1 var(--mono)!important;letter-spacing:.1em;text-transform:uppercase}
+      .lf-k .lf-n{color:var(--tx-3);margin-left:auto}
+      .lp-feat b{font-size:17px!important;line-height:21px!important;letter-spacing:-.015em}
+      .lp-feat small{margin-top:4px!important}
+      .lf-ro{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)}
+      .lf-ro em{font:500 11px/1.2 var(--mono);font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:var(--tx-2);text-align:right}
+      .lf-ro strong{font:500 30px/1 var(--mono);letter-spacing:-.04em;color:var(--tx)}
+      .lf-av{display:flex}.lf-av i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:700 11px/1 var(--font);font-style:normal;background:#F6F8FA;color:#0E2A47;box-shadow:0 0 0 2px #15304F}.lf-av i+i{margin-left:-6px}.lf-av i.on{background:var(--acc)}
+      .lf-rt{flex:1;display:flex;gap:3px;height:6px;max-width:170px}.lf-rt i{border-radius:3px}
+      .lf-pin{display:inline-flex;align-items:center;gap:6px;padding:6px 10px 6px 8px;border-radius:99px;background:rgba(200,240,60,.12);color:var(--acc);font:600 13px/1 var(--font)}.lf-pin svg{width:15px;height:15px}
+      .lp-end{margin-top:18px;padding:22px 0 6px;border-top:1px solid rgba(255,255,255,.08);display:grid;justify-items:center;gap:12px;text-align:center}
+      .lp-end p{margin:0;color:var(--tx-2);font-size:14px}
+      .lp-end nav{display:flex;gap:20px}.lp-end nav a{color:var(--tx);font:500 13px/1 var(--font);text-decoration:none;opacity:.85}
+      .lp-end small{color:var(--tx-3);font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}`;
       document.head.appendChild(st);
       document.body.appendChild(el);
       const f = el.querySelector("form"), noteEl = el.querySelector(".join-note"), btns = el.querySelectorAll("button");
