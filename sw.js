@@ -15,7 +15,7 @@ const CORE = [
   "three.min.js", "LineSegmentsGeometry.js", "LineMaterial.js", "LineSegments2.js",
   "firebase-app-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js",
   "Geist-Variable.woff2", "GeistMono-Variable.woff2",
-  "icon-192.png", "icon-512.png", "maskable-512.png", "apple-touch-icon.png", "favicon-32.png", "icon.svg"
+  "nieve-k.webp", "icon-192.png", "icon-512.png", "maskable-512.png", "apple-touch-icon.png", "favicon-32.png", "icon.svg"
 ];
 const FRESH = /\/(index\.html|backend\.js|firebase-config\.js)?$/;   // la página y los scripts propios
 const NET_MS = 2500;

@@ -54,10 +54,11 @@
       const el = document.createElement("div");
       el.className = "join";
       el.innerHTML = `
+        <div class="lp-snow" aria-hidden="true"></div>
         <div class="lp" data-lang="${LANG}">
         <div class="lp-lang" role="group" aria-label="Idioma / Language"><button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button></div>
         <header class="lp-hero">
-          <div class="lp-logo"><svg width="48" height="48" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#14355A" stroke-width="4.5" stroke-linecap="round"/></svg><svg class="lp-wm" viewBox="0 0 331 100" width="122" height="37" role="img" aria-label="Vallik"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg></div>
+          <div class="lp-logo"><svg class="lp-mark" width="48" height="48" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#14355A" stroke-width="4.5" stroke-linecap="round"/></svg><svg class="lp-wm" viewBox="0 0 331 100" width="122" height="37" role="img" aria-label="Vallik"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg></div>
           <h1>${L("Que nadie se pierda del grupo","Nobody gets lost from the group")}</h1>
           <p>${L("Ves a tus amigos en el mapa de pistas, llegas hasta ellos y volvéis a casa antes de que cierren los remontes.","See your friends on the piste map, get to them in a few turns and make it home before the lifts close.")}</p>
           <p class="lp-tags"><span>${L("Gratis","Free")}</span><span>${L("Sin instalar nada","No install")}</span><span>${L("Para grupos","Made for groups")}</span></p>
@@ -125,14 +126,21 @@
       .join-card input{height:52px;border-radius:26px;padding:0 18px;font-size:16px;color:var(--tx);background:rgba(255,255,255,.06);border:1px solid var(--hair);-webkit-appearance:none}
       .join-card input:focus{outline:none;border-color:var(--acc)}
       .join-card .btn.wide+.btn.wide{margin-top:-4px}
-      .join-card .btn[disabled]{opacity:.5}`;
+      .join-card .btn[disabled]{opacity:.5}
+      .join{background:#0E2A47!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+      .lp-snow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:min(100%,572px);height:min(calc(100vw * 1.1185),640px);pointer-events:none;background:#3a4f66 url(nieve-k.jpg) 50% 50%/cover no-repeat;background-image:image-set("nieve-k.webp" type("image/webp"),"nieve-k.jpg" type("image/jpeg"));-webkit-mask-image:radial-gradient(140% 110% at 50% 30%,#000 60%,transparent 100%);mask-image:radial-gradient(140% 110% at 50% 30%,#000 60%,transparent 100%)}
+      .lp-snow::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,42,71,.62) 0%,rgba(14,42,71,0) 26%,rgba(14,42,71,0) 70%,#0E2A47 100%)}
+      .lp-mark{display:none}
+      .lp-hero h1{margin-top:calc(min(calc(100vw * 1.1185),640px) * .8 - 90px)!important;text-shadow:0 2px 24px rgba(14,42,71,.6)}
+      .lp-lang{background:rgba(14,42,71,.55)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+      .lp-logo .lp-wm{filter:drop-shadow(0 2px 12px rgba(14,42,71,.45))}`;
       document.head.appendChild(st);
       document.body.appendChild(el);
       const f = el.querySelector("form"), noteEl = el.querySelector(".join-note"), btns = el.querySelectorAll("button");
       const say = t => { noteEl.textContent = t || ""; noteEl.hidden = !t; };
       const busy = on => btns.forEach(b => { b.disabled = on; });
       say(note);
-      (myName && f.c ? f.c : f.n).focus();
+      (myName && f.c ? f.c : f.n).focus({ preventScroll: true });
       const nameOk = () => { myName = f.n.value.trim().slice(0, 24); if (!myName) { say((EN?"Type your name.":"Escribe tu nombre.")); f.n.focus(); } return !!myName; };
       const finish = () => {
         LS.set("pistea.nombre", myName);
