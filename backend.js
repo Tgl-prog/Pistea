@@ -128,10 +128,10 @@
       .join-card .btn[disabled]{opacity:.5}
       .join{background:#0E2A47!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
       .lp-snow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:min(100%,572px);height:min(calc(100vw * 1.3),700px);pointer-events:none;background:#3a4f66 url(nieve-k.jpg) 50% 45%/cover no-repeat;background-image:image-set("nieve-k.webp" type("image/webp"),"nieve-k.jpg" type("image/jpeg"));-webkit-mask-image:radial-gradient(140% 110% at 50% 30%,#000 60%,transparent 100%);mask-image:radial-gradient(140% 110% at 50% 30%,#000 60%,transparent 100%)}
-      .lp-snow::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,42,71,.5) 0%,rgba(14,42,71,.5) 50%,rgba(14,42,71,.88) 78%,#0E2A47 100%)}
+      .lp-snow::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,42,71,.55) 0%,rgba(14,42,71,.18) 18%,rgba(14,42,71,.22) 38%,rgba(14,42,71,.72) 56%,rgba(14,42,71,.9) 78%,#0E2A47 100%)}
       .lp-mark{display:none}
       .lp-hero{padding:8px 0 4px!important}.lp-auth small{padding:0!important}.lp-wm{width:92px;height:28px}
-      .lp-hero h1{margin-top:calc(min(calc(100vw * 1.3),700px) * .36)!important;font-size:44px!important;line-height:44px!important;text-shadow:0 2px 24px rgba(14,42,71,.6)}
+      .lp-hero h1{margin-top:calc(min(calc(100vw * 1.3),700px) * .40)!important;font-size:44px!important;line-height:44px!important;text-shadow:0 2px 24px rgba(14,42,71,.6)}
       .lp-lang{background:rgba(14,42,71,.55)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
       .lp-logo .lp-wm{filter:drop-shadow(0 2px 12px rgba(14,42,71,.45))}`;
       document.head.appendChild(st);
