@@ -18,4 +18,4 @@ window.PISTEA_PETER = { url: "https://pistea-peter.vercel.app/api/peter" };
 window.PISTEA_LOGIN = { google: true, apple: false };
 
 /* Borrado automático: true solo cuando las reglas de firestore.rules que aceptan "ttl" estén publicadas en Firebase. */
-window.PISTEA_TTL = false;
+window.PISTEA_TTL = true;
