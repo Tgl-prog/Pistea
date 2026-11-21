@@ -1186,11 +1186,13 @@ if (EN) (function () {
   }
   function minsTo(node) { const mp = myPos(); if (!mp || mp.near < 0 || node < 0) return null; const d = distAll(mp.near); return d && isFinite(d[node]) ? Math.max(1, Math.round(d[node] / 60)) : null; }
 
-  /* ================= Peter: guía de Les 3 Vallées con IA ================= */
+  /* ================= Peter: guía de esquí con IA ================= */
   const PETER_URL = (window.PISTEA_PETER && window.PISTEA_PETER.url) || "";
+  /* La estación del mapa cargado. Peter la recibe en el contexto, así sirve para cualquier estación. */
+  const RESORT = { nombre: "Les 3 Vallées", pueblos: ["Courchevel", "La Tania", "Méribel", "Brides-les-Bains", "Saint-Martin-de-Belleville", "Les Menuires", "Val Thorens", "Orelle"] };
   const PETER = { msgs: [], busy: false };
   try { const o = JSON.parse(sessionStorage.getItem("pistea.peter") || "null"); if (o && Array.isArray(o.msgs)) PETER.msgs = o.msgs.slice(-30); } catch (e) {}
-  const PETER_SUG = [(EN?"Where can we get a drink in the sun?":"¿Dónde tomamos algo al sol?"), (EN?"A nice route for this afternoon":"Ruta bonita para esta tarde"), (EN?"Where to eat well in Méribel":"Comer bien en Méribel"), (EN?"Après-ski nearby":"Après-ski cerca")];
+  const PETER_SUG = [(EN?"Where can we get a drink in the sun?":"¿Dónde tomamos algo al sol?"), (EN?"A nice route for this afternoon":"Ruta bonita para esta tarde"), (EN?"Where to eat well nearby":"Comer bien cerca"), (EN?"Après-ski nearby":"Après-ski cerca")];
   const PETER_AV = `<svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 37C17 33 7 26.5 7 16.5a13 13 0 1 1 26 0C33 26.5 23 33 20 37z" fill="#C8F03C"/><ellipse cx="15" cy="16" rx="4.2" ry="5.2" fill="#fff"/><ellipse cx="25" cy="16" rx="4.2" ry="5.2" fill="#fff"/><circle cx="16.2" cy="17.2" r="2.1" fill="#0E2A47"/><circle cx="26.2" cy="17.2" r="2.1" fill="#0E2A47"/><path d="M16.5 23.5q3.5 2.6 7 0" fill="none" stroke="#0E2A47" stroke-width="1.8" stroke-linecap="round"/></svg>`;
   function peterSave() { try { sessionStorage.setItem("pistea.peter", JSON.stringify({ msgs: PETER.msgs.slice(-30) })); } catch (e) {} }
   /* Lo que Peter necesita saber: dónde estás, la hora, qué hay cerca y qué está cerrado. Nada de nombres del grupo. */
@@ -1205,6 +1207,7 @@ if (EN) (function () {
     const mt = meet();
     return {
       idioma: EN ? "en" : "es",
+      estacion: RESORT,
       hora: new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Paris", weekday: "long", hour: "2-digit", minute: "2-digit" }).format(new Date()),
       donde: mp ? (placeOf(mp) || (EN?"on the map":"en el mapa")) : (EN?"no position marked":"sin posición marcada"),
       sitios_cerca: near.length ? near : far,
@@ -1250,7 +1253,7 @@ if (EN) (function () {
   function peterRender(scroll) {
     const el = $("#peter"); if (!el || el.hidden) return;
     const log = el.querySelector(".plog");
-    log.innerHTML = (PETER.msgs.length ? "" : `${EN?`<div class="msg a">Hi, I'm Peter. I'll tell you where to eat, where to grab a drink and which routes to ski around Les 3 Vallées, based on where you are and what's open.</div>`:`<div class="msg a">Hola, soy Peter. Te digo dónde comer, dónde tomar algo y qué rutas hacer por Les 3 Vallées, contando con dónde estás y lo que está abierto.</div>`}`)
+    log.innerHTML = (PETER.msgs.length ? "" : `${EN?`<div class="msg a">Hi, I'm Peter. I'll tell you where to eat, where to grab a drink and which routes to ski around ${esc(RESORT.nombre)}, based on where you are and what's open.</div>`:`<div class="msg a">Hola, soy Peter. Te digo dónde comer, dónde tomar algo y qué rutas hacer por ${esc(RESORT.nombre)}, contando con dónde estás y lo que está abierto.</div>`}`)
       + PETER.msgs.map(peterMsgHtml).join("") + (PETER.busy ? `${EN?`<div class="msg a typing">Peter is thinking…</div>`:`<div class="msg a typing">Peter está pensando…</div>`}` : "");
     el.querySelector(".psug").hidden = PETER.msgs.length > 2;
     el.querySelector("form .btn").disabled = PETER.busy;
@@ -1261,9 +1264,9 @@ if (EN) (function () {
     if (!el) {
       el = document.createElement("div"); el.id = "peter"; el.className = "peter";
       el.innerHTML = `<div class="pbox" role="dialog" aria-labelledby="peter-t">
-        <div class="phead"><span class="pav">${PETER_AV}${EN?`</span><div><h2 id="peter-t">Peter</h2><small>Your Les 3 Vallées guide</small></div><button class="x" data-act="peter-close" aria-label="Close">×</button></div>
+        <div class="phead"><span class="pav">${PETER_AV}${EN?`</span><div><h2 id="peter-t">Peter</h2><small>Your ski guide</small></div><button class="x" data-act="peter-close" aria-label="Close">×</button></div>
         <div class="plog" aria-live="polite"></div>
-        <div class="psug">`:`</span><div><h2 id="peter-t">Peter</h2><small>Tu guía de Les 3 Vallées</small></div><button class="x" data-act="peter-close" aria-label="Cerrar">×</button></div>
+        <div class="psug">`:`</span><div><h2 id="peter-t">Peter</h2><small>Tu guía de esquí</small></div><button class="x" data-act="peter-close" aria-label="Cerrar">×</button></div>
         <div class="plog" aria-live="polite"></div>
         <div class="psug">`}${PETER_SUG.map(t => `<button class="btn ghost" data-act="peter-sug">${esc(t)}</button>`).join("")}${EN?`</div>
         <form><input name="t" placeholder="Ask Peter…" autocomplete="off" enterkeyhint="send" aria-label="Write to Peter" maxlength="600"><button class="btn" type="submit" aria-label="Send"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
@@ -1283,7 +1286,7 @@ if (EN) (function () {
     let seen = false; try { seen = localStorage.getItem("pistea.peterhi") === "1"; } catch (e) {}
     if (seen || $("#peterhi")) return;
     const b = document.createElement("button"); b.id = "peterhi"; b.className = "peterhi"; b.dataset.act = "peter";
-    b.innerHTML = `${EN?`<b>Hi, I'm Peter</b>Ask me where to eat, where to grab a drink or which route to ski around Les 3 Vallées.`:`<b>Hola, soy Peter</b>Pregúntame dónde comer, dónde tomar algo o qué ruta hacer por Les 3 Vallées.`}`;
+    b.innerHTML = `${EN?`<b>Hi, I'm Peter</b>Ask me where to eat, where to grab a drink or which route to ski around ${esc(RESORT.nombre)}.`:`<b>Hola, soy Peter</b>Pregúntame dónde comer, dónde tomar algo o qué ruta hacer por ${esc(RESORT.nombre)}.`}`;
     const tb = $("#topbar"); b.style.top = ((tb ? tb.offsetTop + tb.offsetHeight : topInset() + 60) + 6) + "px"; document.body.appendChild(b);
     setTimeout(() => { b.remove(); try { localStorage.setItem("pistea.peterhi", "1"); } catch (e) {} }, 9000);
   }

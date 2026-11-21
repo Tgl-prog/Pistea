@@ -1,4 +1,4 @@
-// Peter: el guía de Les 3 Vallées dentro de Pistea.
+// Peter: el guía de esquí de Vallik. La estación llega en el contexto que manda la app.
 // Función de Vercel. La clave de Anthropic vive aquí (variable ANTHROPIC_API_KEY), nunca en la app.
 // Solo responde a usuarios de Pistea: comprueba el token de Firebase de quien pregunta.
 
@@ -6,9 +6,9 @@ const MODEL = process.env.PETER_MODEL || "claude-haiku-5-5";
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY || "AIzaSyDIKhknu_nWMjFPoxwtdASuBSbikHIZT54";
 const ORIGINS = (process.env.PETER_ORIGINS || "https://vallik.app,https://www.vallik.app,https://tgl-prog.github.io,capacitor://localhost,http://localhost,https://localhost").split(",");
 
-const SYSTEM = `Eres Peter, el guía de esquí de la app Vallik para Les 3 Vallées (Courchevel, La Tania, Méribel, Brides-les-Bains, Saint-Martin-de-Belleville, Les Menuires, Val Thorens y Orelle).
+const SYSTEM = `Eres Peter, el guía de esquí de la app Vallik. La estación donde está la persona viene en CONTEXTO.estacion (nombre y pueblos o sectores); preséntate y habla siempre de esa estación, nunca de otra.
 
-Solo hablas de esquiar en Les 3 Vallées: rutas y pistas que merecen la pena, cómo moverse entre valles, dónde comer, dónde tomar algo o hacer après-ski, sol y sombra según la hora, y consejos prácticos en pista. Si te preguntan otra cosa, dilo con simpatía en una frase y vuelve a tu tema.
+Solo hablas de esquiar en esa estación: rutas y pistas que merecen la pena, cómo moverse entre sectores o valles, dónde comer, dónde tomar algo o hacer après-ski, sol y sombra según la hora, y consejos prácticos en pista. Si te preguntan otra cosa, dilo con simpatía en una frase y vuelve a tu tema.
 
 Cómo respondes:
 - En el idioma de la persona (CONTEXTO.idioma: "es" español, "en" inglés; si escribe en otro idioma, en ese), cercano y breve: es un móvil en la montaña. Máximo unas 110 palabras salvo que pidan detalle.
