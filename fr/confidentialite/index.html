@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Confidentialité · Vallik</title>
+<meta name="description" content="Quelles données Vallik utilise, pourquoi, avec qui elles sont partagées et comment les supprimer.">
+<meta name="theme-color" content="#0E2A47">
+<link rel="icon" href="../../favicon-32.png" sizes="32x32">
+<style>
+@font-face { font-family: "Geist"; src: url(../../Geist-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+:root { --bg: #0E2A47; --raised: #14355A; --tx: #F6F8FA; --tx-2: #A9BCD0; --acc: #C8F03C; --line: #2A4A6B; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--tx); font: 400 17px/1.6 "Geist", system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+main { max-width: 680px; margin: 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 32px) 20px calc(env(safe-area-inset-bottom, 0px) + 48px); }
+.logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+h1 { margin: 36px 0 8px; font-size: 40px; line-height: 1.05; font-weight: 800; letter-spacing: -.035em; }
+.fecha { margin: 0 0 28px; color: var(--tx-2); font-size: 15px; }
+.resumen { margin: 0 0 36px; padding: 18px 20px; border-radius: 18px; background: rgba(200,240,60,.08); box-shadow: inset 0 0 0 1px rgba(200,240,60,.3); }
+.resumen p { margin: 0; }
+h2 { margin: 40px 0 10px; font-size: 22px; line-height: 1.25; font-weight: 700; letter-spacing: -.02em; }
+p, li { color: #DCE4EC; }
+ul { padding-left: 20px; margin: 10px 0; }
+li { margin: 6px 0; }
+b { color: var(--tx); font-weight: 600; }
+a { color: var(--acc); }
+table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--tx-2); font-weight: 600; font-size: 13px; }
+td:first-child { color: var(--tx); font-weight: 600; width: 34%; }
+.lang { float: right; margin-top: 8px; margin-left: 14px; font-size: 14px; }
+footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--tx-2); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+<a class="logo" href="../../" aria-label="Vallik, retour à l'app">
+<svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#14355A" stroke-width="4.5" stroke-linecap="round"/></svg>
+<svg viewBox="0 0 331 100" width="96" height="29" aria-hidden="true"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg>
+</a>
+<a class="lang" href="../../privacidad/" hreflang="es">Español</a> <a class="lang" href="../../privacy/" hreflang="en">English</a>
+
+<h1>Politique de confidentialité</h1>
+<p class="fecha">Dernière mise à jour : 21 novembre 2026</p>
+
+<div class="resumen"><p><b>En bref :</b> Vallik utilise ton prénom et ta position dans la station pour que les personnes de ton groupe te voient sur la carte. Seul ton groupe les voit, nous ne vendons pas de données, il n'y a pas de publicité et tu peux tout supprimer quand tu veux.</p></div>
+
+<h2>Qui est responsable</h2>
+<p>Vallik est une app pour les groupes de skieurs, disponible aujourd'hui aux 3 Vallées. Pour toute question sur tes données, écris à <a href="mailto:vallik-soporte@googlegroups.com">vallik-soporte@googlegroups.com</a>.</p>
+
+<h2>Quelles données nous utilisons et pourquoi</h2>
+<table>
+<thead><tr><th>Donnée</th><th>Pourquoi</th></tr></thead>
+<tbody>
+<tr><td>Ton prénom</td><td>Pour que ton groupe sache qui tu es sur la carte et dans les messages.</td></tr>
+<tr><td>Ta photo de profil, si tu en ajoutes une</td><td>Pour que ton groupe te reconnaisse sur la carte. Elle est enregistrée en petit format (environ 160 px) et seul ton groupe la voit. Tu peux la retirer quand tu veux depuis ton profil.</td></tr>
+<tr><td>Ton compte Google ou Apple (nom et e-mail), si tu choisis de te connecter avec</td><td>Pour retrouver ton profil sur un autre téléphone. Si tu entres seulement avec ton prénom, nous n'utilisons aucun compte.</td></tr>
+<tr><td>Ta position</td><td>Pour te montrer sur la carte à ton groupe, calculer les itinéraires, le retour et le point de rendez-vous. Elle est enregistrée quand tu appuies sur « Je suis ici » ou tant que « En direct » est activé, jamais sans que tu l'actives.</td></tr>
+<tr><td>Ta position pendant le guidage vocal</td><td>Si tu actives le guidage vocal sur un itinéraire, l'app lit ton GPS <b>uniquement sur ton téléphone</b> pour t'annoncer chaque étape. Elle n'est ni enregistrée ni envoyée, sauf si « En direct » est aussi activé.</td></tr>
+<tr><td>Ton parcours de la journée</td><td>Tant que « En direct » est activé, l'app garde ton parcours <b>uniquement sur ton téléphone</b> pour que tu puisses le revoir dans « Ma journée ». Il n'est envoyé à personne et s'efface tout seul au bout d'environ 15 jours.</td></tr>
+<tr><td>Les pistes que tu notes dans le carnet</td><td>Ton résumé de la journée et celui du groupe.</td></tr>
+<tr><td>Messages et alertes</td><td>« Je t'attends ici », « J'ai besoin d'aide », points de rendez-vous et alertes sur les pistes ou remontées que tu partages avec ton groupe.</td></tr>
+<tr><td>Questions à Peter</td><td>Pour te répondre. Voir la partie sur Peter.</td></tr>
+<tr><td>Données enregistrées sur ton téléphone</td><td>Ton prénom, le code du groupe, la langue, ton logement, ton parcours et la copie de la carte, pour que l'app marche sans réseau. Elles ne quittent pas ton téléphone.</td></tr>
+</tbody>
+</table>
+<p>La base légale est ton consentement, que tu donnes en rejoignant un groupe et en activant la localisation, ainsi que l'exécution du service que tu demandes. Tu peux le retirer à tout moment en arrêtant de partager ta position ou en quittant le groupe.</p>
+
+<h2>Qui voit tes données</h2>
+<p>Ton prénom, ta photo, ta position, tes messages et tes pistes ne sont visibles que par les personnes de ton groupe, c'est-à-dire celles qui ont son lien ou son code. Il n'y a pas de profils publics, nous ne vendons pas de données et ne les utilisons pas pour la publicité.</p>
+
+<h2>Peter, le guide à intelligence artificielle</h2>
+<p>Quand tu poses une question à Peter, nous envoyons ta question avec un contexte minimal : la station, l'heure, la langue, le nom de la piste ou du lieu où tu es, les restaurants et bars proches, ce qui est fermé et les alertes du groupe. <b>Nous n'envoyons ni les noms ni les photos des personnes de ton groupe.</b> La question passe par notre serveur et la réponse vient d'un modèle d'Anthropic (Claude), qui n'utilise pas ces conversations pour entraîner ses modèles.</p>
+
+<h2>Prestataires que nous utilisons</h2>
+<ul>
+<li><b>Google Firebase</b> : connexion et base de données du groupe.</li>
+<li><b>GitHub Pages</b> : héberge le site de l'app.</li>
+<li><b>Vercel</b> et <b>Anthropic</b> : uniquement pour Peter.</li>
+<li><b>Google</b> et <b>Apple</b> : seulement si tu choisis de te connecter avec leur compte.</li>
+</ul>
+<p>Certains de ces prestataires peuvent traiter des données hors de l'Espace économique européen. Ils le font avec les garanties exigées par le RGPD, comme les clauses contractuelles types de la Commission européenne.</p>
+
+<h2>Combien de temps nous les gardons</h2>
+<ul>
+<li>Quand tu appuies sur <b>Quitter le groupe</b>, ta position, ton profil (avec ta photo) et tes messages dans ce groupe sont supprimés.</li>
+<li>Si la personne qui a créé le groupe te retire, ils sont aussi supprimés.</li>
+<li>Les pistes du carnet restent dans le groupe comme historique du séjour. Si tu veux les supprimer, ou supprimer tout ton compte, écris-nous et nous le ferons sous 30 jours maximum.</li>
+<li>Les données enregistrées sur ton téléphone, y compris ton parcours, s'effacent quand tu supprimes l'app ou les données du navigateur.</li>
+</ul>
+
+<h2>Tes droits</h2>
+<p>Tu peux demander à accéder à tes données, les corriger, les supprimer, en limiter l'utilisation, les récupérer ou t'opposer à leur traitement en écrivant à <a href="mailto:vallik-soporte@googlegroups.com">vallik-soporte@googlegroups.com</a>. Si tu penses que nous les traitons mal, tu peux porter plainte auprès de l'autorité de protection des données de ton pays, par exemple la CNIL en France (<a href="https://www.cnil.fr">cnil.fr</a>) ou l'AEPD en Espagne (<a href="https://www.aepd.es">aepd.es</a>).</p>
+
+<h2>Mineurs</h2>
+<p>Vallik n'est pas destinée aux moins de 15 ans en France, ni aux moins de 14 ans en Espagne. Si tu as moins que cet âge, utilise l'app seulement avec l'accord de tes parents ou tuteurs.</p>
+
+<h2>Modifications</h2>
+<p>Si nous modifions cette politique, nous mettrons à jour la date ci-dessus et, si le changement est important, nous le signalerons dans l'app.</p>
+
+<p class="fecha">Ceci est une traduction. En cas de différence, la <a href="../../privacidad/">version espagnole</a> fait foi.</p>
+
+<footer>Vallik · <a href="../conditions/">Conditions</a> · <a href="../../">Retour à l'app</a></footer>
+</main>
+</body>
+</html>

@@ -673,7 +673,7 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
   <button id="dimbtn" data-act="dim" aria-label="Cambiar entre 3D y plano">2D</button>
   <button data-act="zme" aria-label="Centrar en mí"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#C8F03C" stroke="none"/><path d="M12 1.8v3M12 19.2v3M1.8 12h3M19.2 12h3"/></svg></button>
 </div>
-<div class="attr">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · Copernicus DEM</div>
+<div class="attr">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> (ODbL) · <a href="condiciones/#datos" target="_blank" rel="noopener">Copernicus DEM</a></div>
 <section class="sheet" id="sheet" aria-label="Panel">
   <button id="grab" data-act="sheet-toggle" aria-label="Subir o bajar el panel"><span></span></button>
   <div id="speek"></div>
@@ -716,8 +716,8 @@ if (EN) (function () {
   document.querySelectorAll("[aria-label],[placeholder]").forEach(function (el) {
     ["aria-label", "placeholder"].forEach(function (at) { var v = el.getAttribute(at); if (v && T[v]) el.setAttribute(at, T[v]); });
   });
-  if (!CA) document.querySelectorAll('a[href="privacidad/"]').forEach(function (a) { a.setAttribute("href", "privacy/"); });
-  if (!CA) document.querySelectorAll('a[href="condiciones/"]').forEach(function (a) { a.setAttribute("href", "terms/"); });
+  if (!CA) document.querySelectorAll('a[href="privacidad/"]').forEach(function (a) { a.setAttribute("href", FR ? "fr/confidentialite/" : "privacy/"); });
+  if (!CA) document.querySelectorAll('a[href^="condiciones/"]').forEach(function (a) { a.setAttribute("href", a.getAttribute("href").replace("condiciones/", FR ? "fr/conditions/" : "terms/")); });
   document.title = CA ? "Vallik · El mapa del teu grup a l'estació" : FR ? "Vallik · La carte de ton groupe à la station" : "Vallik · Your group's map at the resort";
 })();
 </script>
@@ -3061,7 +3061,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <div class="profhead"><label class="profav" aria-label="${has ? (EN ? ((CA?"Canviar la foto":FR?"Changer la photo":"Change photo")) : "Cambiar foto") : (EN ? ((CA?"Afegir una foto":FR?"Ajouter une photo":"Add a photo")) : "Poner una foto")}">${fotoSrc(me) ? `<img src="${fotoSrc(me)}" alt="">` : `<span style="--c:${colorOf(me)}">${esc(initial(me))}</span>`}<i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></i><input type="file" accept="image/*" id="fotoin" hidden></label>
         <div><p class="quiet">${EN ? ((CA?"El teu grup veu la teva foto al mapa en lloc de la inicial.":FR?"Ton groupe voit ta photo sur la carte au lieu de ton initiale.":"Your group sees your photo on the map instead of your initial.")) : "Tu grupo ve tu foto en el mapa en lugar de tu inicial."}</p>${has ? `<button class="link" data-act="foto-del">${EN ? ((CA?"Treure la foto":FR?"Retirer la photo":"Remove photo")) : "Quitar foto"}</button>` : ""}</div></div>
       ${langHtml()}`;
-    const smore = `${accHtml()}<p class="quiet proflegal"><a href="${EN ? (CA?"privacidad/":"privacy/") : "privacidad/"}">${EN ? ((CA?"Privacitat":FR?"Confidentialité":"Privacy")) : "Privacidad"}</a> · <a href="${EN ? (CA?"condiciones/":"terms/") : "condiciones/"}">${EN ? ((CA?"Condicions":FR?"Conditions":"Terms")) : "Condiciones"}</a></p>`;
+    const smore = `${accHtml()}<p class="quiet proflegal"><a href="${EN ? (CA?"privacidad/":FR?"fr/confidentialite/":"privacy/") : "privacidad/"}">${EN ? ((CA?"Privacitat":FR?"Confidentialité":"Privacy")) : "Privacidad"}</a> · <a href="${EN ? (CA?"condiciones/":FR?"fr/conditions/":"terms/") : "condiciones/"}">${EN ? ((CA?"Condicions":FR?"Conditions":"Terms")) : "Condiciones"}</a></p>`;
     return { speek, smore };
   }
   function fotoHtml() {
@@ -3092,7 +3092,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     if (!a.anon) return `${EN?((CA?`<h3 class="sec">El teu compte</h3><p class="quiet">Has entrat amb `:FR?`<h3 class="sec">Ton compte</h3><p class="quiet">Tu es connecté avec `:`<h3 class="sec">Your account</h3><p class="quiet">You're signed in with `)):`<h3 class="sec">Tu cuenta</h3><p class="quiet">Has entrado con `}${esc(a.via || (EN?((CA?"el teu compte":FR?"ton compte":"your account")):"tu cuenta"))}${a.email ? " · " + esc(a.email) : ""}${EN?((CA?`. El teu perfil et segueix encara que canviïs de mòbil.</p>`:FR?`. Ton profil te suit si tu changes de téléphone.</p>`:`. Your profile follows you if you change phones.</p>`)):`. Tu perfil te sigue si cambias de móvil.</p>`}`;
     const ks = ["google", "apple"].filter(k => G.canLogin(k)); if (!ks.length) return "";
     return `${EN?((CA?`<h3 class="sec">Guarda el teu perfil</h3><p class="quiet">Ara el teu perfil només viu en aquest mòbil. Amb un compte el recuperes en qualsevol altre, sense perdre res d'avui. <a href="privacidad/" style="color:var(--acc)">Privacitat</a></p>
-      `:FR?`<h3 class="sec">Garde ton profil</h3><p class="quiet">Pour l'instant ton profil ne vit que sur ce téléphone. Avec un compte, tu le retrouves sur n'importe quel autre, sans rien perdre d'aujourd'hui. <a href="privacy/" style="color:var(--acc)">Confidentialité</a></p>
+      `:FR?`<h3 class="sec">Garde ton profil</h3><p class="quiet">Pour l'instant ton profil ne vit que sur ce téléphone. Avec un compte, tu le retrouves sur n'importe quel autre, sans rien perdre d'aujourd'hui. <a href="fr/confidentialite/" style="color:var(--acc)">Confidentialité</a></p>
       `:`<h3 class="sec">Save your profile</h3><p class="quiet">Right now your profile only lives on this phone. With an account you get it back on any other, without losing anything from today. <a href="privacy/" style="color:var(--acc)">Privacy</a></p>
       `)):`<h3 class="sec">Guarda tu perfil</h3><p class="quiet">Ahora tu perfil vive solo en este móvil. Con una cuenta lo recuperas en cualquier otro, sin perder nada de lo de hoy. <a href="privacidad/" style="color:var(--acc)">Privacidad</a></p>
       `}${ks.map(k => `<button class="btn wide acc-btn ${k}" data-act="acc-link" data-k="${k}${EN?((CA?`">Continuar amb `:FR?`">Continuer avec `:`">Continue with `)):`">Continuar con `}${k === "google" ? "Google" : "Apple"}</button>`).join("")}`;

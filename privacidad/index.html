@@ -29,7 +29,7 @@ table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15px;
 th, td { text-align: left; vertical-align: top; padding: 10px 8px; border-bottom: 1px solid var(--line); }
 th { color: var(--tx-2); font-weight: 600; font-size: 13px; }
 td:first-child { color: var(--tx); font-weight: 600; width: 34%; }
-.lang { float: right; margin-top: 8px; font-size: 14px; }
+.lang { float: right; margin-top: 8px; margin-left: 14px; font-size: 14px; }
 footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--tx-2); font-size: 14px; }
 </style>
 </head>
@@ -39,10 +39,10 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#14355A" stroke-width="4.5" stroke-linecap="round"/></svg>
 <svg viewBox="0 0 331 100" width="96" height="29" aria-hidden="true"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg>
 </a>
-<a class="lang" href="../privacy/" hreflang="en">English</a>
+<a class="lang" href="../privacy/" hreflang="en">English</a> <a class="lang" href="../fr/confidentialite/" hreflang="fr">Français</a>
 
 <h1>Política de privacidad</h1>
-<p class="fecha">Última actualización: 20 de noviembre de 2026</p>
+<p class="fecha">Última actualización: 21 de noviembre de 2026</p>
 
 <div class="resumen"><p><b>En resumen:</b> Vallik usa tu nombre y tu posición en la estación para que las personas de tu grupo te vean en el mapa. Solo las ve tu grupo, no vendemos datos ni mostramos publicidad, y puedes borrarlo todo cuando quieras.</p></div>
 
@@ -58,6 +58,7 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <tr><td>Tu cuenta de Google o Apple (nombre y correo), si eliges entrar con ella</td><td>Recuperar tu perfil en otro móvil. Si entras solo con tu nombre, no usamos ninguna cuenta.</td></tr>
 <tr><td>Tu posición</td><td>Mostrarte en el mapa a tu grupo, calcular rutas, la vuelta a casa y el punto de encuentro. Se guarda cuando pulsas «Estoy aquí» o mientras tienes activado «En directo», nunca sin que lo actives.</td></tr>
 <tr><td>Tu recorrido del día</td><td>Mientras tienes «En directo» activado, la app guarda tu recorrido <b>solo en tu móvil</b> para que puedas volver a verlo en «Mi día». No se envía a nadie y se borra solo pasados unos 15 días.</td></tr>
+<tr><td>Tu posición mientras usas la guía por voz</td><td>Si activas la guía por voz en una ruta, la app lee tu GPS <b>solo en tu móvil</b> para avisarte de cada paso. No se guarda ni se envía a nadie, salvo que también tengas activado «En directo».</td></tr>
 <tr><td>Pistas que apuntas en el diario</td><td>Tu resumen del día y el del grupo.</td></tr>
 <tr><td>Mensajes y avisos</td><td>«Os espero aquí», «Necesito ayuda», puntos de encuentro y avisos sobre pistas o remontes que compartes con tu grupo.</td></tr>
 <tr><td>Preguntas a Peter</td><td>Responderte. Ver el apartado sobre Peter.</td></tr>
@@ -70,7 +71,7 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <p>Tu nombre, tu foto, tu posición, tus mensajes y tus pistas solo los ven las personas que están en tu grupo, es decir, quienes tienen su enlace o su código. No hay perfiles públicos, no vendemos datos y no los usamos para publicidad.</p>
 
 <h2>Peter, el guía con inteligencia artificial</h2>
-<p>Cuando preguntas algo a Peter, enviamos tu pregunta junto con un contexto mínimo: la hora, el idioma, el nombre de la pista o el sitio donde estás, los restaurantes y bares cercanos, lo que está cerrado y los avisos del grupo. <b>No enviamos los nombres ni las fotos de las personas de tu grupo.</b> La pregunta pasa por nuestro servidor y la responde un modelo de Anthropic (Claude), que no usa esas conversaciones para entrenar sus modelos.</p>
+<p>Cuando preguntas algo a Peter, enviamos tu pregunta junto con un contexto mínimo: la estación, la hora, el idioma, el nombre de la pista o el sitio donde estás, los restaurantes y bares cercanos, lo que está cerrado y los avisos del grupo. <b>No enviamos los nombres ni las fotos de las personas de tu grupo.</b> La pregunta pasa por nuestro servidor y la responde un modelo de Anthropic (Claude), que no usa esas conversaciones para entrenar sus modelos.</p>
 
 <h2>Proveedores que usamos</h2>
 <ul>
@@ -93,7 +94,7 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <p>Puedes pedir acceder a tus datos, corregirlos, borrarlos, limitar su uso, llevártelos o oponerte a su tratamiento escribiendo a <a href="mailto:vallik-soporte@googlegroups.com">vallik-soporte@googlegroups.com</a>. Si crees que no los tratamos bien, puedes reclamar ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es">aepd.es</a>).</p>
 
 <h2>Menores</h2>
-<p>Vallik no está pensada para menores de 14 años. Si eres menor de esa edad, usa la app solo con permiso de tus padres o tutores.</p>
+<p>Vallik no está pensada para menores de 14 años en España, ni de 15 en Francia. Si eres menor de esa edad, usa la app solo con permiso de tus padres o tutores.</p>
 
 <h2>Cambios</h2>
 <p>Si cambiamos esta política, actualizaremos la fecha de arriba y, si el cambio es importante, lo avisaremos dentro de la app.</p>
