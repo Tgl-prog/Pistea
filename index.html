@@ -1770,6 +1770,13 @@ if (EN) (function () {
   }
 
   /* ================= Mapa: dibujo ================= */
+  /* Medidor para probar en el móvil: vallik.app/?perf muestra fotogramas por segundo y lo que tarda cada dibujo */
+  const PERFHUD = /[?&]perf\b/.test(location.search) ? { t: [], d: [], el: null } : null;
+  function perfHud(now) {
+    const H = PERFHUD; H.t.push(now); while (H.t.length && now - H.t[0] > 1000) H.t.shift();
+    if (!H.el) { H.el = document.createElement("div"); H.el.style.cssText = "position:fixed;left:8px;top:calc(env(safe-area-inset-top,0px) + 70px);z-index:99;padding:6px 9px;border-radius:9px;background:rgba(0,0,0,.72);color:#C8F03C;font:600 12px/1.3 ui-monospace,monospace;pointer-events:none;white-space:pre"; document.body.appendChild(H.el); }
+    if (!H.n || now - H.n > 250) { H.n = now; H.el.textContent = H.t.length + " fps\n" + (dragging ? "arrastrando" : inertia ? "inercia" : "quieto"); }
+  }
   function drawSoon() { if (drawQueued) return; drawQueued = true; requestAnimationFrame(frame); }
   function frame(now) {
     drawQueued = false;
@@ -1785,6 +1792,7 @@ if (EN) (function () {
       if (Math.hypot(inertia.vx, inertia.vy) * V.s < 0.02 && Math.abs(inertia.vz || 0) < 0.00004 && Math.abs(inertia.vb || 0) < 0.003) inertia = null; else more = true;
     }
     if (window.__PERF) { const t0 = performance.now(); draw(); window.__PERF.push(performance.now() - t0); } else draw();
+    if (PERFHUD) perfHud(now);
     const cp = $("#compass"); if (cp) cp.style.transform = `rotate(${-CAM.b}deg)`;
     const dm = $("#dimbtn"); if (dm) dm.textContent = CAM.t > 8 ? "2D" : "3D";
     if (more) drawSoon();
@@ -3430,7 +3438,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
   const setHtml = (el, h) => { if (el && el.__h !== h) { el.innerHTML = h; el.__h = h; return true; } return false; };
   function ui() {
     if (!$("#sheet")) return;
-    if (ptrDown && !dragging) { uiLater = true; drawSoon(); return; }
+    if (ptrDown) { uiLater = true; if (!dragging) drawSoon(); return; }   // con el dedo en el mapa tampoco: rehacer el HTML a mitad de arrastre da tirones
     const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, juntar: juntarHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml, replay: replayHtml, prof: profHtml }[m]();
     const sb = $("#sheet");
     const ae = document.activeElement, fid = ae && ae.id && sb.contains(ae) ? ae.id : null;
@@ -4069,11 +4077,13 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     if (M.ok && firstFit) { firstFit = false; overview(0); }
     else if (M.ok) drawSoon();
     const ptrs = new Map(); let last = null, moved = 0, t0 = 0, mode = null, lastTap = 0, samples = [], psamples = [];
-    const rel = e => { const rr = vp.getBoundingClientRect(); return [e.clientX - rr.left, e.clientY - rr.top]; };
+    let vpRect = null;   // se mide al apoyar el dedo: medir en cada movimiento obliga al navegador a recalcular la página
+    const rel = e => { const rr = vpRect || vp.getBoundingClientRect(); return [e.clientX - rr.left, e.clientY - rr.top]; };
     vp.addEventListener("contextmenu", e => e.preventDefault());
     vp.addEventListener("pointerdown", e => {
       if (e.target.closest("button, a")) return;
       stopMotion();
+      if (!ptrs.size) vpRect = vp.getBoundingClientRect();
       const [x, y] = rel(e);
       ptrs.set(e.pointerId, { x, y, x0: x, y0: y, rot: e.pointerType === "mouse" && (e.button === 2 || e.shiftKey || e.ctrlKey) });
       try { vp.setPointerCapture(e.pointerId); } catch (er) {}
@@ -4134,6 +4144,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
         if (ptrs.size) return;
       }
       if (!ptrs.size) {
+        vpRect = null;
         vp.classList.remove("drag"); dragging = false; drawSoon();
         if (moved < 8 && Date.now() - t0 < 600) {
           const now = Date.now();
