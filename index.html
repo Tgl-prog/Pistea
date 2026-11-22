@@ -138,7 +138,7 @@ button { cursor: pointer; }
 .topbar { position: fixed; z-index: 6; left: 0; right: 0; top: 0; padding: calc(var(--sat) + 10px) 12px 0; display: grid; grid-template-columns: 1fr 52px; gap: 8px; pointer-events: none; }
 .topbar > * { pointer-events: auto; }
 .search { position: relative; }
-.search input { width: 100%; height: 52px; border-radius: 26px; color: var(--tx); background: var(--glass) url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%2314355A%22/%3E%3Cmask id=%22h%22 maskUnits=%22userSpaceOnUse%22 x=%220%22 y=%220%22 width=%22110%22 height=%22100%22%3E%3Crect width=%22110%22 height=%22100%22 fill=%22%23fff%22/%3E%3Cpath d=%22M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%224.5%22 stroke-linecap=%22round%22/%3E%3C/mask%3E%3Cg mask=%22url(%23h)%22%3E%3Crect x=%2227%22 y=%2216%22 width=%2217%22 height=%2268%22 fill=%22%23F6F8FA%22/%3E%3Cpolygon points=%2243,58 67,32 87,32 43,79%22 fill=%22%23F6F8FA%22/%3E%3Cpolygon points=%2256,65 66,55 88,84 67,84%22 fill=%22%23C8F03C%22/%3E%3C/g%3E%3C/svg%3E") no-repeat 12px 50% / 28px 28px; -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); padding: 0 16px 0 48px; font-size: 16px; box-shadow: var(--shadow); -webkit-appearance: none; }
+.search input { width: 100%; height: 52px; border-radius: 26px; color: var(--tx); background: var(--glass) url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%2314355A%22/%3E%3Cmask id=%22h%22 maskUnits=%22userSpaceOnUse%22 x=%220%22 y=%220%22 width=%22110%22 height=%22100%22%3E%3Crect width=%22110%22 height=%22100%22 fill=%22%23fff%22/%3E%3Cpath d=%22M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%224.5%22 stroke-linecap=%22round%22/%3E%3C/mask%3E%3Cg mask=%22url(%23h)%22 transform=%22translate(-5%200)%22%3E%3Crect x=%2227%22 y=%2216%22 width=%2217%22 height=%2268%22 fill=%22%23F6F8FA%22/%3E%3Cpolygon points=%2243,58 67,32 87,32 43,79%22 fill=%22%23F6F8FA%22/%3E%3Cpolygon points=%2256,65 66,55 88,84 67,84%22 fill=%22%23C8F03C%22/%3E%3C/g%3E%3C/svg%3E") no-repeat 12px 50% / 28px 28px; -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); padding: 0 16px 0 48px; font-size: 16px; box-shadow: var(--shadow); -webkit-appearance: none; }
 .search input::placeholder { color: var(--tx-3); }
 .search input { padding-right: 56px; }
 .peterbtn { position: absolute; right: 5px; top: 5px; width: 42px; height: 42px; border: 0; border-radius: 21px; padding: 0; background: rgba(200,240,60,.14); box-shadow: inset 0 0 0 1px rgba(200,240,60,.45); display: grid; place-items: center; }
@@ -432,6 +432,7 @@ body.has-dock #smore { padding-bottom: 20px; }
 .msgbtns .btn.danger { background: rgba(255,77,79,.14); font-weight: 700; }
 .meetwide { width: 100%; min-height: 52px; border-radius: 26px; display: flex; align-items: center; justify-content: center; gap: 10px; font: 600 16px/1 var(--font); color: var(--acc); background: rgba(200,240,60,.10); border: 0; box-shadow: inset 0 0 0 1px rgba(200,240,60,.45); }
 .meetwide .flag { width: 20px; height: 20px; }
+.meetwide.ghostw { margin-top: 8px; color: var(--tx); background: transparent; box-shadow: inset 0 0 0 1px var(--hair-2); }
 .avgrid { display: grid; gap: 6px; }
 .avgrid button { min-height: 60px; border: 0; border-radius: 18px; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); color: var(--tx); font: 600 13px/1 var(--font); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
 .avgrid button i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
@@ -693,7 +694,7 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
 <div id="mapvp">
   <canvas id="gl" aria-hidden="true"></canvas>
   <canvas id="cv" role="img" aria-label="Vallik: mapa en 3D de pistas y remontes de Les 3 Vallées"></canvas>
-  <div class="loading" id="mload"><div class="kload" role="img" aria-label="Vallik"><svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 100 100" aria-hidden="true"><defs><filter id="kglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter></defs><rect width="100" height="100" rx="22.5" fill="#0E2A47"/><mask id="kcut" maskUnits="userSpaceOnUse" x="0" y="0" width="110" height="100"><rect width="110" height="100" fill="#fff"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#000" stroke-width="4.5" stroke-linecap="round"/></mask><g mask="url(#kcut)"><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C" opacity=".16"/><polygon class="kleg kglow" points="56,65 66,55 88,84 67,84" fill="#C8F03C" filter="url(#kglow)"/><polygon class="kleg" points="56,65 66,55 88,84 67,84" fill="#C8F03C"/></g></svg></div><small>Cargando la montaña</small><p class="seo">Vallik es una app gratuita para grupos de esquiadores. Ves dónde está cada uno en el mapa de la estación, calculas la ruta hasta un amigo, un bar o el punto de encuentro, y sabes cuándo salir para volver antes de que cierren los remontes. Vallik is a free app for groups of skiers: see your friends on the resort map, get to them and make it home before the lifts close.</p><nav class="seo-links" aria-label="Información legal"><a href="privacidad/">Política de privacidad</a> · <a href="condiciones/">Condiciones del servicio</a></nav></div>
+  <div class="loading" id="mload"><div class="kload" role="img" aria-label="Vallik"><svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 100 100" aria-hidden="true"><defs><filter id="kglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter></defs><rect width="100" height="100" rx="22.5" fill="#0E2A47"/><mask id="kcut" maskUnits="userSpaceOnUse" x="0" y="0" width="110" height="100"><rect width="110" height="100" fill="#fff"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#000" stroke-width="4.5" stroke-linecap="round"/></mask><g mask="url(#kcut)" transform="translate(-5 0)"><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C" opacity=".16"/><polygon class="kleg kglow" points="56,65 66,55 88,84 67,84" fill="#C8F03C" filter="url(#kglow)"/><polygon class="kleg" points="56,65 66,55 88,84 67,84" fill="#C8F03C"/></g></svg></div><small>Cargando la montaña</small><p class="seo">Vallik es una app gratuita para grupos de esquiadores. Ves dónde está cada uno en el mapa de la estación, calculas la ruta hasta un amigo, un bar o el punto de encuentro, y sabes cuándo salir para volver antes de que cierren los remontes. Vallik is a free app for groups of skiers: see your friends on the resort map, get to them and make it home before the lifts close.</p><nav class="seo-links" aria-label="Información legal"><a href="privacidad/">Política de privacidad</a> · <a href="condiciones/">Condiciones del servicio</a></nav></div>
 </div>
 <div id="cross" hidden aria-hidden="true"><svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="14" fill="none" stroke="#fff" stroke-width="7"/><circle cx="32" cy="32" r="14" fill="none" stroke="#C8F03C" stroke-width="3.5"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M32 2v16M32 46v16M2 32h16M46 32h16" stroke="#0E2A47" stroke-width="3" stroke-linecap="round"/></svg></div>
 <header class="topbar" id="topbar">
@@ -798,12 +799,16 @@ if (EN) (function () {
   const AVISOS = {
     cerrado: { s: (EN?((CA?"Tancat":FR?"Fermé":"Closed")):"Cerrado"), c: "#E03131", t: "#fff", L: 1, R: 1 },
     cola: { s: (EN?(CA?"Cua":"Queue"):"Cola"), c: "#FFD23F", t: "#0E2A47", L: 1 },
+    gente: { s: (EN?((CA?"Molta gent":FR?"Du monde":"Crowded")):"Mucha gente"), c: "#FF922B", t: "#0E2A47", R: 1 },
     hielo: { s: (EN?((CA?"Gel":FR?"Verglas":"Ice")):"Hielo"), c: "#A5D8FF", t: "#0E2A47", R: 1 },
     niebla: { s: (EN?((CA?"Boira":FR?"Brouillard":"Fog")):"Niebla"), c: "#CED4DA", t: "#0E2A47", L: 1, R: 1 }
   };
-  const AVISO_MS = 2 * 3600e3, COLA_S = 600;
+  const AVISO_MS = 2 * 3600e3, COLA_S = 600, GENTE_S = 180;   // una pista llena se evita si hay otra que tarde poco más
   /* Mensajes de un toque. Salen como aviso a los demás si son de hace menos de 10 min (ayuda: 30 min) */
   const MSGS = { espero: (EN?((CA?"T'espero aquí":FR?"Je t'attends ici":"I'm waiting here")):"Os espero aquí"), bar: (EN?((CA?"Anem al bar":FR?"On va au bar":"Heading to the bar")):"Bajo al bar"), ayuda: (EN?((CA?"Necessito ajuda":FR?"J'ai besoin d'aide":"I need help")):"Necesito ayuda"), voy: (EN?((CA?"Vinc a ajudar":FR?"J'arrive pour aider":"I'm coming to help")):"Voy a ayudar") };
+  /* "Os espero arriba de…": es un "espero" con el sitio en lo alto de un remonte. Se lee entero en el aviso. */
+  const TOPRE = /^(arriba |at the top of |en haut |a dalt )/;
+  const msgText = m => m && m.tipo === "espero" && typeof m.en === "string" && TOPRE.test(m.en) ? (EN ? ((CA?"T'espero ":FR?"Je t'attends ":"I'm waiting ")) : "Os espero ") + m.en : MSGS[m.tipo];
   const MSG_HOME = ["espero", "bar"];   // la ayuda tiene su propio botón grande, arriba
   const MSG_IC = {
     espero: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`,
@@ -939,7 +944,7 @@ if (EN) (function () {
       for (const e of ADJ[u]) {
         if (noBlack && e[3] === 0 && (F[e[2]].d === "n" || F[e[2]].d === "i")) continue;
         if (e[2] >= 0 && (AVX.closed.has(e[2]) || (ofiClosedSet && ofiClosedSet.has(e[2])))) continue;
-        const c = e[1] + ((e[3] === 1 || e[3] === 3) && AVX.cola.has(e[2]) ? COLA_S : 0), nd = d + c;
+        const c = e[1] + ((e[3] === 1 || e[3] === 3) && AVX.cola.has(e[2]) ? COLA_S : 0) + (e[2] >= 0 && AVX.gente.has(e[2]) ? GENTE_S : 0), nd = d + c;
         if (nd < dist[e[0]]) { dist[e[0]] = nd; prev[e[0]] = u; pe[e[0]] = e; pc[e[0]] = c; push([nd, e[0]]); }
       }
     }
@@ -1118,13 +1123,13 @@ if (EN) (function () {
     const fi = fisOfRef(ref)[0]; if (fi == null) return null;
     const f = F[fi]; return f.g || { k: f.k, name: "", d: f.d, t: f.t, fis: [fi], len: f.len, zt: f.zt, zb: f.zb, dur: f.dur };
   }
-  const AVX = { closed: new Set(), cola: new Set() };
+  const AVX = { closed: new Set(), cola: new Set(), gente: new Set() };
   let avCache = [], avKey = null, avT = 0;
   function avisos() {
     if (!M.ok) return [];
     const now = Date.now();
     if (avKey === S.avisos && now - avT < 30000) return avCache;
-    avKey = S.avisos; avT = now; AVX.closed = new Set(); AVX.cola = new Set();
+    avKey = S.avisos; avT = now; AVX.closed = new Set(); AVX.cola = new Set(); AVX.gente = new Set();
     avCache = list("avisos").filter(a => AVISOS[a.tipo] && a.exp > now && typeof a.ref === "string").sort((a, b) => b.at - a.at);
     avCache.forEach(a => fisOfRef(a.ref).forEach(fi => { if (a.tipo === "cerrado") AVX.closed.add(fi); else if (a.tipo === "cola" && F[fi].k === "L") AVX.cola.add(fi); }));
     return avCache;
@@ -1241,7 +1246,7 @@ if (EN) (function () {
       const [d, u] = pop(); if (d > dist[u]) continue;
       for (const e of ADJ[u]) {
         if (e[2] >= 0 && (AVX.closed.has(e[2]) || (cl && cl.has(e[2])))) continue;
-        const nd = d + e[1] + ((e[3] === 1 || e[3] === 3) && AVX.cola.has(e[2]) ? COLA_S : 0);
+        const nd = d + e[1] + ((e[3] === 1 || e[3] === 3) && AVX.cola.has(e[2]) ? COLA_S : 0) + (e[2] >= 0 && AVX.gente.has(e[2]) ? GENTE_S : 0);
         if (nd < dist[e[0]]) { dist[e[0]] = nd; push([nd, e[0]]); }
       }
     }
@@ -1408,7 +1413,7 @@ if (EN) (function () {
     const x = `<button class="x" data-act="banner-x" data-k="${esc(b.k)}${EN?((CA?`" aria-label="Tancar l'avís">×</button>`:FR?`" aria-label="Fermer l'alerte">×</button>`:`" aria-label="Close alert">×</button>`)):`" aria-label="Cerrar aviso">×</button>`}`;
     if (b.q) return `<div class="banner" role="status"><span class="flag" aria-hidden="true"></span><div><b>${esc(who(b.q.uid))}${EN?((CA?` proposa quedar`:FR?` propose de se retrouver`:` suggests meeting up`)):` propone quedar`}${b.q.hora ? (EN?((CA?" a les ":FR?" à ":" at ")):" a las ") + esc(b.q.hora) : ""}</b><small>${esc(cap(placeOf(b.q)))}</small></div><button class="btn go" data-act="banner-meet" data-k="${esc(b.k)}${EN?((CA?`">Veure</button>`:FR?`">Voir</button>`:`">View</button>`)):`">Ver</button>`}${x}</div>`;
     const m = b.m;
-    return `<div class="banner${b.help ? " help" : ""}" role="${b.help ? "alert" : "status"}">${av(m.uid)}<div><b>${esc(who(m.uid))}${b.help ? (EN?((CA?" necessita ajuda":FR?" a besoin d'aide":" needs help")):" necesita ayuda") : ": «" + esc(MSGS[m.tipo]) + "»"}</b><small>${m.en ? esc(placeOf(m)) + " · " : ""}${esc(ago(m.at))}</small></div>${b.help || m.tipo === "espero" ? `<button class="btn go" data-act="banner-go" data-uid="${esc(m.uid)}" data-k="${esc(b.k)}">${EN ? ((CA?"Anar-hi":FR?"Y aller":"Go")) : "Ir"}</button>` : ""}${x}</div>`;
+    return `<div class="banner${b.help ? " help" : ""}" role="${b.help ? "alert" : "status"}">${av(m.uid)}<div><b>${esc(who(m.uid))}${b.help ? (EN?((CA?" necessita ajuda":FR?" a besoin d'aide":" needs help")):" necesita ayuda") : ": «" + esc(msgText(m)) + "»"}</b><small>${m.en ? esc(placeOf(m)) + " · " : ""}${esc(ago(m.at))}</small></div>${b.help || m.tipo === "espero" ? `<button class="btn go" data-act="banner-go" data-uid="${esc(m.uid)}" data-k="${esc(b.k)}">${EN ? ((CA?"Anar-hi":FR?"Y aller":"Go")) : "Ir"}</button>` : ""}${x}</div>`;
   }
   const msgOf = uid => { const m = S.mensajes.get(uid); return m && MSGS[m.tipo] && Date.now() - m.at < HIDE_MS ? m : null; };
 
@@ -1866,6 +1871,15 @@ if (EN) (function () {
       strokeSet(lifts.filter(small), liftW * 0.7, "#1B2733");
       strokeSet(lifts.filter(f => !small(f)), liftW, "#1B2733");
     }
+
+    /* Cerrado (según Les 3 Vallées o avisado por el grupo): la línea se apaga y queda a rayas grises */
+    { const cl = ofiClosed(), shut = f => AVX.closed.has(f.fi) || (cl && cl.has(f.fi));
+      const cr = runs.filter(f => shut(f) && visibleF(f)), cL = filt.L ? lifts.filter(shut) : [];
+      if (cr.length || cL.length) {
+        strokeSet(cr, runW + 2.8, "rgba(240,244,247,.94)"); strokeSet(cr, Math.max(1.4, runW * 0.62), "rgba(84,98,112,.92)", [runW * 1.3, runW * 1.5]);
+        strokeSet(cL, liftW + 2.8, "rgba(240,244,247,.94)"); strokeSet(cL, liftW, "rgba(84,98,112,.92)", [5, 5]);
+        ctx.setLineDash([]);
+      } }
 
     /* Al seleccionar o con ruta, el resto queda en segundo plano */
     if (dim) { ctx.fillStyle = "rgba(240,245,248,.5)"; ctx.fillRect(0, 0, V.w, V.h); }
@@ -2828,7 +2842,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <div class="msgbtns">`)):`
       <h3 class="sec">Avisar al grupo</h3>
       <div class="msgbtns">`}${MSG_HOME.map(k => `<button class="btn ${k === "ayuda" ? "ghost danger" : "dark"}${myT === k ? " on" : ""}" data-act="msg" data-t="${k}" aria-pressed="${myT === k}">${MSG_IC[k]}${k === "ayuda" && confirmAct === "msg:ayuda" ? (EN?((CA?"Torna a tocar":FR?"Touche encore":"Tap again")):"Toca otra vez") : MSGS[k]}</button>`).join("")}</div>
-      ${myT ? `${EN?((CA?`<p class="quiet">Has enviat «`:FR?`<p class="quiet">Tu as envoyé «`:`<p class="quiet">You sent «`)):`<p class="quiet">Enviaste «`}${esc(MSGS[myT])}» ${esc(ago(myMsg.at))}${EN?((CA?`. Torna-hi a tocar per treure'l.</p>`:FR?`. Touche-le encore pour le retirer.</p>`:`. Tap it again to remove it.</p>`)):`. Tócalo otra vez para quitarlo.</p>`}` : `${EN?((CA?`<p class="quiet">S'envia amb la teva posició. Tothom ho veu a l'instant.</p>`:FR?`<p class="quiet">C'est envoyé avec ta position. Tout le monde le voit tout de suite.</p>`:`<p class="quiet">It's sent with your position. Everyone sees it straight away.</p>`)):`<p class="quiet">Se envía con tu posición. Los demás lo ven al momento.</p>`}`}` : "";
+      ${myT ? `${EN?((CA?`<p class="quiet">Has enviat «`:FR?`<p class="quiet">Tu as envoyé «`:`<p class="quiet">You sent «`)):`<p class="quiet">Enviaste «`}${esc(msgText(myMsg))}» ${esc(ago(myMsg.at))}${EN?((CA?`. Torna-hi a tocar per treure'l.</p>`:FR?`. Touche-le encore pour le retirer.</p>`:`. Tap it again to remove it.</p>`)):`. Tócalo otra vez para quitarlo.</p>`}` : `${EN?((CA?`<p class="quiet">S'envia amb la teva posició. Tothom ho veu a l'instant.</p>`:FR?`<p class="quiet">C'est envoyé avec ta position. Tout le monde le voit tout de suite.</p>`:`<p class="quiet">It's sent with your position. Everyone sees it straight away.</p>`)):`<p class="quiet">Se envía con tu posición. Los demás lo ven al momento.</p>`}`}` : "";
     const avs = avisos();
     const avList = avs.length ? `${EN?((CA?`
       <h3 class="sec">Avisos a pistes i remuntadors</h3>
@@ -2975,17 +2989,17 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
         <button class="btn dark" data-act="route-here">Cómo llegar</button>
         `}${tipoT && g.name ? `<button class="btn ghost${doneToday ? " on" : ""}" data-act="sel-add">${doneToday ? (EN?((CA?"Feta ✓":FR?"Fait ✓":"Done ✓")):"Hecha ✓") : (EN?((CA?"L'he feta":FR?"Je l'ai faite":"I did it")):"La hice")}</button>` : ""}${EN?((CA?`
       </div>
-      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Quedar aquí amb el grup</button>
+      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Quedar aquí amb el grup</button>${isL ? `<button class="meetwide ghostw" data-act="espero-arriba">T'espero a dalt</button>` : ""}
       <div role="group" aria-label="Avisar el grup"><span class="sublabel">Avisar el grup sobre `:FR?`
       </div>
-      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Retrouver le groupe ici</button>
+      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Retrouver le groupe ici</button>${isL ? `<button class="meetwide ghostw" data-act="espero-arriba">Je vous attends en haut</button>` : ""}
       <div role="group" aria-label="Alerter le groupe"><span class="sublabel">Prévenir le groupe à propos de `:`
       </div>
-      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Meet the group here</button>
+      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Meet the group here</button>${isL ? `<button class="meetwide ghostw" data-act="espero-arriba">Wait for the group at the top</button>` : ""}
       <div role="group" aria-label="Alert the group"><span class="sublabel">Tell the group about `)):`
       </div>
-      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Quedar aquí con el grupo</button>
-      <div role="group" aria-label="Avisar al grupo"><span class="sublabel">Avisar al grupo de `}${isL ? (EN?((CA?"aquest remuntador":FR?"cette remontée":"this lift")):"este remonte") : (EN?((CA?"aquesta pista":FR?"cette piste":"this piste")):"esta pista")}</span>${(ks => `<div class="avgrid" style="grid-template-columns:repeat(${ks.length},minmax(0,1fr))">${ks.map(k => `<button data-act="aviso" data-t="${k}" aria-pressed="${mineAv.has(k)}"><i style="--c:${AVISOS[k].c}"></i>${AVISOS[k].s}</button>`).join("")}</div>`)(Object.keys(AVISOS).filter(k => AVISOS[k][g.k]))}${EN?((CA?`<small class="avhint">Duren 2 hores. `:FR?`<small class="avhint">Elles durent 2 heures. `:`<small class="avhint">They last 2 hours. `)):`<small class="avhint">Duran 2 horas. `}${isL ? (EN?((CA?"Les rutes eviten el que està tancat i sumen la cua.":FR?"Les itinéraires évitent ce qui est fermé et ajoutent la queue.":"Routes avoid what's closed and add the queue.")):"Las rutas evitan lo cerrado y suman la cola.") : (EN?((CA?"Les rutes eviten el que està tancat.":FR?"Les itinéraires évitent ce qui est fermé.":"Routes avoid what's closed.")):"Las rutas evitan lo cerrado.")}</small></div>`;
+      <button class="meetwide" data-act="meet-here"><span class="flag" aria-hidden="true"></span>Quedar aquí con el grupo</button>${isL ? `<button class="meetwide ghostw" data-act="espero-arriba">Os espero arriba</button>` : ""}
+      <div role="group" aria-label="Avisar al grupo"><span class="sublabel">Avisar al grupo de `}${isL ? (EN?((CA?"aquest remuntador":FR?"cette remontée":"this lift")):"este remonte") : (EN?((CA?"aquesta pista":FR?"cette piste":"this piste")):"esta pista")}</span>${(ks => `<div class="avgrid" style="grid-template-columns:repeat(${ks.length},minmax(0,1fr))">${ks.map(k => `<button data-act="aviso" data-t="${k}" aria-pressed="${mineAv.has(k)}"><i style="--c:${AVISOS[k].c}"></i>${AVISOS[k].s}</button>`).join("")}</div>`)(Object.keys(AVISOS).filter(k => AVISOS[k][g.k]))}${EN?((CA?`<small class="avhint">Duren 2 hores. `:FR?`<small class="avhint">Elles durent 2 heures. `:`<small class="avhint">They last 2 hours. `)):`<small class="avhint">Duran 2 horas. `}${isL ? (EN?((CA?"Les rutes eviten el que està tancat i sumen la cua.":FR?"Les itinéraires évitent ce qui est fermé et ajoutent la queue.":"Routes avoid what's closed and add the queue.")):"Las rutas evitan lo cerrado y suman la cola.") : (EN?((CA?"Les rutes eviten el que està tancat i, si poden, les pistes amb molta gent.":FR?"Les itinéraires évitent ce qui est fermé et, si possible, les pistes bondées.":"Routes avoid what's closed and, when they can, crowded runs.")):"Las rutas evitan lo cerrado y, si pueden, las pistas con mucha gente.")}</small></div>`;
     const smore = `${pi ? pisteProfile(pi) : ""}
       <dl class="spec">
         ${isL ? `${EN?((CA?`<div><dt>Inici</dt><dd>`:FR?`<div><dt>Départ</dt><dd>`:`<div><dt>Start</dt><dd>`)):`<div><dt>Salida</dt><dd>`}${g.zb ? fmtNum(g.zb) + " m" : "?"}${EN?((CA?`</dd></div><div><dt>Final</dt><dd>`:FR?`</dd></div><div><dt>Arrivée</dt><dd>`:`</dd></div><div><dt>End</dt><dd>`)):`</dd></div><div><dt>Llegada</dt><dd>`}${g.zt ? fmtNum(g.zt) + " m" : "?"}${EN?((CA?`</dd></div><div><dt>Trajecte</dt><dd>`:FR?`</dd></div><div><dt>Trajet</dt><dd>`:`</dd></div><div><dt>Ride</dt><dd>`)):`</dd></div><div><dt>Viaje</dt><dd>`}${g.dur ? fmtMin(g.dur) : "?"}</dd></div>`
@@ -3000,7 +3014,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <p class="quiet">Els avisos (`:FR?`</p>
       <p class="quiet">Alertes (`:`</p>
       <p class="quiet">Alerts (`)):`</p>
-      <p class="quiet">Los avisos (`}${Object.keys(AVISOS).filter(k => AVISOS[k][g.k]).map(k => AVISOS[k].s.toLowerCase()).join(", ")}) ${EN ? ((CA?"duren 2 h.":FR?"2 dernières h.":"last 2 h.")) : "duran 2 h."} ${isL ? (EN?((CA?"Les rutes eviten el que està tancat i sumen 10 min si hi ha cua.":FR?"Les itinéraires évitent ce qui est fermé et ajoutent 10 min s'il y a de la queue.":"Routes avoid what's closed and add 10 min if there's a queue.")):"Las rutas evitan lo cerrado y suman 10 min si hay cola.") : (EN?((CA?"Les rutes eviten el que està tancat.":FR?"Les itinéraires évitent ce qui est fermé.":"Routes avoid what's closed.")):"Las rutas evitan lo cerrado.")}${EN?((CA?` Torna a tocar el teu per treure'l.</p>`:FR?` Touche encore la tienne pour la retirer.</p>`:` Tap yours again to remove it.</p>`)):` Toca otra vez el tuyo para quitarlo.</p>`}`;
+      <p class="quiet">Los avisos (`}${Object.keys(AVISOS).filter(k => AVISOS[k][g.k]).map(k => AVISOS[k].s.toLowerCase()).join(", ")}) ${EN ? ((CA?"duren 2 h.":FR?"2 dernières h.":"last 2 h.")) : "duran 2 h."} ${isL ? (EN?((CA?"Les rutes eviten el que està tancat i sumen 10 min si hi ha cua.":FR?"Les itinéraires évitent ce qui est fermé et ajoutent 10 min s'il y a de la queue.":"Routes avoid what's closed and add 10 min if there's a queue.")):"Las rutas evitan lo cerrado y suman 10 min si hay cola.") : (EN?((CA?"Les rutes eviten el que està tancat i, si poden, les pistes amb molta gent.":FR?"Les itinéraires évitent ce qui est fermé et, si possible, les pistes bondées.":"Routes avoid what's closed and, when they can, crowded runs.")):"Las rutas evitan lo cerrado y, si pueden, las pistas con mucha gente.")}${EN?((CA?` Torna a tocar el teu per treure'l.</p>`:FR?` Touche encore la tienne pour la retirer.</p>`:` Tap yours again to remove it.</p>`)):` Toca otra vez el tuyo para quitarlo.</p>`}`;
     return { speek, smore };
   }
 
@@ -3180,7 +3194,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <p class="facts">`:`</h2></div></div><button class="x" data-act="close-sel" aria-label="Close">×</button></div>
       <p class="facts">`)):`</h2></div></div><button class="x" data-act="close-sel" aria-label="Cerrar">×</button></div>
       <p class="facts">`}${esc(placeOf(p) || "")}</p>${msgOf(p.uid) ? (m => `
-      <p class="msgline${m.tipo === "ayuda" ? " help" : ""}">«${esc(MSGS[m.tipo])}» · ${esc(ago(m.at))}</p>`)(msgOf(p.uid)) : ""}
+      <p class="msgline${m.tipo === "ayuda" ? " help" : ""}">«${esc(msgText(m))}» · ${esc(ago(m.at))}</p>`)(msgOf(p.uid)) : ""}
       ${!mine && msgOf(p.uid) && msgOf(p.uid).tipo === "ayuda" ? `<div class="helpacts"><button class="btn" data-act="route-friend" data-uid="${esc(p.uid)}${EN?((CA?`">Anar a `:FR?`">Aller vers `:`">Go to `)):`">Ir hasta `}${esc(who(p.uid))}${EN?((CA?`</button><a class="btn ghost danger" href="tel:112">Trucar al 112</a></div>
       <button class="btn dark wide" data-act="msg" data-t="voy">Hi vaig · avisar el grup</button>`:FR?`</button><a class="btn ghost danger" href="tel:112">Appeler le 112</a></div>
       <button class="btn dark wide" data-act="msg" data-t="voy">J'y vais · prévenir le groupe</button>`:`</button><a class="btn ghost danger" href="tel:112">Call 112</a></div>
@@ -3354,7 +3368,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <p class="quiet">Temps aproximat, amb uns 2 min d'espera per remuntador`:FR?`
       <p class="quiet">Temps approximatif, avec environ 2 min d'attente par remontée`:`
       <p class="quiet">Approximate time, with about 2 min wait per lift`)):`
-      <p class="quiet">Tiempo aproximado, con unos 2 min de espera por remonte`}${AVX.cola.size ? (EN?((CA?" i 10 més on avisen de cua":FR?" et 10 de plus là où une queue est signalée":" and 10 more where a queue is reported")):" y 10 más donde avisan de cola") : ""}${EN?((CA?`. Comproveu a l'estació què està obert.</p>`:FR?`. Vérifie à la station ce qui est ouvert.</p>`:`. Check what's open at the resort.</p>`)):`. Comprobad en la estación qué está abierto.</p>`}`;
+      <p class="quiet">Tiempo aproximado, con unos 2 min de espera por remonte`}${AVX.cola.size ? (EN?((CA?" i 10 més on avisen de cua":FR?" et 10 de plus là où une queue est signalée":" and 10 more where a queue is reported")):" y 10 más donde avisan de cola") : ""}${AVX.gente.size ? (EN?((CA?". Evita les pistes amb molta gent si hi ha una alternativa semblant":FR?". Évite les pistes bondées s'il existe une alternative proche":". Avoids crowded runs if there's a similar alternative")):". Evita las pistas con mucha gente si hay otra parecida") : ""}${EN?((CA?`. Comproveu a l'estació què està obert.</p>`:FR?`. Vérifie à la station ce qui est ouvert.</p>`:`. Check what's open at the resort.</p>`)):`. Comprobad en la estación qué está abierto.</p>`}`;
     return { speek, smore };
   }
 
@@ -3440,6 +3454,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
   const setHtml = (el, h) => { if (el && el.__h !== h) { el.innerHTML = h; el.__h = h; return true; } return false; };
   function ui() {
     if (!$("#sheet")) return;
+    if (!!(rt && rt.res) !== !!VOZ.watch && !document.hidden) setTimeout(navSync, 0);
     if (ptrDown) { uiLater = true; if (!dragging) drawSoon(); return; }   // con el dedo en el mapa tampoco: rehacer el HTML a mitad de arrastre da tirones
     const m = sheetMode(), H = { home: homeHtml, feat: featHtml, poi: poiHtml, person: personHtml, meet: meetHtml, goto: gotoHtml, juntar: juntarHtml, route: routeHtml, mark: markHtml, diario: diarioHtml, sun: sunHtml, replay: replayHtml, prof: profHtml }[m]();
     const sb = $("#sheet");
@@ -3642,12 +3657,34 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     const r = rt.res, m = Math.max(1, Math.round(r.time / 60)), nL = r.steps.filter(s => s.ty === 1 || s.ty === 3).length;
     speak((EN ? ((CA?`Uns ${m} minuts, ${nL} ${nL === 1 ? "remuntador" : "remuntadors"}. Primer: `:FR?`Environ ${m} minutes, ${nL} ${nL === 1 ? "remontée" : "remontées"}. D'abord : `:`About ${m} minutes, ${nL} ${nL === 1 ? "lift" : "lifts"}. First: `)) : `Unos ${m} minutos, ${nL} ${nL === 1 ? "remonte" : "remontes"}. Primero: `) + lowFirst(stepSay(rt.cur)));
   }
+  /* Distancia de (x, y) al recorrido de un paso (por tramos, no solo por nodos: un remonte tiene dos) */
+  function stepDist(st, x, y) {
+    const ns = st.nodes; let best = Infinity;
+    for (let k = 0; k < ns.length; k++) {
+      const ax = NX[ns[k]], ay = NY[ns[k]];
+      if (k === ns.length - 1) { best = Math.min(best, Math.hypot(x - ax, y - ay)); break; }
+      const bx = NX[ns[k + 1]], by = NY[ns[k + 1]], dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy;
+      const t = L ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L)) : 0;
+      best = Math.min(best, Math.hypot(x - ax - t * dx, y - ay - t * dy));
+    }
+    return best;
+  }
+  /* Con la ruta abierta, cada posición del GPS hace avanzar los pasos solos (con o sin voz).
+     Si te saltas un paso o vuelves a mirar el móvil más adelante, se pone al día. */
   function navFix(x, y) {
-    if (!VOZ.on || !rt || !rt.res) return;
+    if (!rt || !rt.res) return;
     const steps = rt.res.steps, N = steps.length; if (rt.cur >= N) return;
     const st = steps[rt.cur], end = st.nodes[st.nodes.length - 1], d = Math.hypot(x - NX[end], y - NY[end]);
-    if (d < 40) {   // llegaste al final de este paso
-      rt.cur++; VOZ.warned = -1; ui(); sayStep(); return;
+    let to = d < 40 ? rt.cur + 1 : rt.cur;
+    if (to === rt.cur) {
+      const here = stepDist(st, x, y); let bj = -1, bd = 35;
+      for (let j = rt.cur + 1; j < N; j++) { const dj = stepDist(steps[j], x, y); if (dj < bd && dj < here - 15) { bd = dj; bj = j; } }
+      if (bj > 0) to = bj;
+    }
+    if (to !== rt.cur) {
+      rt.cur = to; VOZ.warned = -1;
+      if (rt.cur < N && !dragging && !ptrDown) focusStep();
+      ui(); sayStep(); return;
     }
     if (d < 180 && VOZ.warned !== rt.cur && rt.cur + 1 < N) {
       VOZ.warned = rt.cur;
@@ -3662,17 +3699,21 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     } catch (e) {}
   }
   function navSync() {
-    const want = VOZ.on && rt && rt.res && !document.hidden;
-    navLock(!!want);
+    const routing = !!(rt && rt.res) && !document.hidden;
+    navLock(routing && VOZ.on);                                    // pantalla encendida solo si te habla
     // Si compartes en directo, el GPS ya está encendido y liveFix avisa a la guía.
-    const own = want && !(LIVE.on && LIVE.watch != null) && !NATIVE && navigator.geolocation;
-    if (own && VOZ.watch == null) {
+    const own = routing && !(LIVE.on && LIVE.watch != null);
+    if (NATIVE) {
+      const N = window.PisteaNative;
+      if (own && !VOZ.watch && N.navWatch) { VOZ.watch = "native"; N.navWatch(p => { const c = p.coords; if (c.accuracy && c.accuracy > 60) return; const [x, y] = toXY(c.longitude, c.latitude); navFix(x, y); }); }
+      else if (!own && VOZ.watch === "native") { N.navUnwatch(); VOZ.watch = null; }
+    } else if (own && VOZ.watch == null && navigator.geolocation) {
       VOZ.watch = navigator.geolocation.watchPosition(p => {
         const c = p.coords; if (c.accuracy && c.accuracy > 60) return;
         const [x, y] = toXY(c.longitude, c.latitude); navFix(x, y);
       }, () => {}, { enableHighAccuracy: true, timeout: 30000, maximumAge: 5000 });
-    } else if (!own && VOZ.watch != null) { navigator.geolocation.clearWatch(VOZ.watch); VOZ.watch = null; }
-    if (!want && vozOk() && !VOZ.on) try { speechSynthesis.cancel(); } catch (e) {}
+    } else if (!own && VOZ.watch != null && VOZ.watch !== "native") { navigator.geolocation.clearWatch(VOZ.watch); VOZ.watch = null; }
+    if (!routing && vozOk()) try { speechSynthesis.cancel(); } catch (e) {}
   }
   document.addEventListener("visibilitychange", () => navSync());
   function vozToggle() {
@@ -3919,6 +3960,14 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       case "poi-meet": { const p = poiById(el.dataset.id); if (!p) break; const n = poiNode(p); if (n >= 0) meetAsk(n, p.name); break; }
       case "res-poi": { closeSearch(); clearModes(); rt = null; const p = poiById(el.dataset.id); if (p) { showPoi(p); setSnap("peek"); } break; }
       /* Punto de encuentro */
+      case "espero-arriba": {
+        if (!sel || sel.g.k !== "L") break;
+        const n = selNode("top"); if (n < 0) break;
+        const [lon, lat] = toLL(NX[n], NY[n]), en = describeNode(n, [...sel.fis][0]).slice(0, 120);
+        const data = { uid: me, tipo: "espero", at: Date.now(), lat: +lat.toFixed(6), lon: +lon.toFixed(6), en };
+        put("mensajes", me, data).then(ok => ok && toast(sentMsg((EN?((CA?"Enviat al grup: «":FR?"Envoyé au groupe : «":"Sent to the group: «")):"Enviado al grupo: «") + msgText(data) + "»")));
+        break;
+      }
       case "meet-here": {
         if (!sel) break;
         const mt = meet();

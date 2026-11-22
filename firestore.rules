@@ -102,7 +102,7 @@ service cloud.firestore {
     // reloj del móvil va adelantado). No se editan; los borra quien los puso o el creador.
     function avisoOk(d) {
       return campos(d, ['uid', 'tipo', 'ref', 'lat', 'lon', 'at', 'exp'], ['uid', 'tipo', 'ref', 'nombre', 'lat', 'lon', 'at', 'exp'])
-        && d.uid == request.auth.uid && d.tipo in ['cerrado', 'cola', 'hielo', 'niebla']
+        && d.uid == request.auth.uid && d.tipo in ['cerrado', 'cola', 'gente', 'hielo', 'niebla']
         && texto(d.ref, 1, 200) && (!('nombre' in d) || texto(d.nombre, 0, 60))
         && lat(d.lat) && lon(d.lon) && d.at is number
         && d.exp is number && d.exp <= ahora() + 9000000;

@@ -11,7 +11,7 @@
   var BG = C.registerPlugin("BackgroundGeolocation");
   var Http = (C.Plugins && C.Plugins.CapacitorHttp) || C.registerPlugin("CapacitorHttp");
   var cfg = window.PISTEA_FIREBASE || {};
-  var watcher = null;
+  var watcher = null, navW = null;
   var tok = { id: null, exp: 0, refresh: null };
 
   document.documentElement.classList.add("native");
@@ -90,6 +90,24 @@
       }).then(function (id) {
         if (watcher === "cancel") { BG.removeWatcher({ id: id }); watcher = null; } else watcher = id;
       });
+    },
+    /* GPS solo para la ruta paso a paso: sin aviso de segundo plano, así que solo con la app delante
+       y sin mensaje de "tu grupo te ve". Va aparte del directo. */
+    navWatch: function (cb) {
+      if (navW === "cancel") { navW = "pending"; return; }
+      if (navW) return;
+      navW = "pending";
+      BG.addWatcher({ requestPermissions: true, stale: false, distanceFilter: 10 }, function (loc, err) {
+        if (err || !loc) return;
+        cb({ coords: { latitude: loc.latitude, longitude: loc.longitude, accuracy: loc.accuracy }, timestamp: loc.time || Date.now() });
+      }).then(function (id) {
+        if (navW === "cancel") { BG.removeWatcher({ id: id }); navW = null; } else navW = id;
+      });
+    },
+    navUnwatch: function () {
+      if (!navW) return;
+      if (navW === "pending") { navW = "cancel"; return; }
+      if (navW !== "cancel") { BG.removeWatcher({ id: navW }); navW = null; }
     },
     unwatch: function () {
       if (!watcher) return;
