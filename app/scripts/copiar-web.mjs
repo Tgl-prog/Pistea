@@ -7,8 +7,9 @@ import { fileURLToPath } from "node:url";
 const app = join(dirname(fileURLToPath(import.meta.url)), "..");
 const raiz = join(app, "..");
 const www = join(app, "www");
-const fuera = new Set(["app", "node_modules", ".git", ".github", "sw.js"]);   // sin service worker dentro de la app
-const sirve = new Set([".html", ".js", ".json", ".jpg", ".png", ".svg", ".woff2", ".webmanifest"]);
+const fuera = new Set(["app", "node_modules", ".git", ".github", "sw.js", "relief.jpg"]);   // sin service worker; el relieve va en WebP (iOS 15 lo lee)
+const sirve = new Set([".html", ".js", ".json", ".jpg", ".png", ".webp", ".svg", ".woff2", ".webmanifest"]);
+const carpetas = ["privacidad", "privacy", "condiciones", "terms", "fr"];   // páginas legales, enlazadas desde la app
 
 rmSync(www, { recursive: true, force: true });
 mkdirSync(www, { recursive: true });
@@ -19,4 +20,5 @@ for (const f of readdirSync(raiz)) {
   if (statSync(p).isDirectory() || !sirve.has(extname(f))) continue;
   cpSync(p, join(www, f)); n++;
 }
-console.log(`Web copiada a www/ (${n} archivos)`);
+for (const d of carpetas) { cpSync(join(raiz, d), join(www, d), { recursive: true }); n++; }
+console.log(`Web copiada a www/ (${n} archivos y carpetas)`);

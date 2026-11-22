@@ -1,0 +1,95 @@
+# Compila la app de iPhone y la sube a TestFlight.
+# Se lanza a mano: GitHub → Actions → "iPhone a TestFlight" → Run workflow.
+#
+# Secretos (GitHub → Settings → Secrets and variables → Actions):
+#   APPLE_TEAM_ID     Team ID de la cuenta de Apple Developer (10 caracteres)
+#   ASC_KEY_ID        Key ID de la clave de API de App Store Connect
+#   ASC_ISSUER_ID     Issuer ID de esa clave
+#   ASC_KEY_P8        Contenido del archivo AuthKey_XXXX.p8, tal cual
+# La clave tiene que tener el rol Admin: Apple crea y renueva los certificados de firma con ella.
+
+name: iPhone a TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versión que se ve en el App Store (por ejemplo 1.0 o 1.1)"
+        required: true
+        default: "1.0"
+
+concurrency:
+  group: ios
+  cancel-in-progress: false
+
+jobs:
+  testflight:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      # Apple solo acepta apps compiladas con Xcode 26 o posterior
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Copiar la web y preparar el proyecto
+        working-directory: app
+        run: |
+          npm ci
+          npm run sync
+
+      - name: Clave de App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/keys/AuthKey_${ASC_KEY_ID}.p8"
+
+      - name: Compilar (archive)
+        working-directory: app/ios/App
+        env:
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          # Número de compilación: único y creciente en cada ejecución
+          BUILD=$(( 100 + ${{ github.run_number }} ))
+          xcodebuild archive \
+            -project App.xcodeproj -scheme App -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath "$RUNNER_TEMP/Vallik.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey_${ASC_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic \
+            MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD"
+
+      - name: Firmar y subir a App Store Connect
+        working-directory: app/ios/App
+        env:
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          /usr/libexec/PlistBuddy -c "Add :teamID string $TEAM" ExportOptions.plist
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Vallik.xcarchive" \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey_${ASC_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      - name: Borrar la clave
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keys"

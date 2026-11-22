@@ -9,7 +9,9 @@ La web sigue siendo la única fuente: lo que cambies en `index.html` vale para G
 
 ## Necesitas
 
-- Un Mac con Xcode 16 o posterior y Node 20 o posterior.
+- Un Mac con Xcode 26 o posterior (Apple no acepta compilaciones de versiones anteriores) y Node 20 o posterior.
+
+Sin Mac: GitHub → Actions → **iPhone a TestFlight** compila y sube la app sola (ver `.github/workflows/ios-testflight.yml`).
 - Una cuenta de Apple Developer (para instalarla en iPhones de otros y repartirla por TestFlight).
 
 ## Compilar
@@ -23,7 +25,7 @@ npm run ios        # copia la web a www/, sincroniza el proyecto y lo abre en Xc
 En Xcode:
 
 1. Selecciona el proyecto **App** y luego el target **App**. En **Signing & Capabilities**, elige tu equipo en **Team**.
-2. Si `com.pistea.app` ya está cogido, cambia el **Bundle Identifier**, por ejemplo a `com.tunombre.pistea`.
+2. El **Bundle Identifier** es `app.vallik`. No lo cambies: es el de la ficha en App Store Connect.
 3. Elige tu iPhone o un simulador y pulsa ▶︎.
 
 Para probar el directo en el simulador: **Features › Location › Freeway Drive** y bloquea la pantalla (⌘L).
