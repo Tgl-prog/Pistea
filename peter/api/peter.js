@@ -19,11 +19,23 @@ Cómo respondes:
 - Seguridad: no animes a salir de pista; si alguien habla de un accidente o una urgencia, que llame al 112 y use «Necesito ayuda» en la app («I need help» si la app está en inglés, «J'ai besoin d'aide» si está en francés, «Necessito ajuda» si está en catalán). Si piden copas, recuerda sin sermonear que después hay que bajar esquiando.
 - Sin listas largas ni encabezados; como mucho 3 viñetas cortas.`;
 
-const hits = new Map();   // límite sencillo por usuario: 30 preguntas cada 10 min (por instancia)
-function limited(uid) {
-  const now = Date.now(), arr = (hits.get(uid) || []).filter(t => now - t < 600e3);
-  arr.push(now); hits.set(uid, arr);
-  return arr.length > 30;
+// Límites (en memoria de cada instancia de Vercel). El tope de verdad es el límite de gasto mensual de la consola de Anthropic.
+const hits = new Map();   // por usuario: 30 preguntas cada 10 min
+const ipHits = new Map(); // por conexión: 60 preguntas por hora, aunque se creen cuentas nuevas
+const DAILY_MAX = Number(process.env.PETER_DAILY_MAX || 500); // tope global por día
+let day = "", dayCount = 0;
+function over(map, key, windowMs, max) {
+  const now = Date.now(), arr = (map.get(key) || []).filter(t => now - t < windowMs);
+  arr.push(now); map.set(key, arr);
+  if (map.size > 5000) for (const [k, v] of map) if (!v.length || now - v[v.length - 1] > windowMs) map.delete(k);
+  return arr.length > max;
+}
+const limited = uid => over(hits, uid, 600e3, 30);
+const ipLimited = ip => over(ipHits, ip, 3600e3, 60);
+function dailyFull() {
+  const d = new Date().toISOString().slice(0, 10);
+  if (d !== day) { day = d; dayCount = 0; }
+  return ++dayCount > DAILY_MAX;
 }
 
 async function verify(token) {
@@ -53,6 +65,9 @@ module.exports = async (req, res) => {
     const uid = await verify(String(req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
     if (!uid) return res.status(401).json({ error: "Entra en un grupo de Vallik para hablar con Peter." });
     if (limited(uid)) return res.status(429).json({ error: "Demasiadas preguntas seguidas. Espera un poco." });
+    const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "?";
+    if (ipLimited(ip)) return res.status(429).json({ error: "Demasiadas preguntas desde esta conexión. Espera un rato." });
+    if (dailyFull()) return res.status(429).json({ error: "Peter ya ha contestado mucho hoy. Vuelve mañana." });
 
     const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
     const msgs = (Array.isArray(body.messages) ? body.messages : []).slice(-12)

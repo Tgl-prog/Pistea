@@ -176,6 +176,8 @@ body.searching .peterbtn { display: none; }
 .results { grid-column: 1 / -1; list-style: none; margin: 0; padding: 6px; border-radius: 22px; max-height: 58vh; overflow-y: auto; background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: 0 18px 40px rgba(0,0,0,.4); }
 .results:empty { display: none; }
 .results li.none { padding: 16px; color: var(--tx-2); }
+.results .pav.sm { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 18px; overflow: hidden; display: grid; place-items: center; }
+.results .pav.sm svg { width: 100%; height: 100%; }
 .results button { width: 100%; min-height: 56px; background: none; border: 0; border-radius: 16px; text-align: left; padding: 8px 12px; display: flex; gap: 12px; align-items: center; }
 .results button:active, .results button:hover { background: var(--glass-hi); }
 .results b { display: block; font-weight: 600; font-size: 16px; }
@@ -635,6 +637,16 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
 .gl-card.help { box-shadow: inset 0 0 0 2px var(--bad), var(--lg-shadow); }
 .gl-card.help .w { color: #FF8A80; }
 .gl-card.invite { justify-content: center; align-items: flex-start; gap: 8px; flex-basis: 200px; }
+/* Tarjetas compactas: una fila por persona, para que el mapa se vea */
+.gl-card { position: relative; flex: 0 0 228px; height: 64px; padding: 10px 12px 10px 10px; border-radius: 22px; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 10px; row-gap: 4px; align-content: center; }
+.gl-card .top { display: contents; }
+.gl-card .top .av { grid-column: 1; grid-row: 1 / 3; align-self: center; width: 34px; height: 34px; flex-basis: 34px; }
+.gl-card .top b { grid-column: 2; grid-row: 1; align-self: end; }
+.gl-card .ld { position: absolute; left: 37px; top: 11px; box-shadow: 0 0 0 2px rgba(14,42,71,.9); }
+.gl-card .n { grid-column: 3; grid-row: 1 / 3; align-self: center; text-align: right; font: 500 24px/1 var(--mono); }
+.gl-card .n small { display: block; margin-top: 3px; font: 500 10px/1 var(--mono); }
+.gl-card .w { grid-column: 2; grid-row: 2; align-self: start; }
+.gl-card.invite { display: flex; flex-direction: column; justify-content: center; gap: 4px; flex-basis: 236px; }
 /* Panel: tu grupo en tarjetas con los minutos en grande */
 .ftiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
 .ftile { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 0; border-radius: 20px; background: rgba(255,255,255,.055); color: var(--tx); text-align: left; min-width: 0; }
@@ -1489,7 +1501,7 @@ if (EN) (function () {
       const pos = geo.attributes.position;
       for (let i = 0; i < pos.count; i++) pos.setY(i, TER.z[i] * EXAG);
       geo.computeVertexNormals();
-      const tex = new THREE.TextureLoader().load("relief.jpg", () => drawSoon());
+      const TL = new THREE.TextureLoader(); const tex = TL.load("relief.webp", () => drawSoon(), undefined, () => TL.load("relief.jpg", t => { tex.image = t.image; tex.needsUpdate = true; drawSoon(); }));
       tex.encoding = THREE.sRGBEncoding;
       tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
       tex.minFilter = THREE.LinearMipmapLinearFilter;
@@ -1784,7 +1796,7 @@ if (EN) (function () {
     const s = V.s, dpr = V.dpr, now = performance.now(), GPU = !!(GL && GL.lines);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, V.w, V.h);
-    if (!GL && GLfail && !RELIEF.img && !RELIEF.loading) { RELIEF.loading = 1; const im = new Image(); im.onload = () => { RELIEF.img = im; drawSoon(); }; im.src = "relief.jpg"; }
+    if (!GL && GLfail && !RELIEF.img && !RELIEF.loading) { RELIEF.loading = 1; const im = new Image(); im.onload = () => { RELIEF.img = im; drawSoon(); }; im.onerror = () => { im.onerror = null; im.src = "relief.jpg"; }; im.src = "relief.webp"; }
     /* Sin WebGL: relieve plano */
     if (!GL && RELIEF.img) {
       const h0 = AX.ty, p0 = proj(TER.x0, TER.y0, h0), p1 = proj(TER.x0 + TER.w, TER.y0, h0), p2 = proj(TER.x0, TER.y0 + TER.h, h0);
@@ -3492,7 +3504,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     const title = mp ? cap(placeOf(mp) || (EN ? ((CA?"Al mapa":FR?"Sur la carte":"On the map")) : "En el mapa")) : (EN ? ((CA?"Marca on ets":FR?"Indique où tu es":"Mark where you are")) : "Marca dónde estás");
     const sub = LIVE.on ? (EN ? ((CA?"En directe · gravant":FR?"En direct · enregistrement":"Live · recording")) : "En directo · grabando") : mp ? (EN ? ((CA?"Marcat ":FR?"Indiqué ":"Marked ")) : "Marcado ") + ago(mp.at) : (EN ? ((CA?"El grup encara no et veu":FR?"Le groupe ne te voit pas encore":"The group can't see you yet")) : "El grupo no te ve todavía");
     const sos = `<button class="gl-sos glass2${helpOn ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${helpOn}">${MSG_IC.ayuda}<span>${helpOn ? (EN ? ((CA?"Ajuda enviada":FR?"Aide envoyée":"Help sent")) : "Aviso enviado") : confirmAct === "msg:ayuda" ? (EN ? ((CA?"Torna a tocar":FR?"Touche encore":"Tap again")) : "Toca otra vez") : (EN ? ((CA?"Ajuda":FR?"Aide":"Help")) : "Ayuda")}</span></button>`;
-    const cards = fl.length ? fl.map(({ p, help, t }) => `<button class="gl-card glass2${help ? " help" : ""}" data-act="person" data-uid="${esc(p.uid)}"><span class="top">${av(p.uid)}<b>${esc(who(p.uid))}</b>${isLive(p) ? `<span class="ld" aria-label="${EN ? ((CA?"en directe":FR?"en direct":"live")) : "en directo"}"></span>` : ""}</span><span class="n">${minsHtml(t)}</span><span class="w">${help ? (EN ? ((CA?"Necessita ajuda":FR?"A besoin d'aide":"Needs help")) : "Necesita ayuda") : esc(cap(placeOf(p) || ""))}</span></button>`).join("")
+    const cards = fl.length ? fl.map(({ p, help, t }) => `<button class="gl-card glass2${help ? " help" : ""}" data-act="person" data-uid="${esc(p.uid)}"><span class="top">${av(p.uid)}<b>${esc(who(p.uid))}</b>${isLive(p) ? `<span class="ld" aria-label="${EN ? ((CA?"en directe":FR?"en direct":"live")) : "en directo"}"></span>` : ""}</span><span class="n">${t == null || t < 1 ? minsHtml(t) : `${t}<small>${EN ? ((CA?"min de tu":FR?"min de toi":"min away")) : "min de ti"}</small>`}</span><span class="w">${help ? (EN ? ((CA?"Necessita ajuda":FR?"A besoin d'aide":"Needs help")) : "Necesita ayuda") : esc(cap(placeOf(p) || ""))}</span></button>`).join("")
       : `<button class="gl-card glass2 invite" data-act="invite"><b style="font:600 15px/1.2 var(--font)">${EN ? ((CA?"Convida el teu grup":FR?"Invite ton groupe":"Invite your group")) : "Invita a tu grupo"}</b><span class="w">${EN ? ((CA?"Envia'ls l'enllaç i els veuràs aquí.":FR?"Envoie-leur le lien et tu les verras ici.":"Send them the link and you'll see them here.")) : "Mándales el enlace y los verás aquí."}</span></button>`;
     return `<div class="gl-row"><button class="gl-me glass2" data-act="glance-open">${av(me)}<span><b>${esc(title)}</b><small${LIVE.on ? ` class="live"` : ""}>${esc(sub)}</small></span></button>${sos}</div><div class="gl-cards">${cards}</div>`;
   }
@@ -3573,7 +3585,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     M.places.forEach(pl => { const n = norm(pl[0]); if (n.includes(q)) res.push({ pl, sc: n.startsWith(q) ? 0.5 : 1.5 }); });
     POIS.forEach(p => { const i = p.n.indexOf(q); if (i >= 0) res.push({ poi: p, sc: i === 0 ? 1.2 : 2.2 }); });
     res.sort((a, b) => a.sc - b.sc);
-    if (!res.length) return `${EN?((CA?`<li class="none">Res amb aquest nom</li>`:FR?`<li class="none">Rien avec ce nom</li>`:`<li class="none">Nothing with that name</li>`)):`<li class="none">Nada con ese nombre</li>`}`;
+    if (!res.length) return `${EN?((CA?`<li class="none">Res amb aquest nom</li>`:FR?`<li class="none">Rien avec ce nom</li>`:`<li class="none">Nothing with that name</li>`)):`<li class="none">Nada con ese nombre</li>`}${PETER_URL ? `<li><button data-act="peter-q"><span class="pav sm" aria-hidden="true">${PETER_AV}</span><span><b>${EN ? ((CA?"Pregunta-ho a en Peter":FR?"Demande à Peter":"Ask Peter")) : "Pregúntaselo a Peter"}</b><small>«${esc(query.trim().slice(0, 60))}»</small></span></button></li>` : ""}`;
     return res.slice(0, 25).map(r => {
       if (r.person) return `<li><button data-act="res-person" data-uid="${esc(r.person.uid)}">${av(r.person.uid)}<span><b>${esc(who(r.person.uid))}</b><small>${esc(placeOf(r.person) || "")}</small></span></button></li>`;
       if (r.poi) return `<li><button data-act="res-poi" data-id="${esc(r.poi.id)}"><span class="poiic" style="--c:${POI_CAT[r.poi.cat].c};width:36px;height:36px;flex-basis:36px">${POI_ICON[r.poi.cat]}</span><span><b>${esc(r.poi.name)}</b><small>${esc(poiKind(r.poi))}${r.poi.z ? " · " + fmtNum(r.poi.z) + " m" : ""}</small></span></button></li>`;
@@ -3883,6 +3895,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       case "res-person": case "person": case "center-person": { closeSearch(); const p = positions().find(q => q.uid === el.dataset.uid); if (p) { rt = null; diario = false; showPerson(p); setSnap("peek"); } break; }
       case "close-sel": sel = null; personSheet = null; meetSheet = false; poiSheet = null; juntar = null; ui(); break;
       case "peter": peterOpen(); break;
+      case "peter-q": { const q = query.trim(); peterOpen(q || undefined); break; }
       case "peter-close": peterClose(); break;
       case "peter-sug": peterAsk(el.textContent); break;
       case "peter-poi": { const p = poiById(el.dataset.id); peterOpen(p ? `${EN?((CA?`Explica'm `:FR?`Parle-moi de `:`Tell me about `)):`Háblame de `}${p.name}${EN?((CA?`: què és, com hi arribo i com és.`:FR?` : ce que c'est, comment y aller et à quoi ça ressemble.`:`: what it is, how I get there and what it's like.`)):`: qué es, cómo llego y qué tal está.`}` : ""); break; }

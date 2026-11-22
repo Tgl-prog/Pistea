@@ -11,7 +11,7 @@
 const VERSION = "vallik-v34";
 const CORE = [
   "./", "index.html", "manifest.webmanifest", "backend.js", "native.js", "firebase-config.js",
-  "mapdata.json", "pois.json", "dem.json", "relief.jpg",
+  "mapdata.json", "pois.json", "dem.json", "relief.webp",
   "three.min.js", "LineSegmentsGeometry.js", "LineMaterial.js", "LineSegments2.js",
   "firebase-app-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js",
   "Geist-Variable.woff2", "GeistMono-Variable.woff2",
