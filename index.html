@@ -11,6 +11,16 @@
 <meta property="og:description" content="Tu grupo en el mapa de la estación: dónde está cada uno, cómo llegar y cuándo volver. Gratis y sin instalar nada.">
 <meta property="og:locale" content="es_ES">
 <meta property="og:locale:alternate" content="en_GB">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:locale:alternate" content="ca_ES">
+<link rel="alternate" hreflang="es" href="https://vallik.app/?lang=es">
+<link rel="alternate" hreflang="en" href="https://vallik.app/?lang=en">
+<link rel="alternate" hreflang="fr" href="https://vallik.app/?lang=fr">
+<link rel="alternate" hreflang="ca" href="https://vallik.app/?lang=ca">
+<link rel="alternate" hreflang="x-default" href="https://vallik.app/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Vallik","url":"https://vallik.app/","applicationCategory":"TravelApplication","operatingSystem":"Web, iOS, Android","inLanguage":["es","en","fr","ca"],"description":"App gratuita para esquiar en grupo: el mapa de pistas con tu grupo en directo, rutas hasta un amigo o un bar y la hora para volver antes de que cierren los remontes.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"image":"https://vallik.app/og.png"}
+</script>
 <meta property="og:url" content="https://vallik.app/">
 <meta property="og:image" content="https://vallik.app/og.png">
 <meta property="og:image:width" content="1200">
@@ -29,8 +39,14 @@
 <script>
 /* Idioma: el elegido con ES/EN/FR/CA o, si no, el del móvil. Lo que no sea español, francés ni catalán va en inglés.
    EN es verdadero en inglés, francés y catalán: el francés y el catalán se eligen dentro de cada texto en inglés con FR y CA. */
-var VLANG = (function () { try { var v = localStorage.getItem("vallik.lang"); if (v === "es" || v === "en" || v === "fr" || v === "ca") return v; } catch (e) {} var n = navigator.language || "es"; return /^ca\b/i.test(n) ? "ca" : /^es\b/i.test(n) ? "es" : /^fr\b/i.test(n) ? "fr" : "en"; })();
+var VLANG = (function () { try { var q = (location.search.match(/[?&]lang=(es|en|fr|ca)\b/) || [])[1]; if (q) { try { localStorage.setItem("vallik.lang", q); } catch (e) {} return q; } } catch (e) {} try { var v = localStorage.getItem("vallik.lang"); if (v === "es" || v === "en" || v === "fr" || v === "ca") return v; } catch (e) {} var n = navigator.language || "es"; return /^ca\b/i.test(n) ? "ca" : /^es\b/i.test(n) ? "es" : /^fr\b/i.test(n) ? "fr" : "en"; })();
 var EN = VLANG !== "es", FR = VLANG === "fr", CA = VLANG === "ca"; document.documentElement.lang = VLANG;
+/* Al cambiar de idioma se quita ?lang= de la dirección, para que no gane al idioma elegido. */
+function vReload() { try { var u = new URL(location.href); u.searchParams.delete("lang"); location.replace(u.href); } catch (e) { location.reload(); } }
+/* Dirección canónica: la de la propia página si trae ?lang=, la portada si no. */
+(function () { var q = /[?&]lang=(es|en|fr|ca)\b/.test(location.search); var l = document.createElement("link"); l.rel = "canonical"; l.href = "https://vallik.app/" + (q ? "?lang=" + VLANG : ""); document.head.appendChild(l);
+  if (VLANG !== "es") { var D = { en: "Vallik is a free app for groups of skiers: see where everyone is on the piste map, get a route to a friend or a bar and know when to head back before the lifts close.", fr: "Vallik est une appli gratuite pour les groupes de skieurs : tu vois où est chacun sur le plan des pistes, tu as l'itinéraire jusqu'à un ami ou un bar et tu sais quand rentrer avant la fermeture des remontées.", ca: "Vallik és una app gratuïta per a grups d'esquiadors: veus on és cadascú al mapa de pistes, tens la ruta fins a un amic o un bar i saps quan tornar abans que tanquin els remuntadors." };
+    var m = document.querySelector('meta[name="description"]'); if (m) m.setAttribute("content", D[VLANG]); } })();
 </script>
 <script>
 /* El motor 3D se baja en paralelo y sin frenar el primer dibujo: la landing no lo necesita.
@@ -3923,7 +3939,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       case "juntar": { clearModes(); diario = false; juntar = juntarCalc(); if (!juntar.err) centerOn(NX[juntar.n], NY[juntar.n], 0.12); setSnap("peek"); ui(); break; }
       case "juntar-meet": if (juntar && !juntar.err) meetAsk(juntar.n, juntar.name); break;
       case "juntar-go": if (juntar && !juntar.err) { const j = juntar; juntar = null; if (!myPos()) { toast((EN?((CA?"Primer marca on ets amb el botó Aquí.":FR?"Indique d'abord où tu es avec le bouton Ici.":"First mark where you are with the Here button.")):"Marca primero dónde estás con el botón Aquí.")); break; } startRoute({ node: j.n, label: j.name }); } break;
-      case "lang": { if (el.dataset.v === VLANG) break; try { localStorage.setItem("vallik.lang", el.dataset.v); } catch (e) {} location.reload(); break; }
+      case "lang": { if (el.dataset.v === VLANG) break; try { localStorage.setItem("vallik.lang", el.dataset.v); } catch (e) {} vReload(); break; }
       case "acc-link": { const G = window.PISTEA_GROUP; if (!G || !G.signIn) break; el.disabled = true; G.signIn(el.dataset.k).then(r => { if (r.ok) toast((EN?((CA?"Perfil desat al teu compte":FR?"Profil enregistré sur ton compte":"Profile saved to your account")):"Perfil guardado en tu cuenta")); else if (r.msg) toast(r.msg); ui(); }); break; }
       case "glance-open": setSnap("half"); break;
       case "tab-map": clearModes(); diario = false; setSnap("peek"); ui(); break;
