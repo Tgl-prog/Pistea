@@ -1552,7 +1552,7 @@ if (EN) (function () {
     CAM.t = Math.max(0, Math.min(GL ? 74 : 0, CAM.t));
     CAM.b = ((CAM.b % 360) + 360) % 360;
     if (M.bb) {   // cuanto más lejos, menos se puede desplazar: el relieve siempre llena la pantalla
-      const [x0, y0, x1, y1] = M.bb, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, m = 1500 - CAM.d * 0.5;
+      const [x0, y0, x1, y1] = M.bb, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, m = Math.max(0, 1500 - CAM.d * 0.5);   // de lejos, el centro llega como mínimo hasta el borde de la estación
       const rx = Math.max(0, (x1 - x0) / 2 + m), ry = Math.max(0, (y1 - y0) / 2 + m);
       CAM.x = Math.max(cx - rx, Math.min(cx + rx, CAM.x)); CAM.y = Math.max(cy - ry, Math.min(cy + ry, CAM.y));
     }
