@@ -10,6 +10,14 @@
 
   var BG = C.registerPlugin("BackgroundGeolocation");
   var Http = (C.Plugins && C.Plugins.CapacitorHttp) || C.registerPlugin("CapacitorHttp");
+  /* App Check con App Attest: demuestra a Firebase que las peticiones vienen de Vallik de verdad. */
+  var FAC = C.registerPlugin("FirebaseAppCheck");
+  var acReady = FAC.initialize({ isTokenAutoRefreshEnabled: true }).catch(function () {});
+  function acToken() {
+    return acReady.then(function () { return FAC.getToken(); }).then(function (r) {
+      return { token: r.token, expireTimeMillis: r.expireTimeMillis || (Date.now() + 30 * 60000) };
+    });
+  }
   var cfg = window.PISTEA_FIREBASE || {};
   var watcher = null, navW = null;
   var tok = { id: null, exp: 0, refresh: null };
@@ -58,18 +66,26 @@
     var g = window.PISTEA_GROUP;
     if (!g || !cfg.projectId) return Promise.reject(new Error("sin grupo"));
     return idToken().then(function (t) {
-      var fields = {}; Object.keys(data).forEach(function (k) { fields[k] = val(data[k]); });
+      var fields = {}; Object.keys(data).forEach(function (k) { if (k !== "ttl") fields[k] = val(data[k]); });
+      // Fecha de borrado automático, igual que las escrituras del SDK (withTtl en backend.js): posición y mensajes, 2 días.
+      if (window.PISTEA_TTL) fields.ttl = { timestampValue: new Date(Date.now() + 2 * 86400000).toISOString() };
+      return acToken().then(function (a) { return a.token; }, function () { return ""; }).then(function (ac) {
+      var h = { "Content-Type": "application/json", "Authorization": "Bearer " + t };
+      if (ac) h["X-Firebase-AppCheck"] = ac;
       return Http.request({
         url: "https://firestore.googleapis.com/v1/projects/" + cfg.projectId + "/databases/(default)/documents/grupos/" +
           encodeURIComponent(g.code) + "/" + col + "/" + encodeURIComponent(id),
         method: "PATCH",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + t },
+        headers: h,
         data: { fields: fields }
+      });
       });
     }).then(function (r) { if (r.status >= 300) throw new Error("firestore " + r.status); return true; });
   }
 
   window.PisteaNative = {
+    /* Token de App Check para el SDK de Firebase de la web (CustomProvider en backend.js) */
+    appCheckToken: acToken,
     /* GPS que no se para en segundo plano. cb recibe lo mismo que navigator.geolocation. */
     watch: function (cb, onDenied) {
       if (watcher === "cancel") { watcher = "pending"; return; }   // se paró y se volvió a pedir antes de arrancar

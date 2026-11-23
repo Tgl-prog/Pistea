@@ -17,6 +17,10 @@ on:
         description: "Versión que se ve en el App Store (por ejemplo 1.0 o 1.1)"
         required: true
         default: "1.0"
+      subir:
+        description: "Subir a TestFlight (si no, solo compila, firma y comprueba los permisos)"
+        type: boolean
+        default: true
 
 concurrency:
   group: ios
@@ -81,6 +85,7 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           /usr/libexec/PlistBuddy -c "Add :teamID string $TEAM" ExportOptions.plist
+          if [ "${{ inputs.subir }}" != "true" ]; then /usr/libexec/PlistBuddy -c "Set :destination export" ExportOptions.plist; fi
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Vallik.xcarchive" \
             -exportOptionsPlist ExportOptions.plist \
@@ -89,6 +94,14 @@ jobs:
             -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey_${ASC_KEY_ID}.p8" \
             -authenticationKeyID "$ASC_KEY_ID" \
             -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      - name: Comprobar permisos de la app firmada
+        if: ${{ !inputs.subir }}
+        run: |
+          cd "$RUNNER_TEMP/export" && ls -la
+          mkdir -p ipa && unzip -q -o *.ipa -d ipa
+          codesign -d --entitlements - ipa/Payload/*.app 2>&1 | tee ent.txt
+          grep -q "appattest-environment" ent.txt && echo "APP_ATTEST_OK" || { echo "FALTA App Attest en la firma"; exit 1; }
 
       - name: Borrar la clave
         if: always()
