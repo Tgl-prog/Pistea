@@ -3789,7 +3789,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 });
   }
   /* En directo: mientras la app está abierta, tu posición se actualiza sola.
-     Para no gastar batería ni escrituras, solo se envía si te has movido 40 m (como mucho cada 20 s)
+     Para no gastar batería ni escrituras, solo se envía si te has movido 80 m (como mucho cada 45 s)
      o, si estás parado, cada 2 min para que el grupo vea que sigues ahí.
      iPhone y Android cortan el GPS de las webs en segundo plano: al volver a la app se reanuda solo. */
   const LIVE = { on: false, watch: null, last: null };
@@ -3797,7 +3797,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
      la posición se envía por HTTP nativo (native.js). En la web no existe PisteaNative. */
   const NATIVE = !!window.PisteaNative;
   const liveAvailable = () => !!window.PISTEA_GROUP && (NATIVE || !!navigator.geolocation);
-  const LIVE_MIN_MS = 20000, LIVE_BEAT_MS = 120000, LIVE_MOVE_M = 40, LIVE_MAX_ACC = GPS_MAX_ACC, LIVE_FRESH_MS = 3 * 60000;
+  const LIVE_MIN_MS = 45000, LIVE_BEAT_MS = 120000, LIVE_MOVE_M = 80, LIVE_MAX_ACC = GPS_MAX_ACC, LIVE_FRESH_MS = 3 * 60000;
   const isLive = p => !!(p && p.live && Date.now() - p.at < LIVE_FRESH_MS);
   function liveSaved() { try { return localStorage.getItem("pistea.live") === "1"; } catch (e) { return false; } }
   function liveSave(v) { try { localStorage.setItem("pistea.live", v ? "1" : "0"); } catch (e) {} }
