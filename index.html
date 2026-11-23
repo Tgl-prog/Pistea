@@ -58,6 +58,7 @@ window.THREE_READY = new Promise(function (res) {
 });
 </script>
 <script src="firebase-app-compat.js"></script>
+<script src="firebase-app-check-compat.js"></script>
 <script src="firebase-auth-compat.js"></script>
 <script src="firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
@@ -369,6 +370,13 @@ body.has-dock #smore { padding-bottom: 20px; }
 .proflegal { margin-top: 18px; }
 .proflegal a { color: var(--tx-2); }
 .fotorow { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.namerow { margin: 18px 0 0; display: grid; gap: 8px; }
+.namerow label { font-size: 14px; color: var(--tx-2); }
+.namerow span { display: flex; gap: 8px; min-width: 0; }
+.namerow input { flex: 1 1 0; width: 0; min-width: 0; height: 48px; border-radius: 24px; padding: 0 18px; font: 400 16px/1 var(--font); color: var(--tx); background: rgba(255,255,255,.06); border: 1px solid var(--hair); -webkit-appearance: none; }
+.namerow input:focus { outline: none; border-color: var(--acc); }
+.namerow .btn { flex: 0 0 auto; width: auto; min-width: 0; height: 48px; min-height: 48px; padding: 0 18px; }
+.namerow span > * { box-sizing: border-box; }
 .fotorow .quiet { margin: 0; }
 
 .codebox { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 10px 10px 16px; border-radius: var(--r-md); background: var(--raised); border: 1px solid var(--line); }
@@ -3123,6 +3131,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <div class="headrow"><div><small class="kicker">${EN ? ((CA?"El teu perfil":FR?"Ton profil":"Your profile")) : "Tu perfil"}</small><h2 class="title md">${esc(n || (EN ? ((CA?"Tu":FR?"Toi":"You")) : "Tú"))}</h2></div><button class="x" data-act="prof-close" aria-label="${EN ? ((CA?"Tancar":FR?"Fermer":"Close")) : "Cerrar"}">×</button></div>
       <div class="profhead"><label class="profav" aria-label="${has ? (EN ? ((CA?"Canviar la foto":FR?"Changer la photo":"Change photo")) : "Cambiar foto") : (EN ? ((CA?"Afegir una foto":FR?"Ajouter une photo":"Add a photo")) : "Poner una foto")}">${fotoSrc(me) ? `<img src="${fotoSrc(me)}" alt="">` : `<span style="--c:${colorOf(me)}">${esc(initial(me))}</span>`}<i><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></i><input type="file" accept="image/*" id="fotoin" hidden></label>
         <div><p class="quiet">${EN ? ((CA?"El teu grup veu la teva foto al mapa en lloc de la inicial.":FR?"Ton groupe voit ta photo sur la carte au lieu de ton initiale.":"Your group sees your photo on the map instead of your initial.")) : "Tu grupo ve tu foto en el mapa en lugar de tu inicial."}</p>${has ? `<button class="link" data-act="foto-del">${EN ? ((CA?"Treure la foto":FR?"Retirer la photo":"Remove photo")) : "Quitar foto"}</button>` : ""}</div></div>
+      ${me ? `<form class="namerow" data-form="rename"><label for="pname">${EN ? ((CA?"El teu nom":FR?"Ton prénom":"Your name")) : "Tu nombre"}</label><span><input id="pname" name="n" maxlength="24" autocomplete="given-name" autocapitalize="words" enterkeyhint="done" value="${esc(n)}"><button class="btn dark" type="submit">${EN ? ((CA?"Desar":FR?"Enregistrer":"Save")) : "Guardar"}</button></span></form>` : ""}
       ${langHtml()}`;
     const delAcc = window.PISTEA_GROUP && window.PISTEA_GROUP.deleteAccount ? `<button class="btn ghost wide danger delacc" data-act="delacc">${confirmAct === "delacc" ? (EN ? ((CA?"Torna a tocar per esborrar-ho tot":FR?"Touche encore pour tout supprimer":"Tap again to delete everything")) : "Toca otra vez para borrarlo todo") : (EN ? ((CA?"Esborrar el meu compte":FR?"Supprimer mon compte":"Delete my account")) : "Borrar mi cuenta")}</button><p class="quiet">${EN ? ((CA?"S'esborren el teu perfil, la teva foto, la teva posició, els teus missatges i les teves pistes en aquest grup, i el teu compte. No es pot desfer.":FR?"Cela supprime ton profil, ta photo, ta position, tes messages et tes pistes dans ce groupe, ainsi que ton compte. C'est définitif.":"This deletes your profile, photo, position, messages and runs in this group, and your account. It can't be undone.")) : "Se borran tu perfil, tu foto, tu posición, tus mensajes y tus pistas en este grupo, y tu cuenta. No se puede deshacer."}</p>` : "";
     const smore = `${accHtml()}${delAcc}<p class="quiet proflegal"><a href="${EN ? (CA?"privacidad/":FR?"fr/confidentialite/":"privacy/") : "privacidad/"}">${EN ? ((CA?"Privacitat":FR?"Confidentialité":"Privacy")) : "Privacidad"}</a> · <a href="${EN ? (CA?"condiciones/":FR?"fr/conditions/":"terms/") : "condiciones/"}">${EN ? ((CA?"Condicions":FR?"Conditions":"Terms")) : "Condiciones"}</a></p>`;
@@ -3715,6 +3724,19 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     } else if (!own && VOZ.watch != null && VOZ.watch !== "native") { navigator.geolocation.clearWatch(VOZ.watch); VOZ.watch = null; }
     if (!routing && vozOk()) try { speechSynthesis.cancel(); } catch (e) {}
   }
+  /* Cambiar tu nombre desde el perfil: se guarda en el grupo y en el móvil (al volver a abrir la app se usa este) */
+  document.addEventListener("submit", ev => {
+    const f = ev.target; if (!f || f.dataset.form !== "rename") return;
+    ev.preventDefault();
+    const v = String(f.n.value || "").replace(/\s+/g, " ").trim().slice(0, 24);
+    if (!v) { toast(EN ? ((CA?"Escriu el teu nom.":FR?"Écris ton prénom.":"Type your name.")) : "Escribe tu nombre."); f.n.focus(); return; }
+    const base = S.perfiles.get(me) || {};
+    if (v === base.name) { f.n.blur(); return; }
+    try { localStorage.setItem("pistea.nombre", v); } catch (e) {}
+    names[me] = v; f.n.blur();
+    put("perfiles", me, Object.assign({}, base, { name: v, at: Date.now() })).then(ok => ok && toast(EN ? ((CA?"Nom desat. El teu grup ja el veu.":FR?"Prénom enregistré. Ton groupe le voit déjà.":"Name saved. Your group can see it now.")) : "Nombre guardado. Tu grupo ya lo ve."));
+    ui();
+  });
   document.addEventListener("visibilitychange", () => navSync());
   function vozToggle() {
     VOZ.on = !VOZ.on; try { localStorage.setItem("vallik.voz", VOZ.on ? "1" : "0"); } catch (e) {}

@@ -8,12 +8,12 @@
  * aunque se olvide subir VERSION, y con mala señal la app abre igual desde la copia. Si la red llega
  * tarde, la respuesta se guarda igualmente para la próxima vez.
  */
-const VERSION = "vallik-v40";
+const VERSION = "vallik-v41";
 const CORE = [
   "./", "index.html", "manifest.webmanifest", "backend.js", "native.js", "firebase-config.js",
   "mapdata.json", "pois.json", "dem.json", "relief.webp",
   "three.min.js", "LineSegmentsGeometry.js", "LineMaterial.js", "LineSegments2.js",
-  "firebase-app-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js",
+  "firebase-app-compat.js", "firebase-app-check-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js",
   "Geist-Variable.woff2", "GeistMono-Variable.woff2",
   "nieve-k.webp", "icon-192.png", "icon-512.png", "maskable-512.png", "apple-touch-icon.png", "favicon-32.png", "icon.svg"
 ];

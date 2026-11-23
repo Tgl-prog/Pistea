@@ -229,6 +229,21 @@
 
   /* ----- Firebase ----- */
   firebase.initializeApp(cfg);
+  /* App Check: Firebase comprueba que quien pide datos es Vallik y no un programa que copió la clave.
+     En la web, Fraud Defense (reCAPTCHA) de forma invisible; en el iPhone, App Attest a través de native.js.
+     Hasta que se active "Aplicar" en la consola, si falla no bloquea nada. */
+  (function appCheck() {
+    const AC = window.PISTEA_APPCHECK || {};
+    if (!firebase.appCheck) return;
+    try {
+      const N = window.PisteaNative;
+      if (N && N.appCheckToken) {
+        firebase.appCheck().activate(new firebase.appCheck.CustomProvider({ getToken: () => N.appCheckToken() }), true);
+      } else if (AC.web && /(^|\.)vallik\.app$|^pistea-94bf0\.firebaseapp\.com$/.test(location.hostname)) {
+        firebase.appCheck().activate(new firebase.appCheck.ReCaptchaEnterpriseProvider(AC.web), true);
+      }
+    } catch (e) {}
+  })();
   const auth = firebase.auth();
   const fs = firebase.firestore();
   // Copia local de los datos del grupo (IndexedDB): sin cobertura se ve lo último que llegó,
