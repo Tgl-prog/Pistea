@@ -19,3 +19,7 @@ window.PISTEA_LOGIN = { google: true, apple: false };
 
 /* Borrado automático: true solo cuando las reglas de firestore.rules que aceptan "ttl" estén publicadas en Firebase. */
 window.PISTEA_TTL = true;
+
+/* App Check: demuestra que quien usa la base de datos es Vallik de verdad. La clave de reCAPTCHA
+   (Fraud Defense) es pública y solo vale en vallik.app. En el iPhone se usa App Attest. */
+window.PISTEA_APPCHECK = { web: "6LcX6C4uAAAAAJd3n9r_QN3Cd28cEAz_bq5_TYxy" };
