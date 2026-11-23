@@ -13,7 +13,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.6.2"),
         .package(name: "CapacitorCommunityBackgroundGeolocation", path: "../../../node_modules/@capacitor-community/background-geolocation"),
-        .package(name: "CapacitorFirebaseAppCheck", path: "../../../node_modules/@capacitor-firebase/app-check")
+        .package(name: "CapacitorFirebaseAppCheck", path: "../../plugins/CapacitorFirebaseAppCheck")
     ],
     targets: [
         .target(

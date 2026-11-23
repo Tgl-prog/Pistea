@@ -5,7 +5,7 @@
   "description": "Pistea como app nativa (Capacitor). La web vive en la raíz del repo; este proyecto la empaqueta para iPhone.",
   "scripts": {
     "web": "node scripts/copiar-web.mjs",
-    "sync": "npm run web && npx cap sync ios",
+    "sync": "npm run web && npx cap sync ios && node scripts/arreglar-spm.mjs",
     "ios": "npm run sync && npx cap open ios"
   },
   "dependencies": {
