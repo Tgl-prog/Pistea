@@ -48,12 +48,47 @@ async function verify(token) {
   return j.users && j.users[0] ? j.users[0].localId : null;
 }
 
+// App Check: comprueba que la pregunta viene de la app de verdad (web con reCAPTCHA, iPhone con App Attest).
+// El token es un JWT firmado por Google; se verifica con sus claves públicas, sin ninguna clave secreta.
+// PETER_APPCHECK: "monitor" (por defecto, solo lo anota en los registros), "enforce" (rechaza sin token válido) u "off".
+const crypto = require("crypto");
+const AC_MODE = process.env.PETER_APPCHECK || "monitor";
+const PROJECT_NUMBER = process.env.FIREBASE_PROJECT_NUMBER || "113462040978";
+const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || "pistea-94bf0";
+let jwks = null, jwksAt = 0;
+async function acKeys(force) {
+  if (!force && jwks && Date.now() - jwksAt < 6 * 3600e3) return jwks;
+  const r = await fetch("https://firebaseappcheck.googleapis.com/v1/jwks");
+  if (!r.ok) throw new Error("jwks " + r.status);
+  jwks = (await r.json()).keys || []; jwksAt = Date.now();
+  return jwks;
+}
+const b64 = s => Buffer.from(s.replace(/-/g, "+").replace(/_/g, "/"), "base64");
+async function verifyAppCheck(token) {
+  try {
+    const parts = String(token || "").split(".");
+    if (parts.length !== 3) return false;
+    const head = JSON.parse(b64(parts[0]).toString("utf8")), body = JSON.parse(b64(parts[1]).toString("utf8"));
+    if (head.alg !== "RS256" || head.typ !== "JWT" || !head.kid) return false;
+    let jwk = (await acKeys()).find(k => k.kid === head.kid);
+    if (!jwk) jwk = (await acKeys(true)).find(k => k.kid === head.kid);
+    if (!jwk) return false;
+    const key = crypto.createPublicKey({ key: jwk, format: "jwk" });
+    const ok = crypto.verify("RSA-SHA256", Buffer.from(parts[0] + "." + parts[1]), key, b64(parts[2]));
+    if (!ok) return false;
+    const aud = [].concat(body.aud || []), now = Date.now() / 1000;
+    return body.iss === "https://firebaseappcheck.googleapis.com/" + PROJECT_NUMBER
+      && (aud.includes("projects/" + PROJECT_NUMBER) || aud.includes("projects/" + PROJECT_ID))
+      && typeof body.exp === "number" && body.exp > now && typeof body.sub === "string";
+  } catch (e) { return false; }
+}
+
 function cors(req, res) {
   const o = req.headers.origin || "";
   res.setHeader("Access-Control-Allow-Origin", ORIGINS.includes(o) ? o : ORIGINS[0]);
   res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Firebase-AppCheck");
 }
 
 module.exports = async (req, res) => {
@@ -64,6 +99,11 @@ module.exports = async (req, res) => {
   try {
     const uid = await verify(String(req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
     if (!uid) return res.status(401).json({ error: "Entra en un grupo de Vallik para hablar con Peter." });
+    if (AC_MODE !== "off") {
+      const acOk = await verifyAppCheck(req.headers["x-firebase-appcheck"]);
+      console.log("appcheck", acOk ? "ok" : (req.headers["x-firebase-appcheck"] ? "invalido" : "sin-token"));
+      if (!acOk && AC_MODE === "enforce") return res.status(401).json({ error: "Actualiza Vallik para hablar con Peter." });
+    }
     if (limited(uid)) return res.status(429).json({ error: "Demasiadas preguntas seguidas. Espera un poco." });
     const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "?";
     if (ipLimited(ip)) return res.status(429).json({ error: "Demasiadas preguntas desde esta conexión. Espera un rato." });
