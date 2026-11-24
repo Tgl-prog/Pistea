@@ -3631,14 +3631,15 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     M.places.forEach(pl => { const n = norm(pl[0]); if (n.includes(q)) res.push({ pl, sc: n.startsWith(q) ? 0.5 : 1.5 }); });
     POIS.forEach(p => { const i = p.n.indexOf(q); if (i >= 0) res.push({ poi: p, sc: i === 0 ? 1.2 : 2.2 }); });
     res.sort((a, b) => a.sc - b.sc);
-    if (!res.length) return `${EN?((CA?`<li class="none">Res amb aquest nom</li>`:FR?`<li class="none">Rien avec ce nom</li>`:`<li class="none">Nothing with that name</li>`)):`<li class="none">Nada con ese nombre</li>`}${PETER_URL ? `<li><button data-act="peter-q"><span class="pav sm" aria-hidden="true">${PETER_AV}</span><span><b>${EN ? ((CA?"Pregunta-ho a en Peter":FR?"Demande à Peter":"Ask Peter")) : "Pregúntaselo a Peter"}</b><small>«${esc(query.trim().slice(0, 60))}»</small></span></button></li>` : ""}`;
+    const peterLi = q.length >= 3 ? `${PETER_URL ? `<li><button data-act="peter-q"><span class="pav sm" aria-hidden="true">${PETER_AV}</span><span><b>${EN ? ((CA?"Pregunta-ho a en Peter":FR?"Demande à Peter":"Ask Peter")) : "Pregúntaselo a Peter"}</b><small>«${esc(query.trim().slice(0, 60))}»</small></span></button></li>` : ""}` : "";
+    if (!res.length) return `${EN?((CA?`<li class="none">Res amb aquest nom</li>`:FR?`<li class="none">Rien avec ce nom</li>`:`<li class="none">Nothing with that name</li>`)):`<li class="none">Nada con ese nombre</li>`}${peterLi}`;
     return res.slice(0, 25).map(r => {
       if (r.person) return `<li><button data-act="res-person" data-uid="${esc(r.person.uid)}">${av(r.person.uid)}<span><b>${esc(who(r.person.uid))}</b><small>${esc(placeOf(r.person) || "")}</small></span></button></li>`;
       if (r.poi) return `<li><button data-act="res-poi" data-id="${esc(r.poi.id)}"><span class="poiic" style="--c:${POI_CAT[r.poi.cat].c};width:36px;height:36px;flex-basis:36px">${POI_ICON[r.poi.cat]}</span><span><b>${esc(r.poi.name)}</b><small>${esc(poiKind(r.poi))}${r.poi.z ? " · " + fmtNum(r.poi.z) + " m" : ""}</small></span></button></li>`;
       if (r.pl) return `<li><button data-act="res-place" data-i="${M.places.indexOf(r.pl)}"><span class="plate town" aria-hidden="true"></span><span><b>${esc(r.pl[0])}${EN?((CA?`</b><small>Estació</small></span></button></li>`:FR?`</b><small>Station</small></span></button></li>`:`</b><small>Resort</small></span></button></li>`)):`</b><small>Estación</small></span></button></li>`}`;
       const g = r.g, isL = g.k === "L";
       return `<li><button data-act="res-g" data-i="${GROUPS.indexOf(g)}">${plate(g.k, g.d)}<span><b>${esc(g.name)}</b><small>${isL ? (LIFT[g.t] || LIFT.tsd).s : DIF[g.d].s}${g.zt ? " · " + fmtNum(g.zt) + " m" : ""}</small></span></button></li>`;
-    }).join("");
+    }).join("") + peterLi;   // Peter siempre al final, también cuando hay resultados
   }
   function closeSearch() { const q = $("#q"); if (q) { q.value = ""; q.blur(); } query = ""; const r = $("#results"); if (r) r.innerHTML = ""; document.body.classList.remove("searching"); }
 
@@ -3961,7 +3962,10 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
   });
   document.addEventListener("focusin", e => { if (e.target.id === "q") { document.body.classList.add("searching"); $("#results").innerHTML = resultsHtml(); } if (e.target.id === "dq" && snap !== "full") setSnap("full"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && e.target.id === "q") closeSearch(); });
-  document.addEventListener("pointerdown", e => { if (!e.target.closest(".topbar")) { const r = $("#results"); if (r && r.innerHTML) { r.innerHTML = ""; document.body.classList.remove("searching"); } } });
+  // Tocar fuera del buscador sale del modo búsqueda aunque no haya resultados (si no, Peter y los botones del mapa se quedaban ocultos).
+  document.addEventListener("pointerdown", e => { if (!e.target.closest(".topbar") && document.body.classList.contains("searching")) { const r = $("#results"); if (r) r.innerHTML = ""; document.body.classList.remove("searching"); const q = $("#q"); if (q && document.activeElement === q) q.blur(); } });
+  // Al salir del buscador sin nada escrito (por ejemplo, con «Listo» del teclado), también.
+  document.addEventListener("focusout", e => { if (e.target.id === "q") setTimeout(() => { const q = $("#q"); if (q && document.activeElement !== q && !q.value.trim()) { const r = $("#results"); if (r) r.innerHTML = ""; document.body.classList.remove("searching"); } }, 150); });
   function clearModes() { RP = null; profOpen = false; sel = null; personSheet = null; marking = false; meetSheet = false; poiSheet = null; gotoOpen = false; juntar = null; }
   document.addEventListener("click", e => {
     const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
