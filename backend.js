@@ -246,6 +246,27 @@
   })();
   const auth = firebase.auth();
   const fs = firebase.firestore();
+
+  /* Informe de errores: si algo falla en el móvil de alguien, queda una nota técnica en "errores"
+     (mensaje, archivo y línea, versión y plataforma). Sin datos personales: sin nombre, sin usuario,
+     sin posición; se quita cualquier código de grupo. Como mucho 5 por sesión, y se borran a los 30 días. */
+  const WEB_VER = "v45";
+  (function errores() {
+    let sent = 0; const seen = new Set();
+    const clean = t => String(t || "").replace(/([#&?]g=)[a-z0-9]+/gi, "$1…").replace(/\b[A-Za-z0-9_-]{24,}\b/g, "…").slice(0, 300);
+    function report(msg, src) {
+      msg = clean(msg); src = clean(src);
+      const k = msg + "|" + src;
+      if (!msg || seen.has(k) || sent >= 5) return;
+      seen.add(k); sent++;
+      const plat = NATIVE_UA ? (/android/i.test(navigator.userAgent) ? "android" : "ios") : "web";
+      const data = { msg, src, v: WEB_VER, plat, at: Date.now() };
+      if (window.PISTEA_TTL) data.ttl = firebase.firestore.Timestamp.fromMillis(Date.now() + 30 * 864e5);
+      ensureAuth().then(() => fs.collection("errores").add(data)).catch(() => {});
+    }
+    window.addEventListener("error", e => { if (e && e.message) report(e.message, (e.filename || "").split("/").pop() + ":" + (e.lineno || 0) + ":" + (e.colno || 0)); });
+    window.addEventListener("unhandledrejection", e => { const r = e && e.reason; if (!r) return; const m = r.message || String(r); if (/permission|offline|unavailable|network|aborted|cancel/i.test(m)) return; report(m, ((r.stack || "").split("\n")[1] || "").trim()); });
+  })();
   // Copia local de los datos del grupo (IndexedDB): sin cobertura se ve lo último que llegó,
   // y lo que escribas se guarda y se envía al recuperarla. Con el SDK compat 10.x es enablePersistence.
   try { fs.enablePersistence({ synchronizeTabs: true }).catch(() => {}); } catch (e) {}

@@ -138,6 +138,18 @@ service cloud.firestore {
         && (!('at' in request.resource.data) || request.resource.data.at is number);
       allow update, delete: if false;
     }
+    // Informe de errores técnicos de la app: solo se pueden crear (nadie los lee desde la app).
+    // Sin datos personales; se borran solos a los 30 días (ttl).
+    match /errores/{id} {
+      allow create: if signedIn()
+        && campos(request.resource.data, ['msg', 'at'], ['msg', 'src', 'v', 'plat', 'at'])
+        && texto(request.resource.data.msg, 1, 300) && request.resource.data.at is number
+        && (!('src' in request.resource.data) || texto(request.resource.data.src, 0, 300))
+        && (!('v' in request.resource.data) || texto(request.resource.data.v, 0, 20))
+        && (!('plat' in request.resource.data) || request.resource.data.plat in ['web', 'ios', 'android']);
+      allow read, update, delete: if false;
+    }
+
     // Cambio de código. El creador deja a cada persona que sigue en el grupo una nota con el código
     // nuevo (solo la lee esa persona) y marca el grupo viejo como cerrado. Quien fue quitado no tiene
     // nota y, aunque entre con otro usuario, ya no puede crear su perfil en el grupo viejo.
