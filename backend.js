@@ -325,6 +325,25 @@
   }
 
   let ready = null;
+  const T_ = (es, en, fr, ca) => EN ? (CA ? ca : FR ? fr : en) : es;
+  const movedMsg = () => T_("Quien creó el grupo cambió el código. Ya estás en el nuevo.", "Whoever created the group changed the code. You're in the new one now.", "La personne qui a créé le groupe a changé le code. Tu es dans le nouveau.", "Qui va crear el grup n'ha canviat el codi. Ja ets al nou.");
+  // Pasar al código nuevo del grupo (lo cambió quien lo creó): me llevo mis pistas del diario,
+  // borro lo mío del grupo viejo y vuelvo a abrir la app con el código nuevo.
+  async function moveTo(group, uid, nc, aviso) {
+    try {
+      const q = got(await within(group.collection("pistas").where("uid", "==", uid).get(), 4000));
+      if (q && q.size) {
+        const dst = fs.collection("grupos").doc(nc).collection("pistas"), b = fs.batch();
+        q.docs.slice(0, 400).forEach(d => { const v = Object.assign({}, d.data()); delete v.ttl; b.set(dst.doc(d.id), withTtl("pistas", v)); });
+        b.commit().catch(() => {});
+      }
+    } catch (e) {}
+    ["aqui", "perfiles", "mensajes"].forEach(c => group.collection(c).doc(uid).delete().catch(() => {}));
+    LS.set("pistea.grupo", nc);
+    if (aviso) LS.set("pistea.aviso", aviso);
+    try { history.replaceState(null, "", location.pathname + location.search + "#g=" + nc); } catch (e) {}
+    setTimeout(() => location.reload(), 400);
+  }
   function goOut(aviso) {
     LS.del("pistea.grupo");
     if (aviso) LS.set("pistea.aviso", aviso);
@@ -366,8 +385,11 @@
       } else {
         // Si la red no contesta a tiempo, lo que haya en la copia del móvil.
         const read = async ref => got(await within(ref.get(), 2500)) || got(await within(ref.get({ source: "cache" }), 1000));
-        const [out, g] = await Promise.all([read(group.collection("fuera").doc(uid)), read(group)]);
+        const [out, g, nv, mv] = await Promise.all([read(group.collection("fuera").doc(uid)), read(group), read(group.collection("nuevo").doc(uid)), read(group.collection("movido").doc("info"))]);
         if (out && out.exists) { kicked(); return new Promise(() => {}); }
+        // El creador cambió el código: si estoy en la lista, paso al nuevo; si no, me quedo fuera.
+        if (nv && nv.exists && nv.data().code) { moveTo(group, uid, nv.data().code, movedMsg()); return new Promise(() => {}); }
+        if (mv && mv.exists) { goOut(T_("Este grupo cambió de código. Pídele el nuevo a quien lo creó.", "This group has a new code. Ask whoever created it for the new one.", "Ce groupe a changé de code. Demande le nouveau à qui l'a créé.", "Aquest grup ha canviat de codi. Demana el nou a qui el va crear.")); return new Promise(() => {}); }
         if (g && g.exists) owner = g.data().owner;
         else if (g && !g.metadata.fromCache) {
           // El servidor dice que no hay documento de grupo: o es un grupo de antes (sin creador)
@@ -384,6 +406,8 @@
 
       // Si me quitan mientras tengo la app abierta, salgo en el momento.
       group.collection("fuera").doc(uid).onSnapshot(s => { if (s.exists) kicked(); }, () => {});
+      // Si el creador cambia el código mientras tengo la app abierta, paso al nuevo en el momento.
+      group.collection("nuevo").doc(uid).onSnapshot(s => { if (s.exists && s.data().code && s.data().code !== code) moveTo(group, uid, s.data().code, movedMsg()); }, () => {});
 
       const base = /^https?:$/.test(location.protocol) ? location.origin + location.pathname : "https://vallik.app/";   // en la app nativa el origen es capacitor://
       const G = window.PISTEA_GROUP = {
@@ -427,6 +451,26 @@
           try { Object.keys(localStorage).filter(k => /^(pistea|vallik)\./.test(k) && k !== "vallik.lang").forEach(k => localStorage.removeItem(k)); } catch (e) {}
           goOut(T("Hemos borrado tu cuenta y todo lo tuyo en el grupo.", "We've deleted your account and everything of yours in the group.", "Nous avons supprimé ton compte et tout ce qui était à toi dans le groupe.", "Hem esborrat el teu compte i tot el que era teu al grup."));
           return { ok: true };
+        },
+        // Cambiar el código (solo quien creó el grupo): crea el grupo con un código nuevo, avisa a cada
+        // persona que sigue en el grupo y cierra el viejo, así quien fue quitado no puede volver a entrar.
+        async changeCode() {
+          if (!G.isOwner) return { ok: false, msg: "" };
+          if (navigator.onLine === false) return { ok: false, msg: T_("Necesitas conexión para cambiar el código.", "You need a connection to change the code.", "Il te faut du réseau pour changer le code.", "Necessites connexió per canviar el codi.") };
+          try {
+            const ps = got(await within(group.collection("perfiles").get({ source: "server" }), 10000));
+            if (!ps) throw new Error("red");
+            const nc = newCode(), ng = fs.collection("grupos").doc(nc), now = Date.now(), b = fs.batch();
+            b.set(ng, { owner: uid, at: now });
+            b.set(ng.collection("perfiles").doc(uid), withTtl("perfiles", { name: myName, at: now }));
+            ps.docs.filter(d => d.id !== uid).slice(0, 400).forEach(d => b.set(group.collection("nuevo").doc(d.id), withTtl("perfiles", { code: nc, by: uid, at: now })));
+            b.set(group.collection("movido").doc("info"), withTtl("perfiles", { by: uid, at: now }));
+            await within(b.commit(), 15000).then(r => { if (r === TIMEOUT) throw new Error("red"); });
+            moveTo(group, uid, nc, T_("Listo. El grupo tiene código nuevo y los demás pasan solos.", "Done. The group has a new code and everyone else moves over on their own.", "C'est fait. Le groupe a un nouveau code et les autres suivent tout seuls.", "Fet. El grup té codi nou i la resta hi passa sola."));
+            return { ok: true };
+          } catch (e) {
+            return { ok: false, msg: T_("No se ha podido cambiar el código. Revisa la conexión y vuelve a probar.", "Couldn't change the code. Check your connection and try again.", "Impossible de changer le code. Vérifie ta connexion et réessaie.", "No s'ha pogut canviar el codi. Revisa la connexió i torna-ho a provar.") };
+          }
         },
         kick(id, onErr) {
           if (!G.isOwner || id === uid) return false;

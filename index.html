@@ -2839,7 +2839,9 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <p class="quiet">Si añades Vallik a la pantalla de inicio del iPhone, al abrirla pega este código.</p>
       <button class="btn dark wide" data-act="invite">Invitar al grupo</button>
       <button class="btn ghost wide danger" data-act="leave">`}${confirmAct === "leave" ? (EN?((CA?"Torna a tocar per sortir":FR?"Touche encore pour quitter":"Tap again to leave")):"Toca otra vez para salir") : (EN?((CA?"Sortir del grup":FR?"Quitter le groupe":"Leave the group")):"Salir del grupo")}</button>
-      ${G.isOwner ? `${EN?((CA?`<p class="quiet">Has creat aquest grup. Per treure algú, toca el seu nom.</p>`:FR?`<p class="quiet">Tu as créé ce groupe. Pour retirer quelqu'un, touche son nom.</p>`:`<p class="quiet">You created this group. To remove someone, tap their name.</p>`)):`<p class="quiet">Creaste este grupo. Para quitar a alguien, toca su nombre.</p>`}` : ""}` : "";
+      ${G.isOwner ? `${EN?((CA?`<p class="quiet">Has creat aquest grup. Per treure algú, toca el seu nom.</p>`:FR?`<p class="quiet">Tu as créé ce groupe. Pour retirer quelqu'un, touche son nom.</p>`:`<p class="quiet">You created this group. To remove someone, tap their name.</p>`)):`<p class="quiet">Creaste este grupo. Para quitar a alguien, toca su nombre.</p>`}
+      <button class="btn ghost wide" data-act="newcode">${confirmAct === "newcode" ? (EN?((CA?"Torna a tocar per canviar el codi":FR?"Touche encore pour changer le code":"Tap again to change the code")):"Toca otra vez para cambiar el código") : (EN?((CA?"Canviar el codi del grup":FR?"Changer le code du groupe":"Change the group code")):"Cambiar el código del grupo")}</button>
+      <p class="quiet">${EN?((CA?"Si has tret algú, canvia el codi perquè no pugui tornar a entrar. La resta del grup passa sola al codi nou.":FR?"Si tu as retiré quelqu'un, change le code pour qu'il ne puisse pas revenir. Le reste du groupe passe tout seul au nouveau code.":"If you removed someone, change the code so they can't get back in. Everyone else moves to the new code on their own.")):"Si quitaste a alguien, cambia el código para que no pueda volver a entrar. El resto del grupo pasa solo al código nuevo."}</p>` : ""}` : "";
     const myMsg = S.mensajes.get(me), myT = myMsg && Date.now() - myMsg.at < MSG_HELP_MS ? myMsg.tipo : null;
     const msgs = mode === "live" || mode === "demo" ? `${EN?((CA?`
       <h3 class="sec">Avisar el grup</h3>
@@ -4069,6 +4071,13 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       case "leave": {
         if (confirmAct !== "leave") { confirmAct = "leave"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
         confirmAct = null; window.PISTEA_GROUP.leave(); break;
+      }
+      case "newcode": {
+        const G = window.PISTEA_GROUP; if (!G || !G.changeCode) break;
+        if (confirmAct !== "newcode") { confirmAct = "newcode"; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmAct = null; ui(); }, 4000); ui(); break; }
+        confirmAct = null; el.disabled = true;
+        G.changeCode().then(r => { if (!r.ok) { if (r.msg) toast(r.msg); ui(); } });
+        break;
       }
       case "kick": {
         const k = "kick:" + el.dataset.uid, nm = who(el.dataset.uid);

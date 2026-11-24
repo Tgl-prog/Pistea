@@ -13,6 +13,8 @@ service cloud.firestore {
     // A quien han quitado del grupo ya no puede leer ni escribir en él (con ese mismo usuario).
     function noExpulsado(g) { return !exists(/databases/$(database)/documents/grupos/$(g)/fuera/$(request.auth.uid)); }
     function soyYo(uid) { return request.auth.uid == uid; }
+    // Grupo cerrado porque el creador le cambió el código: ya no se puede entrar con el viejo.
+    function abierto(g) { return !exists(/databases/$(database)/documents/grupos/$(g)/movido/info); }
 
     function ahora() { return request.time.toMillis(); }
     function texto(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
@@ -46,7 +48,7 @@ service cloud.firestore {
     }
     match /grupos/{g}/perfiles/{uid} {
       allow read: if signedIn() && noExpulsado(g);
-      allow create: if signedIn() && soyYo(uid) && noExpulsado(g) && perfilOk(request.resource.data) && existsAfter(grupo(g));
+      allow create: if signedIn() && soyYo(uid) && noExpulsado(g) && abierto(g) && perfilOk(request.resource.data) && existsAfter(grupo(g));
       allow update: if signedIn() && soyYo(uid) && noExpulsado(g) && perfilOk(request.resource.data);
       // Tu perfil lo borras tú (salir del grupo); el creador puede borrar el de otro al quitarlo.
       allow delete: if signedIn() && ((soyYo(uid) && noExpulsado(g)) || (!soyYo(uid) && esCreador(g)));
@@ -133,6 +135,25 @@ service cloud.firestore {
       allow get: if signedIn() && (soyYo(uid) || esCreador(g));
       allow create: if signedIn() && esCreador(g) && !soyYo(uid)
         && campos(request.resource.data, ['by'], ['at', 'by']) && request.resource.data.by == request.auth.uid
+        && (!('at' in request.resource.data) || request.resource.data.at is number);
+      allow update, delete: if false;
+    }
+    // Cambio de código. El creador deja a cada persona que sigue en el grupo una nota con el código
+    // nuevo (solo la lee esa persona) y marca el grupo viejo como cerrado. Quien fue quitado no tiene
+    // nota y, aunque entre con otro usuario, ya no puede crear su perfil en el grupo viejo.
+    match /grupos/{g}/nuevo/{uid} {
+      allow get: if signedIn() && soyYo(uid);
+      allow create: if signedIn() && esCreador(g) && !soyYo(uid)
+        && campos(request.resource.data, ['code', 'by'], ['code', 'by', 'at'])
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.code is string && request.resource.data.code.matches('^[a-z0-9]{10}$')
+        && (!('at' in request.resource.data) || request.resource.data.at is number);
+      allow update, delete: if false;
+    }
+    match /grupos/{g}/movido/{id} {
+      allow get: if signedIn();
+      allow create: if signedIn() && id == 'info' && esCreador(g)
+        && campos(request.resource.data, ['by'], ['by', 'at']) && request.resource.data.by == request.auth.uid
         && (!('at' in request.resource.data) || request.resource.data.at is number);
       allow update, delete: if false;
     }
