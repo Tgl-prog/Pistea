@@ -57,13 +57,6 @@ window.THREE_READY = new Promise(function (res) {
     s.onload = function () { if (!--left) res(true); }; s.onerror = function () { res(false); }; document.head.appendChild(s); });
 });
 </script>
-<script src="firebase-app-compat.js"></script>
-<script src="firebase-app-check-compat.js"></script>
-<script src="firebase-auth-compat.js"></script>
-<script src="firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="native.js"></script>
-<script src="backend.js"></script>
 <style>
 @font-face { font-family: "Geist"; src: url(Geist-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "Geist Mono"; src: url(GeistMono-Variable.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -699,6 +692,14 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
 </style>
 </head>
 <body>
+<!-- Firebase al principio del body: App Check (reCAPTCHA) necesita que exista document.body al activarse. -->
+<script src="firebase-app-compat.js"></script>
+<script src="firebase-app-check-compat.js"></script>
+<script src="firebase-auth-compat.js"></script>
+<script src="firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="native.js"></script>
+<script src="backend.js"></script>
 <div id="mapvp">
   <canvas id="gl" aria-hidden="true"></canvas>
   <canvas id="cv" role="img" aria-label="Vallik: mapa en 3D de pistas y remontes de Les 3 Vallées"></canvas>
