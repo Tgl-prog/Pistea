@@ -1341,13 +1341,13 @@ if (EN) (function () {
     if (!el) {
       el = document.createElement("div"); el.id = "peter"; el.className = "peter";
       el.innerHTML = `<div class="pbox" role="dialog" aria-labelledby="peter-t">
-        <div class="phead"><span class="pav">${PETER_AV}${EN?((CA?`</span><div><h2 id="peter-t">Peter</h2><small>El teu guia d'esquí</small></div><button class="x" data-act="peter-close" aria-label="Tancar">×</button></div>
+        <div class="phead"><span class="pav">${PETER_AV}${EN?((CA?`</span><div><h2 id="peter-t">Peter</h2><small>El teu guia d'esquí amb IA</small></div><button class="x" data-act="peter-close" aria-label="Tancar">×</button></div>
         <div class="plog" aria-live="polite"></div>
-        <div class="psug">`:FR?`</span><div><h2 id="peter-t">Peter</h2><small>Ton guide de ski</small></div><button class="x" data-act="peter-close" aria-label="Fermer">×</button></div>
+        <div class="psug">`:FR?`</span><div><h2 id="peter-t">Peter</h2><small>Ton guide de ski avec IA</small></div><button class="x" data-act="peter-close" aria-label="Fermer">×</button></div>
         <div class="plog" aria-live="polite"></div>
-        <div class="psug">`:`</span><div><h2 id="peter-t">Peter</h2><small>Your ski guide</small></div><button class="x" data-act="peter-close" aria-label="Close">×</button></div>
+        <div class="psug">`:`</span><div><h2 id="peter-t">Peter</h2><small>Your AI ski guide</small></div><button class="x" data-act="peter-close" aria-label="Close">×</button></div>
         <div class="plog" aria-live="polite"></div>
-        <div class="psug">`)):`</span><div><h2 id="peter-t">Peter</h2><small>Tu guía de esquí</small></div><button class="x" data-act="peter-close" aria-label="Cerrar">×</button></div>
+        <div class="psug">`)):`</span><div><h2 id="peter-t">Peter</h2><small>Tu guía de esquí con IA</small></div><button class="x" data-act="peter-close" aria-label="Cerrar">×</button></div>
         <div class="plog" aria-live="polite"></div>
         <div class="psug">`}${PETER_SUG.map(t => `<button class="btn ghost" data-act="peter-sug">${esc(t)}</button>`).join("")}${EN?((CA?`</div>
         <form><input name="t" placeholder="Pregunta a en Peter…" autocomplete="off" enterkeyhint="send" aria-label="Escriu a en Peter" maxlength="600"><button class="btn" type="submit" aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
