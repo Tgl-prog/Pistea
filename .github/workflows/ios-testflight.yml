@@ -45,6 +45,9 @@ jobs:
       - name: Copiar la web y preparar el proyecto
         working-directory: app
         run: |
+          # Mismo número de compilación que el archive: la app lo lleva dentro (aviso de actualización)
+          export VALLIK_BUILD=$(( 100 + ${{ github.run_number }} ))
+          export VALLIK_VERSION="${{ inputs.version }}"
           npm ci
           npm run sync
 

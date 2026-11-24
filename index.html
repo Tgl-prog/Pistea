@@ -559,6 +559,12 @@ body.has-dock #smore { padding-bottom: 20px; }
 
 .toast { position: fixed; left: 50%; transform: translateX(-50%); color: var(--tx); padding: 12px 18px; border-radius: 22px; font-size: 14px; max-width: calc(100% - 32px); z-index: 9; transition: bottom .3s; background: var(--glass-2); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--hair); box-shadow: 0 10px 30px rgba(0,0,0,.3); }
 .toast[hidden] { display: none; }
+/* Actualización obligatoria (solo en la app del iPhone) */
+.upd { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 24px; background: rgba(6,16,28,.72); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.upd .card { width: 100%; max-width: 360px; padding: 28px 24px 22px; border-radius: 28px; background: var(--glass-2); border: 1px solid var(--hair); box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+.upd h2 { margin: 0 0 10px; font: 700 24px/1.15 var(--font); letter-spacing: -.02em; color: var(--tx); }
+.upd p { margin: 0 0 22px; color: var(--tx-2); font-size: 16px; line-height: 1.45; }
+.upd .btn { width: 100%; text-decoration: none; }
 
 .range { width: 100%; height: 44px; -webkit-appearance: none; appearance: none; background: transparent; margin: 0; }
 .range::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #26364A, #F2A900 28%, #FFE08A 50%, #F2A900 72%, #26364A); }
@@ -4334,6 +4340,35 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadCtl && !done && Date.now() - t0 < 20000) { done = true; location.reload(); } });
   }
 })();
+</script>
+<script>
+  /* Actualización obligatoria (solo en la app nativa). La app lleva su número de compilación
+     (app-build.js, lo escribe el workflow) y lee https://vallik.app/version.json. Si su compilación
+     es menor que ios.minBuild, tapa la app con un aviso para ir a la App Store. Sin conexión no bloquea. */
+  (function forceUpdate() {
+    const N = window.PisteaNative, B = +window.VALLIK_BUILD || 0;
+    if (!N || !N.get || !B) return;
+    let shown = false;
+    const ue = v => String(v).replace(/[&<>"']/g, ch => "&#" + ch.charCodeAt(0) + ";");
+    function show(url) {
+      if (shown) return; shown = true;
+      const d = document.createElement("div"); d.className = "upd"; d.setAttribute("role", "alertdialog"); d.setAttribute("aria-modal", "true");
+      const t = EN ? (CA ? ["Hi ha una versió nova de Vallik", "Per continuar fent servir l'app amb el teu grup, actualitza-la a l'App Store. Només és un minut.", "Actualitzar"]
+        : FR ? ["Une nouvelle version de Vallik est disponible", "Pour continuer à utiliser l'app avec ton groupe, mets-la à jour sur l'App Store. Ça prend une minute.", "Mettre à jour"]
+        : ["There's a new version of Vallik", "To keep using the app with your group, update it from the App Store. It only takes a minute.", "Update"])
+        : ["Hay una versión nueva de Vallik", "Para seguir usando la app con tu grupo, actualízala desde la App Store. Es solo un minuto.", "Actualizar"];
+      d.innerHTML = `<div class="card"><h2>${ue(t[0])}</h2><p>${ue(t[1])}</p><a class="btn" href="${ue(url)}" target="_blank" rel="noopener">${ue(t[2])}</a></div>`;
+      document.body.appendChild(d);
+    }
+    function check() {
+      N.get("https://vallik.app/version.json?t=" + Date.now()).then(txt => {
+        const c = (JSON.parse(txt) || {}).ios;
+        if (c && +c.minBuild > B) show(c.store || "https://apps.apple.com/app/id6838083819");
+      }).catch(() => {});
+    }
+    check();
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+  })();
 </script>
 </body>
 </html>
