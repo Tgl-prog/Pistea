@@ -1300,8 +1300,11 @@ if (EN) (function () {
       if (!PETER_URL) throw new Error("nourl");
       let token = "";
       try { const u = window.firebase && firebase.auth && firebase.auth().currentUser; if (u) token = await u.getIdToken(); } catch (e) {}
+      // App Check: demuestra que la pregunta viene de la app de verdad (Peter lo comprueba).
+      let acTok = "";
+      try { if (window.firebase && firebase.appCheck) { const r = await Promise.race([firebase.appCheck().getToken(false), new Promise(r2 => setTimeout(() => r2(null), 3000))]); if (r && r.token) acTok = r.token; } } catch (e) {}
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
-      const res = await fetch(PETER_URL, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json", "Authorization": token ? "Bearer " + token : "" },
+      const res = await fetch(PETER_URL, { method: "POST", signal: ctl.signal, headers: Object.assign({ "Content-Type": "application/json", "Authorization": token ? "Bearer " + token : "" }, acTok ? { "X-Firebase-AppCheck": acTok } : {}),
         body: JSON.stringify({ messages: PETER.msgs.slice(-12).map(m => ({ role: m.r === "u" ? "user" : "assistant", content: m.t })), context: peterContext() }) });
       clearTimeout(to);
       const j = await res.json().catch(() => ({}));
