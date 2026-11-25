@@ -66,7 +66,7 @@
           <h1>${L("Que nadie se pierda del grupo","Nobody gets lost from the group")}</h1>
           
         </header>
-        ${!code && note ? `<p class="lp-msg" role="status">${note.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>` : ""}
+        ${code ? "" : `<p class="lp-msg" role="status"${note ? "" : " hidden"}>${note.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>`}
         ${code ? "" : `<div class="lp-pick">
           <button class="btn wide" type="button" data-pick="new">${L("Crear un grupo","Create a group")}</button>
           <button class="btn ghost wide" type="button" data-pick="join">${L("Tengo un código","I have a code")}</button>
@@ -184,12 +184,12 @@
       .lp-screen>.lp-hero{flex:1;display:flex!important;flex-direction:column;gap:0!important}
       .lp-hero h1{margin-top:auto!important;font-size:42px!important;line-height:42px!important;max-width:11ch;padding-bottom:6px}
       .lp-hero{padding:0!important}
-      .lp-lang{top:0!important}.lp-lang button{min-width:40px!important;font-size:11px!important}
+      .lp-lang{top:calc(var(--sat,0px) + 6px)!important}.lp-lang button{min-width:40px!important;font-size:11px!important}
       .join[data-stage=pick] .join-card,.join[data-stage=pick] .lp-inv{display:none}
       .join[data-stage=form] .lp-pick{display:none}
       .join[data-stage=form]:not(:has(.join-card[data-mode=invite])) .lp-auth{display:none}
       .lp-pick{display:grid;gap:10px}
-      .lp-msg{margin:0;padding:12px 14px;border-radius:14px;background:rgba(14,42,71,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(200,240,60,.35);font-size:15px}
+      .lp-msg[hidden]{display:none}.lp-msg{margin:0;padding:12px 14px;border-radius:14px;background:rgba(14,42,71,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(200,240,60,.35);font-size:15px}
       .lp-pick .btn,.lp-auth .btn{min-height:54px}
       .join-card{background:none!important;padding:0!important;box-shadow:none!important;border:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
       .join-card h2{font-size:24px!important}
@@ -206,7 +206,8 @@
       document.head.appendChild(st);
       document.body.appendChild(el);
       const f = el.querySelector("form"), noteEl = el.querySelector(".join-note"), btns = el.querySelectorAll("button");
-      const say = t => { noteEl.textContent = t || ""; noteEl.hidden = !t; };
+      // En el primer paso (elegir) no se ve la tarjeta del formulario: los avisos van arriba de los botones.
+      const say = t => { const m = el.dataset.stage === "pick" && el.querySelector(".lp-msg"); const box = m || noteEl; box.textContent = t || ""; box.hidden = !t; };
       let busyBtn = null;
       const busy = (on, who) => { btns.forEach(b => { b.disabled = on; b.removeAttribute("aria-busy"); }); busyBtn = on ? (who || null) : null; if (busyBtn) busyBtn.setAttribute("aria-busy", "true"); };
       const sub = f.querySelector("[type=submit]");
@@ -215,7 +216,7 @@
       if (code) say(note);
       // Primero se elige (crear o entrar con código); después, el nombre. Con enlace de invitación se va directo al nombre.
       const msg = el.querySelector(".lp-msg");
-      const stage = (st2, mode) => { el.dataset.stage = st2; if (mode) f.dataset.mode = mode; say(""); if (msg) msg.remove(); if (st2 === "form") f.n.focus(); el.scrollTop = 0; };
+      const stage = (st2, mode) => { el.dataset.stage = st2; if (mode) f.dataset.mode = mode; if (msg) msg.hidden = true; say(""); if (st2 === "form") f.n.focus(); el.scrollTop = 0; };
       el.querySelectorAll("[data-pick]").forEach(b => b.addEventListener("click", () => stage("form", b.dataset.pick)));
       const bk = el.querySelector("[data-back]"); if (bk) bk.addEventListener("click", () => stage("pick"));
       if (code) f.n.focus({ preventScroll: true });
@@ -295,7 +296,7 @@
   /* Informe de errores: si algo falla en el móvil de alguien, queda una nota técnica en "errores"
      (mensaje, archivo y línea, versión y plataforma). Sin datos personales: sin nombre, sin usuario,
      sin posición; se quita cualquier código de grupo. Como mucho 5 por sesión, y se borran a los 30 días. */
-  const WEB_VER = "v49";
+  const WEB_VER = "v50";
   (function errores() {
     let sent = 0; const seen = new Set();
     const clean = t => String(t || "").replace(/([#&?]g=)[a-z0-9]+/gi, "$1…").replace(/\b[A-Za-z0-9_-]{24,}\b/g, "…").slice(0, 300);
@@ -309,6 +310,9 @@
       if (window.PISTEA_TTL) data.ttl = firebase.firestore.Timestamp.fromMillis(Date.now() + 30 * 864e5);
       ensureAuth().then(() => fs.collection("errores").add(data)).catch(() => {});
     }
+    window.vReport = er => report((er && er.message) || String(er), "diag");
+    // Errores de antes de que cargara este archivo (por ejemplo, native.js): los guarda index.html.
+    (window.__earlyErr || []).forEach(x => report(x.m, x.s));
     window.addEventListener("error", e => { if (e && e.message) report(e.message, (e.filename || "").split("/").pop() + ":" + (e.lineno || 0) + ":" + (e.colno || 0)); });
     window.addEventListener("unhandledrejection", e => { const r = e && e.reason; if (!r) return; const m = r.message || String(r); if (/permission|offline|unavailable|network|aborted|cancel/i.test(m)) return; report(m, ((r.stack || "").split("\n")[1] || "").trim()); });
   })();
@@ -339,7 +343,9 @@
   const NATIVE_UA = /PisteaNative/.test(navigator.userAgent) || !/^https?:$/.test(location.protocol);
   // En la app del iPhone, Apple y Google van por el plugin nativo (las ventanas web de Google no funcionan dentro de apps).
   const NATIVE_LOGIN = () => !!(window.PisteaNative && window.PisteaNative.signIn);
-  const canLogin = k => NATIVE_UA ? NATIVE_LOGIN() && (k === "apple" || k === "google") : !!LOGIN[k];
+  if (NATIVE_UA && !NATIVE_LOGIN() && window.vReport) vReport("sin-puente-al-arrancar " + typeof window.PisteaNative + " " + typeof window.Capacitor);
+  // En la app los botones salen siempre: si el puente nativo aún no está, se comprueba al tocar.
+  const canLogin = k => NATIVE_UA ? (k === "apple" || k === "google") : !!LOGIN[k];
   // Credencial de Firebase a partir de lo que devuelve el plugin nativo.
   function nativeCred(k, c) {
     if (k === "apple") return new firebase.auth.OAuthProvider("apple.com").credential({ idToken: c.idToken, rawNonce: c.nonce });
@@ -353,6 +359,7 @@
     const c = (e && e.code) || "";
     if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return "";
     if (/cancel/i.test((e && e.message) || "") || /cancel/i.test(c)) return "";   // cerró la ventana nativa de Apple o Google
+    if (c === "vallik/sin-puente") return T_("No se pudo abrir el inicio de sesión. Cierra la app del todo y vuelve a abrirla.", "Couldn't open sign-in. Close the app completely and open it again.", "Impossible d'ouvrir la connexion. Ferme complètement l'app et rouvre-la.", "No s'ha pogut obrir l'inici de sessió. Tanca l'app del tot i torna-la a obrir.");
     if (c === "auth/operation-not-allowed") return (EN?((CA?"L'accés amb aquest compte encara no està activat. De moment, fes servir el teu nom.":FR?"La connexion avec ce compte n'est pas encore activée. Utilise ton nom pour l'instant.":"Signing in with that account isn't switched on yet. Use your name for now.")):"El acceso con esa cuenta aún no está activado. Entra con tu nombre de momento.");
     if (c === "auth/unauthorized-domain") return (EN?((CA?"Aquesta adreça encara s'ha d'autoritzar a Firebase. De moment, fes servir el teu nom.":FR?"Cette adresse doit encore être autorisée dans Firebase. Utilise ton nom pour l'instant.":"This address still needs to be authorised in Firebase. Use your name for now.")):"Falta autorizar esta dirección en Firebase. Entra con tu nombre de momento.");
     if (c === "auth/popup-blocked") return (EN?((CA?"El navegador ha bloquejat la finestra. Torna a tocar el botó.":FR?"Le navigateur a bloqué la fenêtre. Touche encore le bouton.":"The browser blocked the window. Tap the button again.")):"El navegador ha bloqueado la ventana. Toca otra vez el botón.");
@@ -365,6 +372,10 @@
   async function login(k, allowSwitch) {
     const pv = provider(k);
     const cur = auth.currentUser || await ensureAuth().catch(() => null);
+    if (NATIVE_UA && !NATIVE_LOGIN()) {
+      try { window.vReport && vReport(new Error("login-sin-puente " + typeof window.PisteaNative + " " + typeof window.Capacitor)); } catch (e) {}
+      const er = new Error("sin-puente"); er.code = "vallik/sin-puente"; throw er;
+    }
     const nat = NATIVE_UA && NATIVE_LOGIN();
     const cred = nat ? nativeCred(k, await window.PisteaNative.signIn(k)) : null;
     let user;

@@ -699,6 +699,7 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
 </head>
 <body>
 <!-- Firebase al principio del body: App Check (reCAPTCHA) necesita que exista document.body al activarse. -->
+<script>window.__earlyErr=[];addEventListener("error",function(e){if(window.__earlyErr.length<5)window.__earlyErr.push({m:String(e.message||""),s:String(e.filename||"").split("/").pop()+":"+(e.lineno||0)})});</script>
 <script src="firebase-app-compat.js"></script>
 <script src="firebase-app-check-compat.js"></script>
 <script src="firebase-auth-compat.js"></script>
