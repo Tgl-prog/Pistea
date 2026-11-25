@@ -55,7 +55,9 @@
     const note = LS.get("pistea.aviso") || ""; LS.del("pistea.aviso");
     return new Promise(resolve => {
       const el = document.createElement("div");
-      el.className = "join"; el.dataset.stage = code ? "form" : "pick";
+      // Primero la cuenta (Apple o Google, o seguir sin cuenta); después crear grupo o entrar con código.
+      const withAuth = canLogin("google") || canLogin("apple");
+      el.className = "join"; el.dataset.stage = withAuth ? "auth" : code ? "form" : "pick";
       el.innerHTML = `
         <div class="lp-photo" aria-hidden="true"></div>
         <div class="lp" data-lang="${LANG}">
@@ -67,9 +69,11 @@
           
         </header>
         ${code ? "" : `<p class="lp-msg" role="status"${note ? "" : " hidden"}>${note.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>`}
+        <div class="lp-who" hidden></div>
         ${code ? "" : `<div class="lp-pick">
           <button class="btn wide" type="button" data-pick="new">${L("Crear un grupo","Create a group")}</button>
           <button class="btn ghost wide" type="button" data-pick="join">${L("Tengo un código","I have a code")}</button>
+          ${canLogin("google") || canLogin("apple") ? `<button class="lp-back" type="button" data-to-auth>${L("Volver","Back")}</button>` : ""}
         </div>`}
         ${code ? `<p class="lp-inv">${L("Te han invitado a un grupo. Entra y en un momento os veis todos en el mapa.","You have been invited to a group. Join and you will all be on the map in a moment.")}</p>` : ""}
         <form class="join-card glass" autocomplete="off" novalidate data-mode="${code ? "invite" : "new"}">
@@ -90,6 +94,7 @@
           ${canLogin("apple") ? `<button class="btn wide lp-apple" type="button" data-login="apple">${A_ICON}${L("Continuar con Apple","Continue with Apple")}${LS.get("vallik.lastLogin") === "apple" ? `<span class="lp-last">${L("Último usado","Last used")}</span>` : ""}</button>` : ""}
           ${canLogin("google") ? `<button class="btn ghost wide lp-google" type="button" data-login="google">${G_ICON}${L("Continuar con Google","Continue with Google")}${LS.get("vallik.lastLogin") === "google" ? `<span class="lp-last">${L("Último usado","Last used")}</span>` : ""}</button>` : ""}
           <small>${L("Opcional. Con Google tu perfil te sigue si cambias de móvil.","Optional. With Google your profile follows you if you change phones.")}</small>
+          <button class="lp-skip" type="button" data-skip>${L("Seguir sin cuenta","Continue without an account")}</button>
         </div>` : ""}
         <p class="lp-legal">${L("Al continuar aceptas las","By continuing you accept the")} <a href="${LANG === "fr" ? "fr/conditions/" : LANG === "en" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a> ${L("y la","and the")} <a href="${LANG === "fr" ? "fr/confidentialite/" : LANG === "en" ? "privacy/" : "privacidad/"}">${L("Política de privacidad","Privacy policy")}</a>.</p>
         </div>
@@ -184,10 +189,14 @@
       .lp-screen>.lp-hero{flex:1;display:flex!important;flex-direction:column;gap:0!important}
       .lp-hero h1{margin-top:auto!important;font-size:42px!important;line-height:42px!important;max-width:11ch;padding-bottom:6px}
       .lp-hero{padding:0!important}
-      .lp-lang{top:calc(var(--sat,0px) + 6px)!important}.lp-lang button{min-width:40px!important;font-size:11px!important}
+      .lp-lang{top:calc(var(--sat,0px) + 6px)!important;right:16px!important}.lp-lang button{min-width:40px!important;font-size:11px!important}
       .join[data-stage=pick] .join-card,.join[data-stage=pick] .lp-inv{display:none}
+      .join[data-stage=auth] .lp-pick,.join[data-stage=auth] .join-card{display:none}
+      .join:not([data-stage=auth]) .lp-auth{display:none}
+      .lp-skip{all:unset;cursor:pointer;justify-self:center;min-height:44px;padding:0 14px;color:var(--tx-2);font:500 15px/44px var(--font)}
+      .lp-who{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(14,42,71,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:14px;color:var(--tx-2)}.lp-who[hidden]{display:none}.lp-who b{color:var(--tx);font-weight:600}
+      .join[data-stage=auth] .lp-who{display:none}
       .join[data-stage=form] .lp-pick{display:none}
-      .join[data-stage=form]:not(:has(.join-card[data-mode=invite])) .lp-auth{display:none}
       .lp-pick{display:grid;gap:10px}
       .lp-msg[hidden]{display:none}.lp-msg{margin:0;padding:12px 14px;border-radius:14px;background:rgba(14,42,71,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(200,240,60,.35);font-size:15px}
       .lp-pick .btn,.lp-auth .btn{min-height:54px}
@@ -207,7 +216,7 @@
       document.body.appendChild(el);
       const f = el.querySelector("form"), noteEl = el.querySelector(".join-note"), btns = el.querySelectorAll("button");
       // En el primer paso (elegir) no se ve la tarjeta del formulario: los avisos van arriba de los botones.
-      const say = t => { const m = el.dataset.stage === "pick" && el.querySelector(".lp-msg"); const box = m || noteEl; box.textContent = t || ""; box.hidden = !t; };
+      const say = t => { const m = (el.dataset.stage === "pick" || el.dataset.stage === "auth") && el.querySelector(".lp-msg"); const box = m || noteEl; box.textContent = t || ""; box.hidden = !t; };
       let busyBtn = null;
       const busy = (on, who) => { btns.forEach(b => { b.disabled = on; b.removeAttribute("aria-busy"); }); busyBtn = on ? (who || null) : null; if (busyBtn) busyBtn.setAttribute("aria-busy", "true"); };
       const sub = f.querySelector("[type=submit]");
@@ -219,7 +228,7 @@
       const stage = (st2, mode) => { el.dataset.stage = st2; if (mode) f.dataset.mode = mode; if (msg) msg.hidden = true; say(""); if (st2 === "form") f.n.focus(); el.scrollTop = 0; };
       el.querySelectorAll("[data-pick]").forEach(b => b.addEventListener("click", () => stage("form", b.dataset.pick)));
       const bk = el.querySelector("[data-back]"); if (bk) bk.addEventListener("click", () => stage("pick"));
-      if (code) f.n.focus({ preventScroll: true });
+      if (code && el.dataset.stage === "form") f.n.focus({ preventScroll: true });
       const nameOk = () => { myName = f.n.value.trim().slice(0, 24); if (!myName) { say((EN?((CA?"Escriu el teu nom.":FR?"Écris ton nom.":"Type your name.")):"Escribe tu nombre.")); f.n.focus(); } return !!myName; };
       const finish = () => {
         LS.set("pistea.nombre", myName);
@@ -242,16 +251,22 @@
         if (!ok) { say((EN?((CA?"No hi ha cap grup amb aquest codi. Revisa l'enllaç o demana'l una altra vegada.":FR?"Il n'y a aucun groupe avec ce code. Vérifie le lien ou redemande-le.":"There's no group with that code. Check the link or ask for it again.")):"No hay ningún grupo con ese código. Revisa el enlace o pide que te lo envíen otra vez.")); f.c.focus(); return; }
         code = c; fromLink = false; finish();
       });
+      // Quién entró: una línea discreta encima de crear o entrar con código.
+      const showWho = (k, email) => { const w = el.querySelector(".lp-who"); if (!w) return; w.innerHTML = `${k === "apple" ? A_ICON : G_ICON}<span><b>${L("Has entrado con","Signed in with")} ${k === "apple" ? "Apple" : "Google"}</b>${email ? " · " + String(email).replace(/</g, "&lt;") : ""}</span>`; w.hidden = false; };
+      const next = () => stage(code ? "form" : "pick", code ? "invite" : null);
+      const sk = el.querySelector("[data-skip]"); if (sk) sk.addEventListener("click", next);
+      const ta = el.querySelector("[data-to-auth]"); if (ta) ta.addEventListener("click", () => { const w = el.querySelector(".lp-who"); if (w) w.hidden = true; stage("auth"); });
+      // Si ya había entrado con Apple o Google en este móvil, no se vuelve a pedir.
+      if (withAuth) try { const off = firebase.auth().onAuthStateChanged(u => { off(); const pd = u && !u.isAnonymous && (u.providerData || [])[0]; if (!pd || el.dataset.stage !== "auth") return; showWho(pd.providerId === "apple.com" ? "apple" : "google", pd.email || u.email); next(); }); } catch (e) {}
       el.querySelectorAll("[data-login]").forEach(b => b.addEventListener("click", async () => {
         const k = b.dataset.login; busy(true, b); say("");
         try {
           const u = await login(k, true);
           LS.set("vallik.lastLogin", k);
-          const box = el.querySelector("#lpauth"), nm = (u.displayName || "").split(" ")[0];
+          const nm = (u.displayName || "").split(" ")[0];
           if (nm && !f.n.value.trim()) f.n.value = nm.slice(0, 24);
-          if (box) box.innerHTML = `<div class="lp-done">${k === "apple" ? A_ICON : G_ICON}<span><b>${L("Has entrado con","Signed in with")} ${k === "apple" ? "Apple" : "Google"}</b>${(u.email || "").replace(/</g, "&lt;")}</span></div>`;
-          say(code ? (EN?((CA?"Fet. Revisa el teu nom i prem Entrar.":FR?"C'est fait. Vérifie ton nom et appuie sur Rejoindre.":"Done. Check your name and press Join.")):"Ya está. Revisa tu nombre y pulsa Entrar.") : (EN?((CA?"Fet. Ara enganxa l'enllaç del teu grup o crea'n un de nou.":FR?"C'est fait. Colle maintenant le lien de ton groupe ou crées-en un nouveau.":"Done. Now paste your group link or create a new one.")):"Ya está. Ahora pega el enlace de tu grupo o crea uno nuevo."));
-          if (el.dataset.stage === "form") (f.c || f.n).focus();
+          showWho(k, u.email);
+          next();
         } catch (er) { const t = loginErr(er); if (t) say(t); }
         busy(false);
       }));
