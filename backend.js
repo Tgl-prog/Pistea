@@ -87,6 +87,9 @@
     q5: ["¿Necesito cuenta?", "Do I need an account?", "Faut-il un compte ?", "Necessito compte?"], a5: ["No. Puedes entrar con Apple o Google para no perder tu perfil, o seguir sin cuenta.", "No. You can sign in with Apple or Google to keep your profile, or carry on without an account.", "Non. Tu peux te connecter avec Apple ou Google pour garder ton profil, ou continuer sans compte.", "No. Pots entrar amb Apple o Google per no perdre el teu perfil, o seguir sense compte."],
     end: ["Nadie baja solo.", "Nobody skis down alone.", "Personne ne descend seul.", "Ningú baixa sol."],
     web: ["Seguir en el navegador", "Continue in the browser", "Continuer dans le navigateur", "Seguir al navegador"],
+    qr: ["Escanéalo con la cámara del iPhone", "Scan it with your iPhone camera", "Scanne-le avec l'appareil photo de l'iPhone", "Escaneja'l amb la càmera de l'iPhone"],
+    faqb: ["Preguntas frecuentes", "FAQ", "Questions fréquentes", "Preguntes freqüents"],
+    close: ["Cerrar", "Close", "Fermer", "Tancar"],
     alt1: ["La app de Vallik con el grupo en el mapa", "The Vallik app with the crew on the map", "L'app Vallik avec le groupe sur la carte", "L'app de Vallik amb el grup al mapa"],
   };
   const P = k => { const r = PT[k]; return LANG === "en" ? r[1] : LANG === "fr" ? r[2] : LANG === "ca" ? r[3] : r[0]; };
@@ -122,7 +125,73 @@
         <small>${L("Apple y App Store son marcas de Apple Inc., registradas en EE. UU. y en otros países.","Apple and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.")} ${L("Mapa","Map")} © OpenStreetMap · Copernicus DEM</small></footer>
     </div>`;
   }
+  function deskHTML() {
+    const badge = `<a class="pr-store" href="https://apps.apple.com/app/id6838083819?ct=web"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>`;
+    const legal = LANG === "fr" ? ["fr/confidentialite/", "fr/conditions/"] : LANG === "en" ? ["privacy/", "terms/"] : ["privacidad/", "condiciones/"];
+    return `<div class="pr-desk">
+      <div class="pr-dk-bg" aria-hidden="true"></div>
+      <header class="pr-dk-top"><svg class="lp-wm" viewBox="0 0 331 100" width="122" height="37" role="img" aria-label="Vallik"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg>
+        <div class="lp-lang pr-dk-lang" role="group" aria-label="Idioma / Language">${["es", "en", "fr", "ca"].map(l => `<button type="button" data-lang="${l}"${l === LANG ? ' aria-pressed="true"' : ""}>${l.toUpperCase()}</button>`).join("")}</div></header>
+      <main class="pr-dk-main">
+        <div class="pr-dk-l">
+          <h1>${L("Que nadie se pierda del grupo","Nobody gets lost from the group")}</h1>
+          <p class="pr-dk-sub">${P("sub")}</p>
+          <div class="pr-dk-get">${badge}<div class="pr-dk-qr"><img src="web/qr-appstore.svg" width="88" height="88" alt=""><span>${P("qr")}</span></div></div>
+          <div class="pr-show pr-dk-show">
+            <div class="pr-tabs" role="tablist">${[1, 2, 3, 4].map(i => `<button type="button" role="tab" data-tab="${i - 1}"${i === 1 ? ' aria-selected="true"' : ""}>${P("f" + i + "k")}<i></i></button>`).join("")}</div>
+            <div class="pr-txt">${[1, 2, 3, 4].map(i => `<div class="pr-tx${i === 1 ? " on" : ""}"><h3>${P("f" + i + "h")}</h3><p>${P("f" + i + "p")}</p></div>`).join("")}</div>
+            <div class="pr-dev pr-dk-dev"><div class="pr-tilt">${["mapa", "ruta", "peter", "dia"].map((n, i) => `<img src="web/app-${n}.webp" width="600" height="1300" alt="${i ? "" : P("alt1")}"${i ? "" : ' class="on"'}>`).join("")}</div><div class="pr-glow"></div>
+              <div class="pr-fl" aria-hidden="true"><span style="--d:0" class="a">${P("c1")}</span><span style="--d:1" class="b">${P("c2")}</span><span style="--d:2" class="c">${P("c4")}</span></div></div>
+          </div>
+        </div>
+      </main>
+      <footer class="pr-dk-foot"><button type="button" class="pr-dk-lk" data-web>${P("web")}</button><button type="button" class="pr-dk-lk" data-faq>${P("faqb")}</button><a href="${legal[0]}">${L("Privacidad","Privacy")}</a><a href="${legal[1]}">${L("Condiciones","Terms")}</a><a href="mailto:vallik-soporte@googlegroups.com">${L("Contacto","Contact")}</a><small>${L("Apple y App Store son marcas de Apple Inc., registradas en EE. UU. y en otros países.","Apple and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.")}</small></footer>
+      <dialog class="pr-dlg"><div class="pr-dlg-in"><div class="pr-dlg-h"><p class="pr-k">${P("qk")}</p><button type="button" data-faq-close aria-label="${P("close")}">✕</button></div>${[1, 2, 3, 4, 5].map(i => `<details><summary>${P("q" + i)}</summary><p>${P("a" + i)}</p></details>`).join("")}</div></dialog>
+    </div>`;
+  }
   const PROMO_CSS = `
+      .pr-desk{display:none}
+      @media (min-width:900px) and (min-height:620px){
+        .join[data-stage=get]{padding:0!important;overflow:hidden!important}
+        .join[data-stage=get] .lp,.join[data-stage=get] .lp-photo{display:none!important}
+        .join[data-stage=get] .pr-desk{display:grid;grid-template-rows:auto 1fr auto;position:fixed;inset:0;color:var(--tx);font-family:var(--font);overflow:hidden}
+      }
+      .pr-dk-bg{position:absolute;inset:0;z-index:-1;background:#0E2A47 url(lp-grupo.jpg) 50% 78%/cover no-repeat;background-image:image-set("lp-grupo.webp" type("image/webp"),"lp-grupo.jpg" type("image/jpeg"))}
+      .pr-dk-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,27,48,.94) 0%,rgba(8,27,48,.82) 40%,rgba(8,27,48,.35) 70%,rgba(8,27,48,.55) 100%),linear-gradient(180deg,rgba(6,20,36,.55) 0%,rgba(6,20,36,0) 25%,rgba(6,20,36,0) 70%,rgba(6,20,36,.8) 100%)}
+      .pr-dk-top{display:flex;justify-content:space-between;align-items:center;width:min(100% - 80px,1200px);margin:0 auto;padding:28px 0 0}
+      .pr-dk-lang{position:static!important}.pr-dk-lang button[aria-pressed=true]{background:#F6F8FA;color:#0E2A47}
+      .pr-dk-main{width:min(100% - 80px,1200px);margin:0 auto;display:flex;align-items:center;min-height:0}
+      .pr-dk-l{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 360px;column-gap:72px;align-items:center}
+      .pr-dk-l>h1,.pr-dk-l>p,.pr-dk-get{grid-column:1}
+      .pr-dk-l h1{margin:0;font:800 clamp(48px,5.2vw,76px)/.98 var(--font);letter-spacing:-.05em;max-width:620px}
+      .pr-dk-sub{margin:18px 0 0;font-size:19px;line-height:28px;color:var(--tx-2);max-width:520px}
+      .pr-dk-get{display:flex;align-items:center;gap:22px;margin-top:28px}
+      .pr-dk-qr{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border-radius:16px;background:rgba(246,248,250,.08);box-shadow:inset 0 0 0 1px rgba(246,248,250,.12)}
+      .pr-dk-qr img{width:64px;height:64px;padding:6px;border-radius:10px;background:#F6F8FA}
+      .pr-dk-qr span{max-width:150px;font-size:13px;line-height:18px;color:var(--tx-2)}
+      .pr-dk-show{display:contents}
+      .pr-dk-show .pr-tabs{grid-column:1;margin:44px 0 16px;padding:0;overflow:visible}
+      .pr-dk-show .pr-txt{grid-column:1;min-height:104px}
+      .pr-dk-show .pr-tx h3{font:700 24px/1.2 var(--font);letter-spacing:-.02em;margin:0}
+      .pr-dk-show .pr-tx p{margin:8px 0 0;font-size:16px;line-height:24px;color:var(--tx-2);max-width:500px}
+      .pr-dk-dev{grid-column:2;grid-row:1 / span 6;width:min(320px,calc((100svh - 220px) * .46))!important;justify-self:center}
+      .pr-fl span{position:absolute;padding:11px 16px;border-radius:18px 18px 18px 6px;background:rgba(246,248,250,.94);color:#0E2A47;font:600 15px/1.2 var(--font);white-space:nowrap;box-shadow:0 18px 40px rgba(2,8,16,.35);opacity:0;transform:translateY(12px) scale(.9);animation:prbub .5s cubic-bezier(.2,.8,.2,1.2) forwards,prfloat 5s ease-in-out infinite;animation-delay:calc(var(--d) * .9s + .8s),calc(var(--d) * .9s + 1.3s)}
+      .pr-fl .a{left:-120px;top:14%}.pr-fl .b{right:-64px;top:38%;border-radius:18px 18px 6px 18px}.pr-fl .c{left:-90px;top:66%}
+      @keyframes prbub{to{opacity:1;transform:none}}
+      .pr-dk-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px 24px;width:min(100% - 80px,1200px);margin:0 auto;padding:0 0 22px}
+      .pr-dk-foot a,.pr-dk-lk{all:unset;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;font-size:14px;color:var(--tx)}
+      .pr-dk-lk:first-child{font-weight:600}
+      .pr-dk-foot small{margin-left:auto;font-size:11px;color:var(--tx-2)}
+      .pr-dlg{border:0;padding:0;border-radius:24px;background:#14355A;color:var(--tx);width:min(560px,calc(100vw - 48px));box-shadow:0 40px 120px rgba(2,8,16,.6)}
+      .pr-dlg::backdrop{background:rgba(6,20,36,.6);backdrop-filter:blur(6px)}
+      .pr-dlg-in{padding:24px 28px 12px}.pr-dlg-h{display:flex;justify-content:space-between;align-items:center}
+      .pr-dlg-h button{all:unset;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--tx-2)}
+      .pr-dlg details{border-top:1px solid rgba(246,248,250,.1)}
+      .pr-dlg summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;min-height:56px;font:600 17px/1.3 var(--font)}
+      .pr-dlg summary::-webkit-details-marker{display:none}.pr-dlg summary::after{content:"+";font-size:22px;color:var(--tx-2);transition:transform .2s}.pr-dlg details[open] summary::after{transform:rotate(45deg)}
+      .pr-dlg details p{margin:0 0 18px;font-size:15px;line-height:23px;color:var(--tx-2)}
+      @media (prefers-reduced-motion:reduce){.pr-fl span{animation:none;opacity:1;transform:none}}
+
       .pr-rv{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
       .pr-rv.in{opacity:1;transform:none}
       .pr-b{opacity:0;transform:translateY(14px) scale(.96);transition:opacity .45s,transform .45s cubic-bezier(.2,.8,.2,1.2);transition-delay:calc(var(--d) * .55s + .2s)}
@@ -234,6 +303,7 @@
       const firstStage = withAuth ? "auth" : code ? "form" : "pick";
       el.className = "join"; el.dataset.stage = getApp ? "get" : firstStage;
       el.innerHTML = `
+        ${NATIVE_UA || code ? "" : deskHTML()}
         <div class="lp-photo" aria-hidden="true"></div>
         <div class="lp" data-lang="${LANG}">
         <div class="lp-lang" role="group" aria-label="Idioma / Language"><button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button><button type="button" data-lang="ca">CA</button></div>
@@ -452,25 +522,35 @@
       el.querySelectorAll("[data-web]").forEach(wb => wb.addEventListener("click", () => { LS.set("vallik.web", "1"); stage(firstStage, code ? "invite" : null); }));
       (function promoFx() {
         const pr = el.querySelector(".lp-promo"); if (!pr) return;
+        const dlg = el.querySelector(".pr-dlg");
+        el.querySelectorAll("[data-faq]").forEach(b => b.addEventListener("click", () => { try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); } }));
+        const dc = el.querySelector("[data-faq-close]"); if (dc) dc.addEventListener("click", () => dlg.close());
+        if (dlg) dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
         const RM = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
         const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { root: el, threshold: .18 }) : null;
         pr.querySelectorAll(".pr-rv").forEach(n => io ? io.observe(n) : n.classList.add("in"));
-        const sh = pr.querySelector(".pr-show"), tabs = [...sh.querySelectorAll("[data-tab]")], txs = [...sh.querySelectorAll(".pr-tx")], ims = [...sh.querySelectorAll(".pr-tilt img")];
-        let cur = 0, timer = null; const DUR = 5000;
-        const go = i => { cur = (i + tabs.length) % tabs.length; tabs.forEach((t, k) => t.setAttribute("aria-selected", k === cur ? "true" : "false")); txs.forEach((t, k) => t.classList.toggle("on", k === cur)); ims.forEach((t, k) => t.classList.toggle("on", k === cur)); };
-        const auto = () => { clearInterval(timer); if (RM) return; timer = setInterval(() => go(cur + 1), DUR); };
-        sh.style.setProperty("--dur", DUR / 1000 + "s");
-        tabs.forEach((t, k) => t.addEventListener("click", () => { go(k); sh.classList.remove("paused"); void sh.offsetWidth; auto(); }));
-        const vis = io ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) auto(); else clearInterval(timer); }), { root: el, threshold: .3 }) : null; if (vis) vis.observe(sh); else auto();
+        const RM2 = RM;
+        const shows = [...el.querySelectorAll(".pr-show")];
+        const tilts = [];
+        shows.forEach(sh => {
+          const tabs = [...sh.querySelectorAll("[data-tab]")], txs = [...sh.querySelectorAll(".pr-tx")], ims = [...sh.querySelectorAll(".pr-tilt img")];
+          let cur = 0, timer = null; const DUR = 5000;
+          const go = i => { cur = (i + tabs.length) % tabs.length; tabs.forEach((t, k) => t.setAttribute("aria-selected", k === cur ? "true" : "false")); txs.forEach((t, k) => t.classList.toggle("on", k === cur)); ims.forEach((t, k) => t.classList.toggle("on", k === cur)); };
+          const auto = () => { clearInterval(timer); if (RM2) return; timer = setInterval(() => go(cur + 1), DUR); };
+          sh.style.setProperty("--dur", DUR / 1000 + "s");
+          tabs.forEach((t, k) => t.addEventListener("click", () => { go(k); auto(); }));
+          if (sh.classList.contains("pr-dk-show")) auto();
+          else { const vis = io ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) auto(); else clearInterval(timer); }), { root: el, threshold: .3 }) : null; if (vis) vis.observe(sh); else auto(); }
+          tilts.push(sh.querySelector(".pr-tilt"));
+        });
         if (RM) return;
-        // 3D: el iPhone sigue al cursor en el ordenador y se inclina con el scroll en el móvil
-        const tilt = sh.querySelector(".pr-tilt"), hero = el.querySelector(".lp-hero-ph");
+        const hero = el.querySelector(".lp-hero-ph"), sh = shows.find(x => !x.classList.contains("pr-dk-show")), tilt = sh && sh.querySelector(".pr-tilt");
         const fine = window.matchMedia && matchMedia("(pointer:fine)").matches;
-        if (fine) el.addEventListener("pointermove", ev => { const x = ev.clientX / innerWidth - .5, y = ev.clientY / innerHeight - .5; tilt.style.setProperty("--ry", (-14 + x * 18).toFixed(1) + "deg"); tilt.style.setProperty("--rx", (6 - y * 10).toFixed(1) + "deg"); if (hero) hero.style.transform = `translateY(-46%) perspective(1400px) rotateY(${(-10 + x * 14).toFixed(1)}deg) rotateX(${(4 - y * 8).toFixed(1)}deg)`; }, { passive: true });
+        if (fine) el.addEventListener("pointermove", ev => { const x = ev.clientX / innerWidth - .5, y = ev.clientY / innerHeight - .5; tilts.forEach(t => { if (!t) return; t.style.setProperty("--ry", (-14 + x * 18).toFixed(1) + "deg"); t.style.setProperty("--rx", (6 - y * 10).toFixed(1) + "deg"); }); if (hero) hero.style.transform = `translateY(-46%) perspective(1400px) rotateY(${(-10 + x * 14).toFixed(1)}deg) rotateX(${(4 - y * 8).toFixed(1)}deg)`; }, { passive: true });
         const band = pr.querySelector(".pr-band img"); let tk = false;
         el.addEventListener("scroll", () => { if (tk) return; tk = true; requestAnimationFrame(() => { tk = false;
           if (band) { const r = band.parentNode.getBoundingClientRect(), p = Math.min(1, Math.max(0, 1 - (r.top + r.height) / (innerHeight + r.height))); band.style.setProperty("--bs", (1.18 - p * .16).toFixed(3)); band.style.translate = `0 ${((p - .5) * 40).toFixed(1)}px`; }
-          if (!fine) { const r = sh.getBoundingClientRect(), q = (r.top + r.height / 2) / innerHeight - .5; tilt.style.setProperty("--ry", (-14 + q * 20).toFixed(1) + "deg"); }
+          if (!fine && tilt) { const r = sh.getBoundingClientRect(), q = (r.top + r.height / 2) / innerHeight - .5; tilt.style.setProperty("--ry", (-14 + q * 20).toFixed(1) + "deg"); }
         }); }, { passive: true });
         if (hero) hero.style.transform = "translateY(-46%) perspective(1400px) rotateY(-10deg) rotateX(4deg)";
       })();
