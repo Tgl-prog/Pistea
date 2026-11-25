@@ -94,31 +94,68 @@
     const badge = `<a class="pr-store" href="https://apps.apple.com/app/id6838083819"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>`;
     const feat = (n, img, flip) => `<section class="pr-f${flip ? " flip" : ""}"><div class="pr-ft"><p class="pr-k">${P("f" + n + "k")}</p><h3>${P("f" + n + "h")}</h3><p>${P("f" + n + "p")}</p></div><img class="pr-ph" src="web/app-${img}.webp" width="600" height="1300" loading="lazy" alt=""></section>`;
     return `<div class="lp-promo">
-      <section class="pr-prob"><div class="pr-in">
+      <section class="pr-prob"><div class="pr-in pr-rv">
         <div class="pr-pt"><p class="pr-k">${P("pk")}</p><h2>${P("ph")}</h2><p>${P("pp")}</p></div>
         <div class="pr-chat" aria-hidden="true">
-          <div class="pr-b"><small>MARTA · 11:42</small><span>${P("c1")}</span></div>
-          <div class="pr-b r"><small>DANI · 11:43</small><span>${P("c2")}</span></div>
-          <div class="pr-b"><small>LEO · 11:47</small><span>${P("c3")}</span></div>
-          <div class="pr-b r"><small>DANI · 12:31</small><span>${P("c4")}</span></div>
+          <div style="--d:0" class="pr-b"><small>MARTA · 11:42</small><span>${P("c1")}</span></div>
+          <div style="--d:1" class="pr-b r"><small>DANI · 11:43</small><span>${P("c2")}</span></div>
+          <div style="--d:2" class="pr-b"><small>LEO · 11:47</small><span>${P("c3")}</span></div>
+          <div style="--d:3" class="pr-b r"><small>DANI · 12:31</small><span>${P("c4")}</span></div>
         </div></div></section>
-      <div class="pr-feats pr-in">${feat(1, "mapa")}${feat(2, "ruta", 1)}${feat(3, "peter")}${feat(4, "dia", 1)}</div>
-      <section class="pr-x pr-in"><p class="pr-k">${P("xk")}</p><ul>
+      <section class="pr-show pr-in pr-rv">
+        <div class="pr-tabs" role="tablist">${[1, 2, 3, 4].map(i => `<button type="button" role="tab" data-tab="${i - 1}"${i === 1 ? ' aria-selected="true"' : ""}>${P("f" + i + "k")}<i></i></button>`).join("")}</div>
+        <div class="pr-stage">
+          <div class="pr-txt">${[1, 2, 3, 4].map(i => `<div class="pr-tx${i === 1 ? " on" : ""}"><h3>${P("f" + i + "h")}</h3><p>${P("f" + i + "p")}</p></div>`).join("")}</div>
+          <div class="pr-dev"><div class="pr-tilt">${["mapa", "ruta", "peter", "dia"].map((n, i) => `<img src="web/app-${n}.webp" width="600" height="1300" ${i ? 'loading="lazy" ' : ""}alt=""${i ? "" : ' class="on"'}>`).join("")}</div><div class="pr-glow"></div></div>
+        </div></section>
+      <section class="pr-x pr-in pr-rv"><p class="pr-k">${P("xk")}</p><ul>
         <li><b>${P("x1h")}</b><span>${P("x1p")}</span></li>
         <li><b>${P("x2h")}</b><span>${P("x2p")}</span></li>
         <li><b>${P("x3h")}</b><span>${P("x3p")}</span></li></ul></section>
       <section class="pr-band"><img src="web/telesilla.webp" width="1600" height="900" loading="lazy" alt=""><p>${P("band")}</p></section>
-      <section class="pr-steps pr-in"><p class="pr-k">${P("sk")}</p><h2>${P("sh")}</h2><ol>
+      <section class="pr-steps pr-in pr-rv"><p class="pr-k">${P("sk")}</p><h2>${P("sh")}</h2><ol>
         <li><span>01</span>${P("s1")}</li><li><span>02</span>${P("s2")}</li><li><span>03</span>${P("s3")}</li></ol></section>
-      <section class="pr-faq pr-in"><p class="pr-k">${P("qk")}</p>
+      <section class="pr-faq pr-in pr-rv"><p class="pr-k">${P("qk")}</p>
         ${[1, 2, 3, 4, 5].map(i => `<details><summary>${P("q" + i)}</summary><p>${P("a" + i)}</p></details>`).join("")}</section>
-      <section class="pr-end"><img src="web/alba.webp" width="1400" height="1749" loading="lazy" alt=""><div class="pr-endt"><h2>${P("end")}</h2>${badge}<button class="lp-skip" type="button" data-web>${P("web")}</button></div></section>
+      <section class="pr-end"><img src="web/alba.webp" width="1400" height="1749" loading="lazy" alt=""><div class="pr-endt pr-rv"><h2>${P("end")}</h2>${badge}<button class="lp-skip" type="button" data-web>${P("web")}</button></div></section>
       <footer class="pr-foot pr-in"><nav><a href="${LANG === "fr" ? "fr/confidentialite/" : LANG === "en" ? "privacy/" : "privacidad/"}">${L("Privacidad","Privacy")}</a><a href="${LANG === "fr" ? "fr/conditions/" : LANG === "en" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a><a href="mailto:vallik-soporte@googlegroups.com">${L("Contacto","Contact")}</a></nav>
         <small>${L("Apple y App Store son marcas de Apple Inc., registradas en EE. UU. y en otros países.","Apple and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.")} ${L("Mapa","Map")} © OpenStreetMap · Copernicus DEM</small></footer>
     </div>`;
   }
   const PROMO_CSS = `
-      .lp-promo{display:none;width:100vw;margin:56px 0 0 calc(50% - 50vw);color:var(--tx);font-family:var(--font)}
+      .pr-rv{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+      .pr-rv.in{opacity:1;transform:none}
+      .pr-b{opacity:0;transform:translateY(14px) scale(.96);transition:opacity .45s,transform .45s cubic-bezier(.2,.8,.2,1.2);transition-delay:calc(var(--d) * .55s + .2s)}
+      .pr-rv.in .pr-b{opacity:1;transform:none}
+      .pr-show{padding:8px 0 56px}
+      .pr-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -20px 22px;padding:0 20px}.pr-tabs::-webkit-scrollbar{display:none}
+      .pr-tabs button{all:unset;cursor:pointer;position:relative;flex:none;min-height:44px;padding:0 16px;display:inline-flex;align-items:center;border-radius:99px;background:rgba(246,248,250,.07);font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--tx-2);overflow:hidden;transition:background .25s,color .25s}
+      .pr-tabs button[aria-selected=true]{background:#F6F8FA;color:#0E2A47}
+      .pr-tabs button i{position:absolute;left:0;bottom:0;height:3px;width:0;background:#C8F03C}
+      .pr-tabs button[aria-selected=true] i{animation:prbar var(--dur,5s) linear forwards}
+      .pr-show.paused .pr-tabs button i{animation:none;width:0}
+      @keyframes prbar{to{width:100%}}
+      .pr-stage{display:grid;gap:18px;justify-items:center}
+      .pr-txt{display:grid;justify-self:stretch}.pr-tx{grid-area:1/1;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s;pointer-events:none}.pr-tx.on{opacity:1;transform:none;pointer-events:auto}
+      .pr-tx p{margin:12px 0 0;max-width:440px}
+      .pr-dev{position:relative;perspective:1400px;width:min(66vw,270px)}
+      .pr-tilt{display:grid;transform:rotateY(var(--ry,-14deg)) rotateX(var(--rx,6deg));transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);animation:prfloat 6s ease-in-out infinite}
+      .pr-tilt img{grid-area:1/1;width:100%;height:auto;opacity:0;transform:translateZ(0) scale(.97);transition:opacity .5s,transform .6s cubic-bezier(.2,.7,.2,1);filter:drop-shadow(-24px 30px 40px rgba(2,8,16,.55))}
+      .pr-tilt img.on{opacity:1;transform:translateZ(30px) scale(1)}
+      .pr-glow{position:absolute;inset:18% -20% 6%;z-index:-1;background:radial-gradient(closest-side,rgba(200,240,60,.18),rgba(200,240,60,0));filter:blur(10px)}
+      @keyframes prfloat{0%,100%{translate:0 0}50%{translate:0 -10px}}
+      .lp-hero-ph{transform-origin:50% 50%}
+      .pr-band{height:min(56vw,420px)!important}
+      .pr-band img{transform:scale(var(--bs,1.12));will-change:transform}
+      @media (prefers-reduced-motion:reduce){.pr-rv,.pr-b,.pr-tx,.pr-tilt img{transition:none!important;opacity:1;transform:none}.pr-tilt{animation:none}.pr-tabs button i{animation:none!important}}
+      @media (min-width:900px){
+        .pr-show{padding:24px 0 96px}
+        .pr-stage{grid-template-columns:1fr 1fr;align-items:center;justify-items:start;gap:60px}
+        .pr-dev{width:300px;justify-self:center}
+        .pr-tabs{margin:0 0 36px;padding:0}
+      }
+
+      .lp-promo{display:none;width:100vw;margin:24px 0 0 calc(50% - 50vw);color:var(--tx);font-family:var(--font)}
       .join[data-stage=get] .lp-promo{display:block}.join[data-stage=get] .lp-more{display:none}
       .join[data-stage=get]{overflow-x:hidden;background:#0E2A47}
       .pr-in{width:min(100% - 40px,1080px);margin:0 auto}
@@ -127,7 +164,7 @@
       .lp-promo h3{margin:0;font:800 clamp(30px,4vw,46px)/1.04 var(--font);letter-spacing:-.04em}
       .lp-promo p{font-size:17px;line-height:26px;color:var(--tx-2)}
       .pr-more{display:flex;justify-content:center;margin-top:auto;padding-top:8px}.pr-more a{display:inline-flex;align-items:center;gap:8px;min-height:44px;color:var(--tx-2);font:600 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;text-decoration:none}
-      .pr-prob{padding:40px 0 72px;border-top:1px solid rgba(246,248,250,.08)}
+      .pr-prob{padding:32px 0 48px;border-top:1px solid rgba(246,248,250,.08)}
       .pr-prob .pr-in{display:grid;gap:36px}
       .pr-pt p:last-child{margin:18px 0 0;max-width:480px}
       .pr-chat{display:grid;gap:12px;max-width:420px}
@@ -139,40 +176,40 @@
       .pr-f{display:grid;gap:28px;justify-items:center}
       .pr-ft{justify-self:stretch}.pr-ft p:last-child{margin:16px 0 0;max-width:440px}
       .pr-ph{width:min(76vw,300px);height:auto;filter:drop-shadow(0 30px 60px rgba(2,8,16,.5))}
-      .pr-x{padding:0 0 88px}.pr-x ul{list-style:none;margin:0;padding:0;display:grid;gap:0}
+      .pr-x{padding:0 0 56px}.pr-x ul{list-style:none;margin:0;padding:0;display:grid;gap:0}
       .pr-x li{display:grid;gap:6px;padding:20px 0;border-top:1px solid rgba(246,248,250,.1)}.pr-x li:last-child{border-bottom:1px solid rgba(246,248,250,.1)}
       .pr-x b{font:700 20px/1.2 var(--font);letter-spacing:-.02em}.pr-x span{color:var(--tx-2);font-size:16px;line-height:24px}
       .pr-band{position:relative;height:min(78vw,640px);overflow:hidden}
       .pr-band img{width:100%;height:100%;object-fit:cover;object-position:50% 45%;display:block}
       .pr-band::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,42,71,0) 40%,rgba(8,27,48,.82) 100%)}
       .pr-band p{position:absolute;left:max(20px,calc(50% - 540px));right:20px;bottom:28px;margin:0;z-index:1;font:800 clamp(28px,4.4vw,52px)/1.04 var(--font)!important;letter-spacing:-.045em;color:var(--tx)!important;max-width:720px}
-      .pr-steps{padding:88px 0}.pr-steps ol{list-style:none;margin:32px 0 0;padding:0;display:grid;gap:14px}
-      .pr-steps li{display:flex;gap:18px;align-items:baseline;padding:22px 22px;border-radius:22px;background:rgba(246,248,250,.06);font:600 19px/1.35 var(--font);letter-spacing:-.015em}
+      .pr-steps{padding:56px 0 48px}.pr-steps ol{list-style:none;margin:32px 0 0;padding:0;display:grid;gap:14px}
+      .pr-steps li{display:flex;gap:16px;align-items:baseline;padding:16px 18px;border-radius:22px;background:rgba(246,248,250,.06);font:600 19px/1.35 var(--font);letter-spacing:-.015em}
       .pr-steps li span{font:500 13px/1 var(--mono);color:var(--tx-2);letter-spacing:.1em}
-      .pr-faq{padding:0 0 88px}
+      .pr-faq{padding:0 0 56px}
       .pr-faq details{border-top:1px solid rgba(246,248,250,.1)}.pr-faq details:last-child{border-bottom:1px solid rgba(246,248,250,.1)}
       .pr-faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:64px;font:600 18px/1.3 var(--font);letter-spacing:-.01em}
       .pr-faq summary::-webkit-details-marker{display:none}
       .pr-faq summary::after{content:"+";font:400 26px/1 var(--font);color:var(--tx-2);transition:transform .2s}.pr-faq details[open] summary::after{transform:rotate(45deg)}
       .pr-faq details p{margin:0 0 22px;max-width:640px}
-      .pr-end{position:relative;min-height:min(130vw,760px);display:flex;align-items:flex-start;overflow:hidden}
+      .pr-end{position:relative;min-height:min(110vw,560px);display:flex;align-items:flex-start;overflow:hidden}
       .pr-end>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 52%}
       .pr-end::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0E2A47 0%,rgba(14,42,71,0) 30%)}
-      .pr-endt{position:relative;z-index:1;width:min(100% - 40px,1080px);margin:0 auto;padding-top:88px;display:grid;justify-items:start;gap:22px}
+      .pr-endt{position:relative;z-index:1;width:min(100% - 40px,1080px);margin:0 auto;padding-top:56px;display:grid;justify-items:start;gap:18px}
       .pr-endt h2{font-size:clamp(44px,7vw,88px)!important}
       .pr-store img{display:block}.pr-endt .lp-skip{justify-self:start;width:auto;padding-left:0;padding-right:0}
       .pr-foot{padding:32px 0 calc(var(--sab,0px) + 36px);display:grid;gap:14px}
       .pr-foot nav{display:flex;gap:22px;flex-wrap:wrap}.pr-foot a{color:var(--tx);font-size:15px;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
       .pr-foot small{color:var(--tx-2);font-size:12px;line-height:18px}
       @media (min-width:900px){
-        .pr-prob{padding:64px 0 120px}.pr-prob .pr-in{grid-template-columns:1.1fr .9fr;align-items:center;gap:80px}
+        .pr-prob{padding:48px 0 72px}.pr-prob .pr-in{grid-template-columns:1.1fr .9fr;align-items:center;gap:80px}
         .pr-feats{gap:120px;padding:40px 0 120px}
         .pr-f{grid-template-columns:1fr 1fr;align-items:center;justify-items:start;gap:80px}
         .pr-f .pr-ph{width:320px;justify-self:center}
         .pr-f.flip .pr-ft{order:2}
-        .pr-x{padding-bottom:120px}.pr-x ul{grid-template-columns:repeat(3,1fr);gap:40px}.pr-x li,.pr-x li:last-child{border-bottom:0}
-        .pr-steps{padding:120px 0}.pr-steps ol{grid-template-columns:repeat(3,1fr)}.pr-steps li{flex-direction:column;gap:28px;min-height:150px}
-        .pr-faq{padding-bottom:120px;display:grid;grid-template-columns:280px 1fr;column-gap:80px}.pr-faq .pr-k{grid-row:span 5}
+        .pr-x{padding-bottom:72px}.pr-x ul{grid-template-columns:repeat(3,1fr);gap:40px}.pr-x li,.pr-x li:last-child{border-bottom:0}
+        .pr-steps{padding:72px 0}.pr-steps ol{grid-template-columns:repeat(3,1fr)}.pr-steps li{flex-direction:column;gap:20px;min-height:110px}
+        .pr-faq{padding-bottom:72px;display:grid;grid-template-columns:280px 1fr;column-gap:80px}.pr-faq .pr-k{grid-row:span 5}
         .join[data-stage=get] .lp{width:min(100%,1080px)!important}
         .join[data-stage=get] .lp-hero h1{font-size:68px!important;line-height:66px!important;letter-spacing:-.05em}
         .join[data-stage=get] .lp-screen{position:relative}
@@ -413,6 +450,30 @@
       const next = () => stage(code ? "form" : "pick", code ? "invite" : null);
       const sk = el.querySelector("[data-skip]"); if (sk) sk.addEventListener("click", next);
       el.querySelectorAll("[data-web]").forEach(wb => wb.addEventListener("click", () => { LS.set("vallik.web", "1"); stage(firstStage, code ? "invite" : null); }));
+      (function promoFx() {
+        const pr = el.querySelector(".lp-promo"); if (!pr) return;
+        const RM = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { root: el, threshold: .18 }) : null;
+        pr.querySelectorAll(".pr-rv").forEach(n => io ? io.observe(n) : n.classList.add("in"));
+        const sh = pr.querySelector(".pr-show"), tabs = [...sh.querySelectorAll("[data-tab]")], txs = [...sh.querySelectorAll(".pr-tx")], ims = [...sh.querySelectorAll(".pr-tilt img")];
+        let cur = 0, timer = null; const DUR = 5000;
+        const go = i => { cur = (i + tabs.length) % tabs.length; tabs.forEach((t, k) => t.setAttribute("aria-selected", k === cur ? "true" : "false")); txs.forEach((t, k) => t.classList.toggle("on", k === cur)); ims.forEach((t, k) => t.classList.toggle("on", k === cur)); };
+        const auto = () => { clearInterval(timer); if (RM) return; timer = setInterval(() => go(cur + 1), DUR); };
+        sh.style.setProperty("--dur", DUR / 1000 + "s");
+        tabs.forEach((t, k) => t.addEventListener("click", () => { go(k); sh.classList.remove("paused"); void sh.offsetWidth; auto(); }));
+        const vis = io ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) auto(); else clearInterval(timer); }), { root: el, threshold: .3 }) : null; if (vis) vis.observe(sh); else auto();
+        if (RM) return;
+        // 3D: el iPhone sigue al cursor en el ordenador y se inclina con el scroll en el móvil
+        const tilt = sh.querySelector(".pr-tilt"), hero = el.querySelector(".lp-hero-ph");
+        const fine = window.matchMedia && matchMedia("(pointer:fine)").matches;
+        if (fine) el.addEventListener("pointermove", ev => { const x = ev.clientX / innerWidth - .5, y = ev.clientY / innerHeight - .5; tilt.style.setProperty("--ry", (-14 + x * 18).toFixed(1) + "deg"); tilt.style.setProperty("--rx", (6 - y * 10).toFixed(1) + "deg"); if (hero) hero.style.transform = `translateY(-46%) perspective(1400px) rotateY(${(-10 + x * 14).toFixed(1)}deg) rotateX(${(4 - y * 8).toFixed(1)}deg)`; }, { passive: true });
+        const band = pr.querySelector(".pr-band img"); let tk = false;
+        el.addEventListener("scroll", () => { if (tk) return; tk = true; requestAnimationFrame(() => { tk = false;
+          if (band) { const r = band.parentNode.getBoundingClientRect(), p = Math.min(1, Math.max(0, 1 - (r.top + r.height) / (innerHeight + r.height))); band.style.setProperty("--bs", (1.18 - p * .16).toFixed(3)); band.style.translate = `0 ${((p - .5) * 40).toFixed(1)}px`; }
+          if (!fine) { const r = sh.getBoundingClientRect(), q = (r.top + r.height / 2) / innerHeight - .5; tilt.style.setProperty("--ry", (-14 + q * 20).toFixed(1) + "deg"); }
+        }); }, { passive: true });
+        if (hero) hero.style.transform = "translateY(-46%) perspective(1400px) rotateY(-10deg) rotateX(4deg)";
+      })();
       const mo = el.querySelector("[data-more]"); if (mo) mo.addEventListener("click", ev => { ev.preventDefault(); const t = el.querySelector(".lp-promo"); if (t) el.scrollTo({ top: t.offsetTop - 8, behavior: "smooth" }); });
       const cp = el.querySelector("[data-copy]"); if (cp) cp.addEventListener("click", () => { try { navigator.clipboard.writeText(location.origin + "/#g=" + cp.dataset.copy); cp.textContent = L("Copiado","Copied"); } catch (e) {} });
       const ta = el.querySelector("[data-to-auth]"); if (ta) ta.addEventListener("click", () => { const w = el.querySelector(".lp-who"); if (w) w.hidden = true; stage("auth"); });
