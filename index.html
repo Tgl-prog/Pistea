@@ -1380,7 +1380,7 @@ if (EN) (function () {
   function peterClose() { const el = $("#peter"); if (el) el.hidden = true; }
   function peterHello() {
     let seen = false; try { seen = localStorage.getItem("pistea.peterhi") === "1"; } catch (e) {}
-    if (seen || $("#peterhi")) return;
+    if (seen || $("#peterhi") || document.body.classList.contains("searching")) return;   // no tapar los resultados del buscador
     const b = document.createElement("button"); b.id = "peterhi"; b.className = "peterhi"; b.dataset.act = "peter";
     b.innerHTML = `${EN?((CA?`<b>Hola, sóc en Peter</b>Pregunta'm on menjar, on fer una copa o quina ruta fer per ${esc(RESORT.nombre)}.`:FR?`<b>Salut, moi c'est Peter</b>Demande-moi où manger, où boire un verre ou quel itinéraire skier à ${esc(RESORT.nombre)}.`:`<b>Hi, I'm Peter</b>Ask me where to eat, where to grab a drink or which route to ski around ${esc(RESORT.nombre)}.`)):`<b>Hola, soy Peter</b>Pregúntame dónde comer, dónde tomar algo o qué ruta hacer por ${esc(RESORT.nombre)}.`}`;
     const tb = $("#topbar"); b.style.top = ((tb ? tb.offsetTop + tb.offsetHeight : topInset() + 60) + 6) + "px"; document.body.appendChild(b);
@@ -3684,6 +3684,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       return `<li><button data-act="res-g" data-i="${GROUPS.indexOf(g)}">${plate(g.k, g.d)}<span><b>${esc(g.name)}</b><small>${isL ? (LIFT[g.t] || LIFT.tsd).s : DIF[g.d].s}${g.zt ? " · " + fmtNum(g.zt) + " m" : ""}</small></span></button></li>`;
     }).join("") + peterLi;   // Peter siempre al final, también cuando hay resultados
   }
+  document.addEventListener("focusin", e => { if (e.target && e.target.id === "q") { const h = $("#peterhi"); if (h) h.remove(); } });
   function closeSearch() { const q = $("#q"); if (q) { q.value = ""; q.blur(); } query = ""; const r = $("#results"); if (r) r.innerHTML = ""; document.body.classList.remove("searching"); }
 
   /* ---------- Guía por voz (estilo Waze) ----------
