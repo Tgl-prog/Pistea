@@ -177,8 +177,8 @@
       .lp-end small{color:var(--tx-3);font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
       /* Pantalla de inicio: foto real a sangre, botones abajo (al alcance del pulgar), sin recuadros. */
       .join{padding:0!important;background:#0E2A47!important}
-      .lp-photo{position:absolute;top:0;left:0;right:0;height:max(78svh,560px);pointer-events:none;background:#0E2A47 url(lp-montana.jpg) 50% 38%/cover no-repeat;background-image:image-set("lp-montana.webp" type("image/webp"),"lp-montana.jpg" type("image/jpeg"))}
-      .lp-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,36,.55) 0%,rgba(6,20,36,0) 18%,rgba(14,42,71,0) 40%,rgba(14,42,71,.55) 62%,#0E2A47 86%)}
+      .lp-photo{position:absolute;top:0;left:0;right:0;height:max(68svh,500px);pointer-events:none;background:#0E2A47 url(lp-grupo.jpg) 50% 100%/cover no-repeat;background-image:image-set("lp-grupo.webp" type("image/webp"),"lp-grupo.jpg" type("image/jpeg"))}
+      .lp-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,36,.7) 0%,rgba(6,20,36,.1) 16%,rgba(14,42,71,0) 45%,rgba(14,42,71,.6) 70%,#0E2A47 90%)}
       .lp{display:block!important;width:min(100%,440px)!important;padding:calc(var(--sat,0px) + 18px) 20px calc(var(--sab,0px) + 18px);gap:12px!important;align-content:start}
       .lp-screen{min-height:calc(100svh - var(--sat,0px) - var(--sab,0px) - 36px);display:flex;flex-direction:column;gap:12px}
       .lp-screen>.lp-hero{flex:1;display:flex!important;flex-direction:column;gap:0!important}
@@ -294,7 +294,7 @@
   /* Informe de errores: si algo falla en el móvil de alguien, queda una nota técnica en "errores"
      (mensaje, archivo y línea, versión y plataforma). Sin datos personales: sin nombre, sin usuario,
      sin posición; se quita cualquier código de grupo. Como mucho 5 por sesión, y se borran a los 30 días. */
-  const WEB_VER = "v47";
+  const WEB_VER = "v48";
   (function errores() {
     let sent = 0; const seen = new Set();
     const clean = t => String(t || "").replace(/([#&?]g=)[a-z0-9]+/gi, "$1…").replace(/\b[A-Za-z0-9_-]{24,}\b/g, "…").slice(0, 300);
