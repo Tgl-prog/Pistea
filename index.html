@@ -75,7 +75,7 @@ window.THREE_READY = new Promise(function (res) {
   --line: #2A4A6B;
   --tx: #F6F8FA;
   --tx-2: #A9BCD0;
-  --tx-3: rgba(169, 188, 208, .75);
+  --tx-3: #97ACC2;  /* 4,5:1 o más sobre los azules de la app (accesibilidad) */
   --acc: #C8F03C;
   --acc-ink: #0E2A47;
   --acc-dim: rgba(200, 240, 60, .14);
@@ -2994,7 +2994,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       <p class="facts">`)):`</h2></div></div>
         <button class="x" data-act="close-sel" aria-label="Cerrar">×</button>
       </div>
-      <p class="facts">`}${facts.filter(Boolean).map(esc).join(" · ")}</p>${pstats}${(cl => { if (!cl) return ""; const o = g.fis.some(fi => OFI.open.has(fi)), c = !o && g.fis.some(fi => cl.has(fi)); return o || c ? `<p class="ofiline ${c ? "c" : "o"}"><i></i>${c ? (isL ? (EN?((CA?"Tancat":FR?"Fermé":"Closed")):"Cerrado") : (EN?((CA?"Tancat":FR?"Fermé":"Closed")):"Cerrada")) : (isL ? (EN?((CA?"Obert":FR?"Ouvert":"Open")):"Abierto") : (EN?((CA?"Obert":FR?"Ouvert":"Open")):"Abierta"))}${EN?((CA?` segons Les 3 Vallées · `:FR?` selon Les 3 Vallées · `:` according to Les 3 Vallées · `)):` según Les 3 Vallées · `}${esc(agoMin(OFI.at))}</p>` : ""; })(ofiClosed())}${avs.map(a => `
+      <p class="facts">`}${facts.filter(Boolean).map(esc).join(" · ")}</p>${pstats}${(cl => { if (!cl) return ""; const o = g.fis.some(fi => OFI.open.has(fi)), c = !o && g.fis.some(fi => cl.has(fi)); return o || c ? `<p class="ofiline ${c ? "c" : "o"}"><i></i>${c ? (isL ? (EN?((CA?"Tancat":FR?"Fermé":"Closed")):"Cerrado") : (EN?((CA?"Tancat":FR?"Fermé":"Closed")):"Cerrada")) : (isL ? (EN?((CA?"Obert":FR?"Ouvert":"Open")):"Abierto") : (EN?((CA?"Obert":FR?"Ouvert":"Open")):"Abierta"))}${EN?((CA?` segons les3vallees.com · `:FR?` selon les3vallees.com · `:` according to les3vallees.com · `)):` según les3vallees.com · `}${esc(agoMin(OFI.at))}</p>` : ""; })(ofiClosed())}${avs.map(a => `
       <div class="avcard"><span class="avtag" style="--c:${AVISOS[a.tipo].c};--t:${AVISOS[a.tipo].t}">${AVISOS[a.tipo].s}</span><small>${a.uid === me ? (EN?((CA?"Ho has avisat tu":FR?"Signalé par toi":"You reported it")):"Lo avisaste tú") : (EN?((CA?"Avisat per ":FR?"Signalé par ":"Reported by ")):"Lo avisó ") + esc(who(a.uid))} · ${esc(ago(a.at))}</small></div>`).join("")}
       <div class="acts ${tipoT && g.name ? "three" : "two"}${EN?((CA?`">
         <button class="btn" data-act="here">Soc aquí</button>
@@ -3386,7 +3386,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
       `)):`</ol>
       <button class="btn ghost wide" data-act="route-all">Ver la ruta entera</button>
       `}${AVX.closed.size ? `${EN?((CA?`<p class="quiet">La ruta evita el que el grup ha marcat com a tancat.</p>`:FR?`<p class="quiet">L'itinéraire évite ce que le groupe a signalé comme fermé.</p>`:`<p class="quiet">The route avoids what the group has marked as closed.</p>`)):`<p class="quiet">La ruta evita lo que el grupo ha marcado como cerrado.</p>`}` : ""}
-      ${r.ofi === "ok" ? `${EN?((CA?`<p class="quiet">Ruta amb el que està obert segons Les 3 Vallées (`:FR?`<p class="quiet">Itinéraire selon ce qui est ouvert d'après Les 3 Vallées (`:`<p class="quiet">Route using what's open according to Les 3 Vallées (`)):`<p class="quiet">Ruta con lo que está abierto según Les 3 Vallées (`}${esc(agoMin(OFI.at))}${EN?((CA?`). Courchevel encara no hi és inclòs.</p>`:FR?`). Courchevel n'est pas encore inclus.</p>`:`). Courchevel isn't included yet.</p>`)):`). Courchevel aún no está incluido.</p>`}` : ""}${EN?((CA?`
+      ${r.ofi === "ok" ? `${EN?((CA?`<p class="quiet">Ruta amb el que està obert segons les3vallees.com (`:FR?`<p class="quiet">Itinéraire selon ce qui est ouvert d'après les3vallees.com (`:`<p class="quiet">Route using what's open according to les3vallees.com (`)):`<p class="quiet">Ruta con lo que está abierto según les3vallees.com (`}${esc(agoMin(OFI.at))}${EN?((CA?`). Courchevel encara no hi és inclòs.</p>`:FR?`). Courchevel n'est pas encore inclus.</p>`:`). Courchevel isn't included yet.</p>`)):`). Courchevel aún no está incluido.</p>`}` : ""}${EN?((CA?`
       <p class="quiet">Temps aproximat, amb uns 2 min d'espera per remuntador`:FR?`
       <p class="quiet">Temps approximatif, avec environ 2 min d'attente par remontée`:`
       <p class="quiet">Approximate time, with about 2 min wait per lift`)):`
@@ -3413,6 +3413,19 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     return `${plate(f.k, f.d)}${esc(describeNode(c.node, c.fi).replace(/^en /, "").replace(/^./, m => m.toUpperCase()))}`;
   }
 
+  /* Valoración en la App Store (sistema oficial de Apple, que decide si lo enseña). Al final de un buen día:
+     al abrir Mi día desde las 15:00 con al menos 3 pistas propias hoy. Solo en la app, una vez por temporada
+     (la temporada empieza en septiembre). Sin preguntar antes si le gusta: Apple no permite filtrar. */
+  function maybeReview() {
+    const N = window.PisteaNative;
+    if (!N || !N.askReview || mode !== "live" || !diario || new Date().getHours() < 15) return;
+    const d = new Date(), season = String(d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1);
+    try { if (localStorage.getItem("vallik.review") === season) return; } catch (e) { return; }
+    let n = 0; S.pistas.forEach(p => { if (p.uid === me && p.day === today()) n++; });
+    if (n < 3) return;
+    try { localStorage.setItem("vallik.review", season); } catch (e) {}
+    N.askReview().catch(() => {});
+  }
   function diarioHtml() {
     const all = list("pistas").sort((a, b) => b.at - a.at);
     const items = diarioScope === "hoy" ? all.filter(p => p.day === today()) : all;
@@ -4124,7 +4137,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
         if (mine.length) { toast((EN?((CA?"Ja l'has apuntada avui. Si l'has tornat a fer, apunta-la des del teu dia.":FR?"Tu l'as déjà notée aujourd'hui. Si tu l'as refaite, note-la depuis ta journée.":"You already logged it today. If you skied it again, log it from your day.")):"Ya la apuntaste hoy. Si la repetiste, apúntala desde el diario.")); break; }
         addPista(g.name, t).then(ok => { if (ok) { toast(g.name + (EN?((CA?" apuntada al teu dia":FR?" notée dans ta journée":" logged in your day")):" apuntada en el diario")); ui(); } }); break;
       }
-      case "diario": clearModes(); rt = null; diario = true; diarioScope = "hoy"; setSnap("full"); ui(); break;
+      case "diario": clearModes(); rt = null; diario = true; diarioScope = "hoy"; setSnap("full"); ui(); setTimeout(maybeReview, 2500); break;
       case "diario-close": diario = false; dq = ""; setSnap("peek"); ui(); break;
       case "scope": diarioScope = el.dataset.s; ui(); break;
       case "sugg-add": addPista(el.dataset.n, el.dataset.t).then(ok => { if (ok) { toast(el.dataset.n + " apuntada"); dq = ""; ui(); } }); break;
