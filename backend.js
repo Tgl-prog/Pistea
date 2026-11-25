@@ -87,8 +87,8 @@
           ${code ? "" : `<button class="btn ghost wide" type="button" data-swap hidden><span data-m="new">${L("Tengo un enlace de invitación","I have an invite link")}</span><span data-m="join">${L("Mejor crear un grupo nuevo","Create a new group instead")}</span></button>`}
         </form>
         ${canLogin("google") || canLogin("apple") ? `<div class="lp-auth" id="lpauth">
+          ${canLogin("apple") ? `<button class="btn wide lp-apple" type="button" data-login="apple">${A_ICON}${L("Continuar con Apple","Continue with Apple")}${LS.get("vallik.lastLogin") === "apple" ? `<span class="lp-last">${L("Último usado","Last used")}</span>` : ""}</button>` : ""}
           ${canLogin("google") ? `<button class="btn ghost wide lp-google" type="button" data-login="google">${G_ICON}${L("Continuar con Google","Continue with Google")}${LS.get("vallik.lastLogin") === "google" ? `<span class="lp-last">${L("Último usado","Last used")}</span>` : ""}</button>` : ""}
-          ${canLogin("apple") ? `<button class="btn ghost wide lp-apple" type="button" data-login="apple">${A_ICON}${L("Continuar con Apple","Continue with Apple")}</button>` : ""}
           <small>${L("Opcional. Con Google tu perfil te sigue si cambias de móvil.","Optional. With Google your profile follows you if you change phones.")}</small>
         </div>` : ""}
         <p class="lp-legal">${L("Al continuar aceptas las","By continuing you accept the")} <a href="${LANG === "fr" ? "fr/conditions/" : LANG === "en" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a> ${L("y la","and the")} <a href="${LANG === "fr" ? "fr/confidentialite/" : LANG === "en" ? "privacy/" : "privacidad/"}">${L("Política de privacidad","Privacy policy")}</a>.</p>
@@ -194,6 +194,7 @@
       .join-card{background:none!important;padding:0!important;box-shadow:none!important;border:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
       .join-card h2{font-size:24px!important}
       .lp-back{all:unset;cursor:pointer;justify-self:center;min-height:44px;padding:0 14px;color:var(--tx-2);font:500 15px/44px var(--font)}
+      .lp-apple{position:relative;background:#F6F8FA!important;color:#000!important;font-weight:600}
       .lp-google{position:relative;background:rgba(14,42,71,.45)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
       .lp-last{position:absolute;top:-9px;right:16px;padding:4px 8px;border-radius:99px;background:var(--acc);color:#0E2A47;font:600 11px/1 var(--font);letter-spacing:0}
       .lp-auth small{display:none}
@@ -294,7 +295,7 @@
   /* Informe de errores: si algo falla en el móvil de alguien, queda una nota técnica en "errores"
      (mensaje, archivo y línea, versión y plataforma). Sin datos personales: sin nombre, sin usuario,
      sin posición; se quita cualquier código de grupo. Como mucho 5 por sesión, y se borran a los 30 días. */
-  const WEB_VER = "v48";
+  const WEB_VER = "v49";
   (function errores() {
     let sent = 0; const seen = new Set();
     const clean = t => String(t || "").replace(/([#&?]g=)[a-z0-9]+/gi, "$1…").replace(/\b[A-Za-z0-9_-]{24,}\b/g, "…").slice(0, 300);
@@ -336,7 +337,14 @@
   // Si esa cuenta ya existía (otro móvil), se entra con ella y recuperas tu usuario de siempre.
   const LOGIN = window.PISTEA_LOGIN || { google: true, apple: false };
   const NATIVE_UA = /PisteaNative/.test(navigator.userAgent) || !/^https?:$/.test(location.protocol);
-  const canLogin = k => !NATIVE_UA && !!LOGIN[k];
+  // En la app del iPhone, Apple y Google van por el plugin nativo (las ventanas web de Google no funcionan dentro de apps).
+  const NATIVE_LOGIN = () => !!(window.PisteaNative && window.PisteaNative.signIn);
+  const canLogin = k => NATIVE_UA ? NATIVE_LOGIN() && (k === "apple" || k === "google") : !!LOGIN[k];
+  // Credencial de Firebase a partir de lo que devuelve el plugin nativo.
+  function nativeCred(k, c) {
+    if (k === "apple") return new firebase.auth.OAuthProvider("apple.com").credential({ idToken: c.idToken, rawNonce: c.nonce });
+    return firebase.auth.GoogleAuthProvider.credential(c.idToken, c.accessToken);
+  }
   function provider(k) {
     if (k === "apple") { const p = new firebase.auth.OAuthProvider("apple.com"); p.addScope("email"); p.addScope("name"); p.setCustomParameters({ locale: "es_ES" }); return p; }
     const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" }); return p;
@@ -344,6 +352,7 @@
   function loginErr(e) {
     const c = (e && e.code) || "";
     if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return "";
+    if (/cancel/i.test((e && e.message) || "") || /cancel/i.test(c)) return "";   // cerró la ventana nativa de Apple o Google
     if (c === "auth/operation-not-allowed") return (EN?((CA?"L'accés amb aquest compte encara no està activat. De moment, fes servir el teu nom.":FR?"La connexion avec ce compte n'est pas encore activée. Utilise ton nom pour l'instant.":"Signing in with that account isn't switched on yet. Use your name for now.")):"El acceso con esa cuenta aún no está activado. Entra con tu nombre de momento.");
     if (c === "auth/unauthorized-domain") return (EN?((CA?"Aquesta adreça encara s'ha d'autoritzar a Firebase. De moment, fes servir el teu nom.":FR?"Cette adresse doit encore être autorisée dans Firebase. Utilise ton nom pour l'instant.":"This address still needs to be authorised in Firebase. Use your name for now.")):"Falta autorizar esta dirección en Firebase. Entra con tu nombre de momento.");
     if (c === "auth/popup-blocked") return (EN?((CA?"El navegador ha bloquejat la finestra. Torna a tocar el botó.":FR?"Le navigateur a bloqué la fenêtre. Touche encore le bouton.":"The browser blocked the window. Tap the button again.")):"El navegador ha bloqueado la ventana. Toca otra vez el botón.");
@@ -356,16 +365,18 @@
   async function login(k, allowSwitch) {
     const pv = provider(k);
     const cur = auth.currentUser || await ensureAuth().catch(() => null);
+    const nat = NATIVE_UA && NATIVE_LOGIN();
+    const cred = nat ? nativeCred(k, await window.PisteaNative.signIn(k)) : null;
     let user;
     if (cur && cur.isAnonymous) {
-      try { user = (await cur.linkWithPopup(pv)).user; }
+      try { user = (nat ? await cur.linkWithCredential(cred) : await cur.linkWithPopup(pv)).user; }
       catch (e) {
-        if (e && (e.code === "auth/credential-already-in-use" || e.code === "auth/email-already-in-use") && e.credential) {
+        if (e && (e.code === "auth/credential-already-in-use" || e.code === "auth/email-already-in-use") && (e.credential || cred)) {
           if (!allowSwitch) { const er = new Error("en-uso"); er.code = "vallik/en-uso"; throw er; }
-          user = (await auth.signInWithCredential(e.credential)).user;
+          user = (await auth.signInWithCredential(e.credential || cred)).user;
         } else throw e;
       }
-    } else user = (await auth.signInWithPopup(pv)).user;
+    } else user = (nat ? await auth.signInWithCredential(cred) : await auth.signInWithPopup(pv)).user;
     authP = Promise.resolve(user);
     LS.set("vallik.cuenta", k);
     return user;
@@ -501,11 +512,20 @@
             await Promise.all(["aqui", "mensajes", "perfiles"].map(c => group.collection(c).doc(uid).delete()));
             const u = auth.currentUser;
             if (u) {
+              const pd = (u.providerData || [])[0], k = pd && pd.providerId === "apple.com" ? "apple" : pd && pd.providerId === "google.com" ? "google" : null;
+              const nat = NATIVE_UA && NATIVE_LOGIN();
+              // Apple exige revocar el permiso de "Iniciar sesión con Apple" al borrar la cuenta (guideline 5.1.1).
+              // Para eso hace falta volver a confirmar con Apple, y de paso sirve como inicio de sesión reciente.
+              if (k === "apple") {
+                if (nat) { const c = await window.PisteaNative.revokeApple(); await u.reauthenticateWithCredential(nativeCred("apple", c)); }
+                else { const r = await u.reauthenticateWithPopup(provider("apple")); const t = r && r.credential && r.credential.accessToken; if (t && auth.revokeAccessToken) await auth.revokeAccessToken(t); }
+              }
               try { await u.delete(); }
               catch (e) {
-                if (e && e.code === "auth/requires-recent-login") {
-                  const pd = (u.providerData || [])[0], k = pd && pd.providerId === "apple.com" ? "apple" : "google";
-                  await u.reauthenticateWithPopup(provider(k)); await u.delete();
+                if (e && e.code === "auth/requires-recent-login" && k) {
+                  if (nat) await u.reauthenticateWithCredential(nativeCred(k, await window.PisteaNative.signIn(k)));
+                  else await u.reauthenticateWithPopup(provider(k));
+                  await u.delete();
                 } else throw e;
               }
             }

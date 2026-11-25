@@ -13,6 +13,9 @@
   /* App Check con App Attest: demuestra a Firebase que las peticiones vienen de Vallik de verdad. */
   var FAC = C.registerPlugin("FirebaseAppCheck");
   var acReady = FAC.initialize({ isTokenAutoRefreshEnabled: true }).catch(function () {});
+  /* Inicio de sesión nativo con Apple o Google (la ventana web de Google no funciona dentro de apps).
+     El plugin solo consigue las credenciales (skipNativeAuth); la sesión la abre el SDK de la web. */
+  var FAU = C.registerPlugin("FirebaseAuthentication");
   function acToken() {
     return acReady.then(function () { return FAC.getToken(); }).then(function (r) {
       return { token: r.token, expireTimeMillis: r.expireTimeMillis || (Date.now() + 30 * 60000) };
@@ -86,6 +89,19 @@
   window.PisteaNative = {
     /* Token de App Check para el SDK de Firebase de la web (CustomProvider en backend.js) */
     appCheckToken: acToken,
+    /* k: "apple" o "google". Devuelve { idToken, accessToken, nonce, authorizationCode } */
+    signIn: function (k) {
+      var f = k === "apple" ? FAU.signInWithApple({ skipNativeAuth: true }) : FAU.signInWithGoogle({ skipNativeAuth: true });
+      return f.then(function (r) { return (r && r.credential) || {}; });
+    },
+    /* Apple exige cortar el permiso al borrar la cuenta: se pide un código nuevo y se revoca. */
+    revokeApple: function () {
+      return FAU.signInWithApple({ skipNativeAuth: true }).then(function (r) {
+        var c = (r && r.credential) || {};
+        if (!c.authorizationCode) throw new Error("sin-codigo");
+        return FAU.revokeAccessToken({ token: c.authorizationCode }).then(function () { return c; });
+      });
+    },
     /* GPS que no se para en segundo plano. cb recibe lo mismo que navigator.geolocation. */
     watch: function (cb, onDenied) {
       if (watcher === "cancel") { watcher = "pending"; return; }   // se paró y se volvió a pedir antes de arrancar
