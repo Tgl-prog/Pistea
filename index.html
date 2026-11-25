@@ -3693,7 +3693,11 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
   try { VOZ.on = localStorage.getItem("vallik.voz") === "1"; } catch (e) {}
   const vozOk = () => !!(window.speechSynthesis && window.SpeechSynthesisUtterance);
   function speak(t) {
-    if (!VOZ.on || !vozOk() || !t) return;
+    if (!VOZ.on || !t) return;
+    // En la app habla el iPhone: sigue con el móvil bloqueado y baja la música mientras habla.
+    const NV = window.PisteaNative;
+    if (NV && NV.speak) { NV.speak(t, EN ? ((CA?"ca-ES":FR?"fr-FR":"en-GB")) : "es-ES").catch(() => {}); return; }
+    if (!vozOk()) return;
     try {
       const u = new SpeechSynthesisUtterance(t), lang = EN ? ((CA?"ca":FR?"fr":"en")) : "es";
       u.lang = EN ? ((CA?"ca-ES":FR?"fr-FR":"en-GB")) : "es-ES"; u.rate = 1.02;
@@ -3774,6 +3778,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
         const [x, y] = toXY(c.longitude, c.latitude); navFix(x, y);
       }, () => {}, { enableHighAccuracy: true, timeout: 30000, maximumAge: 5000 });
     } else if (!own && VOZ.watch != null && VOZ.watch !== "native") { navigator.geolocation.clearWatch(VOZ.watch); VOZ.watch = null; }
+    if (!going) { const NV = window.PisteaNative; if (NV && NV.stopSpeaking) NV.stopSpeaking().catch(() => {}); }
     if (!routing && vozOk()) try { speechSynthesis.cancel(); } catch (e) {}
   }
   /* Cambiar tu nombre desde el perfil: se guarda en el grupo y en el móvil (al volver a abrir la app se usa este) */

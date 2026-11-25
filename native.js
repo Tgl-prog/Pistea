@@ -98,6 +98,9 @@
     /* d: { dest, step, kind, color, next, nextKind, nextColor, mins, idx, total, done, label }. Empieza o actualiza. */
     navActivity: function (d) { return NAV.update(d); },
     navActivityEnd: function () { return NAV.end(); },
+    /* Voz de la guía con el sintetizador del iPhone (sigue con el móvil bloqueado). */
+    speak: function (text, lang) { return NAV.speak({ text: text, lang: lang }); },
+    stopSpeaking: function () { return NAV.stopSpeaking(); },
     /* k: "apple" o "google". Devuelve { idToken, accessToken, nonce, authorizationCode } */
     signIn: function (k) {
       var f = k === "apple" ? FAU.signInWithApple({ skipNativeAuth: true }) : FAU.signInWithGoogle({ skipNativeAuth: true });

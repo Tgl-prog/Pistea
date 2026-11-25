@@ -2,6 +2,7 @@
 // Desde la web: Capacitor.registerPlugin("VallikNav").update({...}) y .end() (ver native.js).
 import Foundation
 import Capacitor
+import AVFoundation
 #if canImport(ActivityKit)
 import ActivityKit
 #endif
@@ -12,8 +13,43 @@ public class VallikNavPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "VallikNav"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "update", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "end", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "end", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "speak", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "stopSpeaking", returnType: CAPPluginReturnPromise)
     ]
+
+    // Voz de la guía con el sintetizador del iPhone: sigue hablando con el móvil bloqueado
+    // (modo de audio en segundo plano) y baja la música mientras habla, como Waze o Google Maps.
+    private let synth = AVSpeechSynthesizer()
+    private lazy var voiceDelegate = VoiceDelegate()
+
+    @objc func speak(_ call: CAPPluginCall) {
+        guard let text = call.getString("text"), !text.isEmpty else { call.resolve(); return }
+        let lang = call.getString("lang") ?? "es-ES"
+        DispatchQueue.main.async {
+            let session = AVAudioSession.sharedInstance()
+            try? session.setCategory(.playback, mode: .voicePrompt, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
+            try? session.setActive(true)
+            if self.synth.isSpeaking { self.synth.stopSpeaking(at: .immediate) }
+            self.synth.delegate = self.voiceDelegate
+            let u = AVSpeechUtterance(string: text)
+            let prefix = String(lang.prefix(2))
+            let voices = AVSpeechSynthesisVoice.speechVoices().filter { $0.language == lang || $0.language.hasPrefix(prefix) }
+            u.voice = voices.first(where: { $0.language == lang && $0.quality != .default })
+                ?? voices.first(where: { $0.quality != .default })
+                ?? AVSpeechSynthesisVoice(language: lang)
+            u.rate = AVSpeechUtteranceDefaultSpeechRate * 1.02
+            self.synth.speak(u)
+            call.resolve()
+        }
+    }
+
+    @objc func stopSpeaking(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            self.synth.stopSpeaking(at: .immediate)
+            call.resolve()
+        }
+    }
 
     @objc func update(_ call: CAPPluginCall) {
         #if canImport(ActivityKit)
@@ -70,5 +106,15 @@ public class VallikNavPlugin: CAPPlugin, CAPBridgedPlugin {
         #else
         call.resolve()
         #endif
+    }
+}
+
+/// Al terminar de hablar devuelve el volumen a la música del usuario.
+final class VoiceDelegate: NSObject, AVSpeechSynthesizerDelegate {
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) { release(synthesizer) }
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) { release(synthesizer) }
+    private func release(_ s: AVSpeechSynthesizer) {
+        guard !s.isSpeaking else { return }
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 }

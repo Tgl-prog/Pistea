@@ -79,7 +79,8 @@ private struct RouteBar: View {
         GeometryReader { g in
             ZStack(alignment: .leading) {
                 Capsule().fill(Color.white.opacity(0.12))
-                Capsule().fill(lima).frame(width: total > 0 ? g.size.width * CGFloat(min(idx, total)) / CGFloat(total) : 0)
+                // Arranca con un tramo hecho para que se lea como progreso desde el primer paso.
+                Capsule().fill(lima).frame(width: total > 0 ? max(10, g.size.width * CGFloat(min(idx, total) + 1) / CGFloat(total + 1)) : 0)
             }
         }
         .frame(height: 4)
