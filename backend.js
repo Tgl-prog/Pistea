@@ -51,6 +51,140 @@
   const LCA = {"Apple and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.": "Apple i App Store són marques d'Apple Inc., registrades als EUA i en altres països.", "You've been invited to a group. Download Vallik and join with this code:": "T'han convidat a un grup. Descarrega Vallik i entra-hi amb aquest codi:", "Copy": "Copiar", "Copied": "Copiat", "Free for iPhone. Your group on the Les 3 Vallées map, live.": "Gratis per a iPhone. El teu grup al mapa de Les 3 Vallées, en directe.", "Download on the App Store": "Descarrega-la a l'App Store", "Continue in the browser": "Continuar al navegador", "Continue without an account": "Continuar sense compte", "Back": "Tornar", "Create your trip's group": "Crea el grup del viatge", "Add your name, then send the link to the others.": "Posa el teu nom i després envia l'enllaç als altres.", "Paste the link or code you were sent.": "Enganxa l'enllaç o el codi que t'han enviat.", "Create my group": "Crear el meu grup", "Join the group": "Entrar al grup", "I have an invite link": "Tinc un enllaç d'invitació", "Create a new group instead": "Millor crear un grup nou", "Optional. With Google your profile follows you if you change phones.": "Opcional. Amb Google el teu perfil et segueix si canvies de mòbil.", "Nobody gets lost from the group": "Que ningú es perdi del grup", "See your friends and family on the piste map, get to them in a few turns and head home together before the lifts close.": "Veus els teus amics i la teva família al mapa de pistes, hi arribes en quatre girs i torneu junts abans que tanquin els remuntadors.", "You have been invited to a group. Join and you will all be on the map in a moment.": "T'han convidat a un grup. Entra i en un moment us veureu tots al mapa.", "Continue with Google": "Continuar amb Google", "Continue with Apple": "Continuar amb Apple", "With Google your profile follows you if you change phones. Or just use your name below.": "Amb Google el teu perfil et segueix encara que canviïs de mòbil. Si ho prefereixes, entra només amb el teu nom aquí sota.", "Join your group": "Entra al teu grup", "This is the name your friends will see.": "Els teus amics et veuran amb aquest nom.", "Your name": "El teu nom", "Group link or code": "Enllaç o codi del grup", "Paste": "Enganxar", "Ask whoever created the group.": "Demana-ho a qui va crear el grup.", "Join": "Entrar", "or": "o", "Create a new group": "Crear un grup nou", "What it does for your group": "Què fa pel teu grup", "Live": "En directe", "Your group, live": "El teu grup, en directe", "Every friend is a dot on the 3D resort map. You know where they are without calling anyone.": "Cada amic és un punt al mapa 3D de l'estació. Saps on és sense trucar a ningú.", "3 on the slopes · 1 min ago": "3 a pistes · fa 1 min", "Route": "Ruta", "Get to anyone": "Arriba fins a qui vulguis", "Step by step route over pistes and lifts to a friend, a bar or a lift. Skip the blacks if you like.": "Ruta pas a pas per pistes i remuntadors fins a un amic, un bar o un remuntador. Sense negres, si ho prefereixes.", "Home": "Tornada", "Make it home in time": "Torna a casa a temps", "It tells you when to head back so you are not stuck in the wrong valley when the lifts close.": "T'avisa de quan sortir per no quedar-te atrapat en una altra vall quan tanquin els remuntadors.", "leave here · lifts close 16:45": "surt d'aquí · tanca 16:45", "Meet up": "Quedada", "Meet up without wasting the morning": "Quedeu sense perdre mig matí", "Vallik picks the spot that is fairest for everyone. And if someone has a problem, the rest see how to reach them.": "Vallik tria el punt que us va millor a tots. I si algú té un problema, la resta veu com arribar-hi.", "Summit bar": "Bar del cim", "6 min for everyone": "6 min per a tothom", "Privacy": "Privacitat", "Terms": "Condicions", "Contact": "Contacte", "Map": "Mapa", "Signed in with": "Has entrat amb"};
   /* Solo el idioma activo: cambiar de idioma recarga la página, y así Google lee un único idioma por dirección. */
   const L = (es, en) => LANG === "es" ? es : LANG === "fr" ? (LFR[en] || en) : LANG === "ca" ? (LCA[en] || es) : en;
+  /* ----- Página promocional (solo en la web, en la pantalla de descarga) ----- */
+  const PT = {
+    sub: ["Gratis para iPhone. Ves a tu grupo en el mapa de pistas y llegas hasta ellos.", "Free for iPhone. See your crew on the piste map and get to them.", "Gratuit sur iPhone. Tu vois ton groupe sur le plan des pistes et tu le rejoins.", "Gratis per a iPhone. Veus el teu grup al mapa de pistes i hi arribes."],
+    more: ["Cómo funciona", "How it works", "Comment ça marche", "Com funciona"],
+    pk: ["El problema", "The problem", "Le problème", "El problema"],
+    ph: ["Seis amigos, una estación enorme y un grupo de WhatsApp.", "Six friends, a huge resort and a group chat.", "Six amis, un domaine immense et un groupe WhatsApp.", "Sis amics, una estació enorme i un grup de WhatsApp."],
+    pp: ["Los mensajes llegan tarde, nadie sabe qué pista es cuál y alguien siempre se queda atrás. Vallik pone a todos en el mismo mapa.", "Messages arrive late, nobody knows which run is which and someone always falls behind. Vallik puts everyone on the same map.", "Les messages arrivent en retard, personne ne sait quelle piste est laquelle et quelqu'un reste toujours derrière. Vallik met tout le monde sur la même carte.", "Els missatges arriben tard, ningú sap quina pista és quina i sempre algú es queda enrere. Vallik posa tothom al mateix mapa."],
+    c1: ["¿Dónde estáis?", "Where are you?", "Vous êtes où ?", "On sou?"],
+    c2: ["Arriba del todo", "Right at the top", "Tout en haut", "A dalt de tot"],
+    c3: ["¿Arriba de qué?", "The top of what?", "En haut de quoi ?", "A dalt de què?"],
+    c4: ["¿Qué bar?", "Which bar?", "Quel bar ?", "Quin bar?"],
+    f1k: ["Mapa", "Map", "Carte", "Mapa"], f1h: ["Todo el grupo en el mapa de pistas.", "The whole crew on the piste map.", "Tout le groupe sur le plan des pistes.", "Tot el grup al mapa de pistes."],
+    f1p: ["Cada uno con su nombre, la pista en la que está y a cuántos minutos queda de ti.", "Everyone with their name, the run they're on and how many minutes away they are.", "Chacun avec son prénom, la piste où il est et à combien de minutes de toi.", "Cadascú amb el seu nom, la pista on és i a quants minuts és de tu."],
+    f2k: ["Ir hasta", "Get to", "Rejoindre", "Anar fins"], f2h: ["Llega hasta tus amigos pista a pista.", "Get to your friends run by run.", "Rejoins tes amis piste après piste.", "Arriba fins als teus amics pista a pista."],
+    f2p: ["La ruta va por pistas y remontes según tu nivel. La guía por voz te avisa de cada giro con el móvil en el bolsillo.", "The route follows runs and lifts at your level. Voice guidance tells you every turn with your phone in your pocket.", "L'itinéraire suit les pistes et les remontées selon ton niveau. Le guidage vocal t'annonce chaque virage, téléphone dans la poche.", "La ruta va per pistes i remuntadors segons el teu nivell. La guia per veu t'avisa de cada gir amb el mòbil a la butxaca."],
+    f3k: ["Peter", "Peter", "Peter", "Peter"], f3h: ["Pregúntale a Peter.", "Ask Peter.", "Demande à Peter.", "Pregunta-ho a en Peter."],
+    f3p: ["Dónde comer, dónde tomar algo al sol o qué ruta hacer esta tarde. Peter conoce la estación y sabe dónde estás.", "Where to eat, where to grab a drink in the sun or which route to ski this afternoon. Peter knows the resort and where you are.", "Où manger, où boire un verre au soleil ou quel itinéraire faire cet après-midi. Peter connaît le domaine et sait où tu es.", "On menjar, on prendre alguna cosa al sol o quina ruta fer aquesta tarda. En Peter coneix l'estació i sap on ets."],
+    f4k: ["Mi día", "My day", "Ma journée", "El meu dia"], f4h: ["Tu día de esquí, en números.", "Your ski day, in numbers.", "Ta journée de ski, en chiffres.", "El teu dia d'esquí, en números."],
+    f4p: ["Pistas, desnivel y kilómetros. Al final del día, una tarjeta para mandar al grupo.", "Runs, vertical and distance. At the end of the day, a card to send to the crew.", "Pistes, dénivelé et kilomètres. En fin de journée, une carte à envoyer au groupe.", "Pistes, desnivell i quilòmetres. Al final del dia, una targeta per enviar al grup."],
+    xk: ["Y además", "And also", "Et aussi", "I a més"],
+    x1h: ["Quedar", "Meet up", "Se retrouver", "Quedar"], x1p: ["El punto de encuentro que queda más justo para todos.", "The meeting point that's fairest for everyone.", "Le point de rendez-vous le plus juste pour tous.", "El punt de trobada més just per a tothom."],
+    x2h: ["Volver a casa", "Head home", "Rentrer", "Tornar a casa"], x2p: ["Te avisa de cuándo salir para no perder el último remonte.", "Tells you when to leave so you don't miss the last lift.", "Te prévient quand partir pour ne pas rater la dernière remontée.", "T'avisa de quan sortir per no perdre l'últim remuntador."],
+    x3h: ["Tengo un problema", "I need help", "J'ai un problème", "Tinc un problema"], x3p: ["Un toque y el grupo sabe dónde estás.", "One tap and the crew knows where you are.", "Un geste et le groupe sait où tu es.", "Un toc i el grup sap on ets."],
+    band: ["Cada uno a su nivel. Todos en el mapa.", "Everyone at their own level. All on the map.", "Chacun à son niveau. Tous sur la carte.", "Cadascú al seu nivell. Tots al mapa."],
+    sk: ["Empezar", "Get started", "Commencer", "Començar"], sh: ["En un minuto, el grupo está listo.", "Your crew is ready in a minute.", "Ton groupe est prêt en une minute.", "En un minut, el grup està llest."],
+    s1: ["Descarga Vallik. Es gratis.", "Download Vallik. It's free.", "Télécharge Vallik. C'est gratuit.", "Descarrega Vallik. És gratis."],
+    s2: ["Crea el grupo del viaje.", "Create your trip's group.", "Crée le groupe du séjour.", "Crea el grup del viatge."],
+    s3: ["Manda el enlace por WhatsApp. Quien lo abre, entra.", "Share the link on WhatsApp. Whoever opens it is in.", "Envoie le lien sur WhatsApp. Qui l'ouvre entre.", "Envia l'enllaç per WhatsApp. Qui l'obre, entra."],
+    qk: ["Preguntas", "Questions", "Questions", "Preguntes"],
+    q1: ["¿Cuánto cuesta?", "How much does it cost?", "Combien ça coûte ?", "Quant costa?"], a1: ["Nada. Vallik es gratis y no tiene publicidad.", "Nothing. Vallik is free and has no ads.", "Rien. Vallik est gratuit et sans publicité.", "Res. Vallik és gratis i no té publicitat."],
+    q2: ["¿Dónde funciona?", "Where does it work?", "Où ça marche ?", "On funciona?"], a2: ["Esta temporada, en Les 3 Vallées. Vallik no es una app oficial de la estación.", "This season, in Les 3 Vallées. Vallik is not an official resort app.", "Cette saison, aux 3 Vallées. Vallik n'est pas une application officielle du domaine.", "Aquesta temporada, a Les 3 Vallées. Vallik no és una app oficial de l'estació."],
+    q3: ["¿Quién ve dónde estoy?", "Who can see where I am?", "Qui voit où je suis ?", "Qui veu on soc?"], a3: ["Solo las personas de tu grupo. Puedes salir del grupo o borrar tu cuenta cuando quieras.", "Only the people in your group. You can leave the group or delete your account whenever you like.", "Seulement les personnes de ton groupe. Tu peux quitter le groupe ou supprimer ton compte quand tu veux.", "Només les persones del teu grup. Pots sortir del grup o esborrar el teu compte quan vulguis."],
+    q4: ["¿Y si mis amigos tienen Android?", "What if my friends use Android?", "Et si mes amis ont Android ?", "I si els meus amics tenen Android?"], a4: ["Entran desde el navegador con el mismo enlace y aparecen en el mapa con el resto.", "They join from the browser with the same link and show up on the map with everyone else.", "Ils entrent depuis le navigateur avec le même lien et apparaissent sur la carte avec les autres.", "Entren des del navegador amb el mateix enllaç i apareixen al mapa amb la resta."],
+    q5: ["¿Necesito cuenta?", "Do I need an account?", "Faut-il un compte ?", "Necessito compte?"], a5: ["No. Puedes entrar con Apple o Google para no perder tu perfil, o seguir sin cuenta.", "No. You can sign in with Apple or Google to keep your profile, or carry on without an account.", "Non. Tu peux te connecter avec Apple ou Google pour garder ton profil, ou continuer sans compte.", "No. Pots entrar amb Apple o Google per no perdre el teu perfil, o seguir sense compte."],
+    end: ["Nadie baja solo.", "Nobody skis down alone.", "Personne ne descend seul.", "Ningú baixa sol."],
+    web: ["Seguir en el navegador", "Continue in the browser", "Continuer dans le navigateur", "Seguir al navegador"],
+    alt1: ["La app de Vallik con el grupo en el mapa", "The Vallik app with the crew on the map", "L'app Vallik avec le groupe sur la carte", "L'app de Vallik amb el grup al mapa"],
+  };
+  const P = k => { const r = PT[k]; return LANG === "en" ? r[1] : LANG === "fr" ? r[2] : LANG === "ca" ? r[3] : r[0]; };
+  function promoHTML() {
+    const badge = `<a class="pr-store" href="https://apps.apple.com/app/id6838083819"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>`;
+    const feat = (n, img, flip) => `<section class="pr-f${flip ? " flip" : ""}"><div class="pr-ft"><p class="pr-k">${P("f" + n + "k")}</p><h3>${P("f" + n + "h")}</h3><p>${P("f" + n + "p")}</p></div><img class="pr-ph" src="web/app-${img}.webp" width="600" height="1300" loading="lazy" alt=""></section>`;
+    return `<div class="lp-promo">
+      <section class="pr-prob"><div class="pr-in">
+        <div class="pr-pt"><p class="pr-k">${P("pk")}</p><h2>${P("ph")}</h2><p>${P("pp")}</p></div>
+        <div class="pr-chat" aria-hidden="true">
+          <div class="pr-b"><small>MARTA · 11:42</small><span>${P("c1")}</span></div>
+          <div class="pr-b r"><small>DANI · 11:43</small><span>${P("c2")}</span></div>
+          <div class="pr-b"><small>LEO · 11:47</small><span>${P("c3")}</span></div>
+          <div class="pr-b r"><small>DANI · 12:31</small><span>${P("c4")}</span></div>
+        </div></div></section>
+      <div class="pr-feats pr-in">${feat(1, "mapa")}${feat(2, "ruta", 1)}${feat(3, "peter")}${feat(4, "dia", 1)}</div>
+      <section class="pr-x pr-in"><p class="pr-k">${P("xk")}</p><ul>
+        <li><b>${P("x1h")}</b><span>${P("x1p")}</span></li>
+        <li><b>${P("x2h")}</b><span>${P("x2p")}</span></li>
+        <li><b>${P("x3h")}</b><span>${P("x3p")}</span></li></ul></section>
+      <section class="pr-band"><img src="web/telesilla.webp" width="1600" height="900" loading="lazy" alt=""><p>${P("band")}</p></section>
+      <section class="pr-steps pr-in"><p class="pr-k">${P("sk")}</p><h2>${P("sh")}</h2><ol>
+        <li><span>01</span>${P("s1")}</li><li><span>02</span>${P("s2")}</li><li><span>03</span>${P("s3")}</li></ol></section>
+      <section class="pr-faq pr-in"><p class="pr-k">${P("qk")}</p>
+        ${[1, 2, 3, 4, 5].map(i => `<details><summary>${P("q" + i)}</summary><p>${P("a" + i)}</p></details>`).join("")}</section>
+      <section class="pr-end"><img src="web/alba.webp" width="1400" height="1749" loading="lazy" alt=""><div class="pr-endt"><h2>${P("end")}</h2>${badge}<button class="lp-skip" type="button" data-web>${P("web")}</button></div></section>
+      <footer class="pr-foot pr-in"><nav><a href="${LANG === "fr" ? "fr/confidentialite/" : LANG === "en" ? "privacy/" : "privacidad/"}">${L("Privacidad","Privacy")}</a><a href="${LANG === "fr" ? "fr/conditions/" : LANG === "en" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a><a href="mailto:vallik-soporte@googlegroups.com">${L("Contacto","Contact")}</a></nav>
+        <small>${L("Apple y App Store son marcas de Apple Inc., registradas en EE. UU. y en otros países.","Apple and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.")} ${L("Mapa","Map")} © OpenStreetMap · Copernicus DEM</small></footer>
+    </div>`;
+  }
+  const PROMO_CSS = `
+      .lp-promo{display:none;width:100vw;margin:56px 0 0 calc(50% - 50vw);color:var(--tx);font-family:var(--font)}
+      .join[data-stage=get] .lp-promo{display:block}.join[data-stage=get] .lp-more{display:none}
+      .join[data-stage=get]{overflow-x:hidden;background:#0E2A47}
+      .pr-in{width:min(100% - 40px,1080px);margin:0 auto}
+      .pr-k{margin:0 0 14px;font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2)}
+      .lp-promo h2{margin:0;font:800 clamp(32px,5vw,56px)/1.02 var(--font);letter-spacing:-.045em}
+      .lp-promo h3{margin:0;font:800 clamp(30px,4vw,46px)/1.04 var(--font);letter-spacing:-.04em}
+      .lp-promo p{font-size:17px;line-height:26px;color:var(--tx-2)}
+      .pr-more{display:flex;justify-content:center;margin-top:auto;padding-top:8px}.pr-more a{display:inline-flex;align-items:center;gap:8px;min-height:44px;color:var(--tx-2);font:600 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;text-decoration:none}
+      .pr-prob{padding:40px 0 72px;border-top:1px solid rgba(246,248,250,.08)}
+      .pr-prob .pr-in{display:grid;gap:36px}
+      .pr-pt p:last-child{margin:18px 0 0;max-width:480px}
+      .pr-chat{display:grid;gap:12px;max-width:420px}
+      .pr-b{display:grid;justify-items:start;gap:6px}.pr-b.r{justify-items:end}
+      .pr-b small{font:500 11px/1 var(--mono);letter-spacing:.1em;color:var(--tx-2)}
+      .pr-b span{padding:13px 18px;border-radius:20px 20px 20px 6px;background:rgba(246,248,250,.08);box-shadow:inset 0 0 0 1px rgba(246,248,250,.1);font-size:17px}
+      .pr-b.r span{border-radius:20px 20px 6px 20px;background:rgba(246,248,250,.14)}
+      .pr-feats{display:grid;gap:88px;padding:24px 0 80px}
+      .pr-f{display:grid;gap:28px;justify-items:center}
+      .pr-ft{justify-self:stretch}.pr-ft p:last-child{margin:16px 0 0;max-width:440px}
+      .pr-ph{width:min(76vw,300px);height:auto;filter:drop-shadow(0 30px 60px rgba(2,8,16,.5))}
+      .pr-x{padding:0 0 88px}.pr-x ul{list-style:none;margin:0;padding:0;display:grid;gap:0}
+      .pr-x li{display:grid;gap:6px;padding:20px 0;border-top:1px solid rgba(246,248,250,.1)}.pr-x li:last-child{border-bottom:1px solid rgba(246,248,250,.1)}
+      .pr-x b{font:700 20px/1.2 var(--font);letter-spacing:-.02em}.pr-x span{color:var(--tx-2);font-size:16px;line-height:24px}
+      .pr-band{position:relative;height:min(78vw,640px);overflow:hidden}
+      .pr-band img{width:100%;height:100%;object-fit:cover;object-position:50% 45%;display:block}
+      .pr-band::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,42,71,0) 40%,rgba(8,27,48,.82) 100%)}
+      .pr-band p{position:absolute;left:max(20px,calc(50% - 540px));right:20px;bottom:28px;margin:0;z-index:1;font:800 clamp(28px,4.4vw,52px)/1.04 var(--font)!important;letter-spacing:-.045em;color:var(--tx)!important;max-width:720px}
+      .pr-steps{padding:88px 0}.pr-steps ol{list-style:none;margin:32px 0 0;padding:0;display:grid;gap:14px}
+      .pr-steps li{display:flex;gap:18px;align-items:baseline;padding:22px 22px;border-radius:22px;background:rgba(246,248,250,.06);font:600 19px/1.35 var(--font);letter-spacing:-.015em}
+      .pr-steps li span{font:500 13px/1 var(--mono);color:var(--tx-2);letter-spacing:.1em}
+      .pr-faq{padding:0 0 88px}
+      .pr-faq details{border-top:1px solid rgba(246,248,250,.1)}.pr-faq details:last-child{border-bottom:1px solid rgba(246,248,250,.1)}
+      .pr-faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:64px;font:600 18px/1.3 var(--font);letter-spacing:-.01em}
+      .pr-faq summary::-webkit-details-marker{display:none}
+      .pr-faq summary::after{content:"+";font:400 26px/1 var(--font);color:var(--tx-2);transition:transform .2s}.pr-faq details[open] summary::after{transform:rotate(45deg)}
+      .pr-faq details p{margin:0 0 22px;max-width:640px}
+      .pr-end{position:relative;min-height:min(130vw,760px);display:flex;align-items:flex-start;overflow:hidden}
+      .pr-end>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 52%}
+      .pr-end::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0E2A47 0%,rgba(14,42,71,0) 30%)}
+      .pr-endt{position:relative;z-index:1;width:min(100% - 40px,1080px);margin:0 auto;padding-top:88px;display:grid;justify-items:start;gap:22px}
+      .pr-endt h2{font-size:clamp(44px,7vw,88px)!important}
+      .pr-store img{display:block}.pr-endt .lp-skip{justify-self:start;width:auto;padding-left:0;padding-right:0}
+      .pr-foot{padding:32px 0 calc(var(--sab,0px) + 36px);display:grid;gap:14px}
+      .pr-foot nav{display:flex;gap:22px;flex-wrap:wrap}.pr-foot a{color:var(--tx);font-size:15px;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+      .pr-foot small{color:var(--tx-2);font-size:12px;line-height:18px}
+      @media (min-width:900px){
+        .pr-prob{padding:64px 0 120px}.pr-prob .pr-in{grid-template-columns:1.1fr .9fr;align-items:center;gap:80px}
+        .pr-feats{gap:120px;padding:40px 0 120px}
+        .pr-f{grid-template-columns:1fr 1fr;align-items:center;justify-items:start;gap:80px}
+        .pr-f .pr-ph{width:320px;justify-self:center}
+        .pr-f.flip .pr-ft{order:2}
+        .pr-x{padding-bottom:120px}.pr-x ul{grid-template-columns:repeat(3,1fr);gap:40px}.pr-x li,.pr-x li:last-child{border-bottom:0}
+        .pr-steps{padding:120px 0}.pr-steps ol{grid-template-columns:repeat(3,1fr)}.pr-steps li{flex-direction:column;gap:28px;min-height:150px}
+        .pr-faq{padding-bottom:120px;display:grid;grid-template-columns:280px 1fr;column-gap:80px}.pr-faq .pr-k{grid-row:span 5}
+        .join[data-stage=get] .lp{width:min(100%,1080px)!important}
+        .join[data-stage=get] .lp-hero h1{font-size:68px!important;line-height:66px!important;letter-spacing:-.05em}
+        .join[data-stage=get] .lp-screen{position:relative}
+        .join[data-stage=get] .lp-screen>*{max-width:520px}
+        .join[data-stage=get] .lp-get{justify-items:start;text-align:left}.join[data-stage=get] .lp-get .lp-skip{justify-self:start;padding-left:0;padding-right:0}.join[data-stage=get] .lp-store{justify-self:start;margin:0}.join[data-stage=get] .pr-more{justify-content:flex-start}
+        .join[data-stage=get] .lp-photo{height:100svh}
+        .join[data-stage=get] .lp-photo{background-position:50% 78%}
+        .join[data-stage=get] .lp-photo::after{background:linear-gradient(90deg,rgba(8,27,48,.86) 0%,rgba(8,27,48,.5) 38%,rgba(8,27,48,0) 62%),linear-gradient(180deg,rgba(6,20,36,.6) 0%,rgba(6,20,36,0) 20%,rgba(14,42,71,0) 70%,#0E2A47 100%)}
+        .join[data-stage=get] .lp-hero-ph{display:block}
+      }
+      .lp-hero-ph{display:none;position:absolute;right:40px;top:50%;transform:translateY(-46%);width:320px;height:auto;max-width:none!important;filter:drop-shadow(0 40px 80px rgba(2,8,16,.6))}
+`;
   function askJoin() {
     const note = LS.get("pistea.aviso") || ""; LS.del("pistea.aviso");
     return new Promise(resolve => {
@@ -67,6 +201,7 @@
         <div class="lp" data-lang="${LANG}">
         <div class="lp-lang" role="group" aria-label="Idioma / Language"><button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button><button type="button" data-lang="ca">CA</button></div>
         <div class="lp-screen">
+        ${NATIVE_UA || code ? "" : `<img class="lp-hero-ph" src="web/app-mapa.webp" width="600" height="1300" alt="${P("alt1")}">`}
         <header class="lp-hero">
           <div class="lp-logo"><svg class="lp-mark" width="48" height="48" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><mask id="kcutL" maskUnits="userSpaceOnUse" x="0" y="0" width="110" height="100"><rect width="110" height="100" fill="#fff"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#000" stroke-width="5.5" stroke-linecap="round"/></mask><g mask="url(#kcutL)" transform="translate(-5 0)"><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65.114 66,54.432 88,84 67,84" fill="#C8F03C"/></g></svg><svg class="lp-wm" viewBox="0 0 331 100" width="122" height="37" role="img" aria-label="Vallik"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg></div>
           <h1>${L("Que nadie se pierda del grupo","Nobody gets lost from the group")}</h1>
@@ -74,10 +209,11 @@
         </header>
         ${code ? "" : `<p class="lp-msg" role="status"${note ? "" : " hidden"}>${note.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>`}
         <div class="lp-get">
-          ${code ? `<p class="lp-code">${L("Te han invitado a un grupo. Descarga Vallik y entra con este código:","You've been invited to a group. Download Vallik and join with this code:")}<span><b>${code}</b><button type="button" class="lp-copy" data-copy="${code}">${L("Copiar","Copy")}</button></span></p>` : `<p class="lp-sub">${L("Gratis para iPhone. Tu grupo en el mapa de Les 3 Vallées, en directo.","Free for iPhone. Your group on the Les 3 Vallées map, live.")}</p>`}
+          ${code ? `<p class="lp-code">${L("Te han invitado a un grupo. Descarga Vallik y entra con este código:","You've been invited to a group. Download Vallik and join with this code:")}<span><b>${code}</b><button type="button" class="lp-copy" data-copy="${code}">${L("Copiar","Copy")}</button></span></p>` : `<p class="lp-sub">${P("sub")}</p>`}
           <a class="lp-store" href="https://apps.apple.com/app/id6838083819"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>
           <button class="lp-skip" type="button" data-web>${L("Seguir en el navegador","Continue in the browser")}</button>
           <p class="lp-tm">${L("Apple y App Store son marcas de Apple Inc., registradas en EE. UU. y en otros países.","Apple and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.")}</p>
+          ${NATIVE_UA || code ? "" : `<div class="pr-more"><a href="#promo" data-more>${P("more")} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a></div>`}
         </div>
         <div class="lp-who" hidden></div>
         ${code ? "" : `<div class="lp-pick">
@@ -108,6 +244,7 @@
         </div>` : ""}
         <p class="lp-legal">${L("Al continuar aceptas las","By continuing you accept the")} <a href="${LANG === "fr" ? "fr/conditions/" : LANG === "en" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a> ${L("y la","and the")} <a href="${LANG === "fr" ? "fr/confidentialite/" : LANG === "en" ? "privacy/" : "privacidad/"}">${L("Política de privacidad","Privacy policy")}</a>.</p>
         </div>
+        ${NATIVE_UA || code ? "" : promoHTML()}
         <div class="lp-more"${NATIVE_UA ? " hidden" : ""}>
         <h2 class="lp-h2">${L("Lo que hace por tu grupo","What it does for your group")}</h2>
         <ul class="lp-feat">
@@ -127,7 +264,7 @@
         </div>
         </div>`;
       const st = document.createElement("style");
-      st.textContent = `.join{position:fixed;inset:0;z-index:30;display:block;padding:calc(var(--sat,0px) + 28px) 16px calc(var(--sab,0px) + 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(14,42,71,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+      st.textContent = PROMO_CSS + `.join{position:fixed;inset:0;z-index:30;display:block;padding:calc(var(--sat,0px) + 28px) 16px calc(var(--sab,0px) + 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(14,42,71,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
       .lp{width:min(100%,400px);margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
       .lp-hero{display:grid;gap:14px;padding:8px 4px 4px}
       .lp-logo{display:flex;align-items:center;gap:14px}
@@ -275,7 +412,8 @@
       const showWho = (k, email) => { const w = el.querySelector(".lp-who"); if (!w) return; w.innerHTML = `${k === "apple" ? A_ICON : G_ICON}<span><b>${L("Has entrado con","Signed in with")} ${k === "apple" ? "Apple" : "Google"}</b>${email ? " · " + String(email).replace(/</g, "&lt;") : ""}</span>`; w.hidden = false; };
       const next = () => stage(code ? "form" : "pick", code ? "invite" : null);
       const sk = el.querySelector("[data-skip]"); if (sk) sk.addEventListener("click", next);
-      const wb = el.querySelector("[data-web]"); if (wb) wb.addEventListener("click", () => { LS.set("vallik.web", "1"); stage(firstStage, code ? "invite" : null); });
+      el.querySelectorAll("[data-web]").forEach(wb => wb.addEventListener("click", () => { LS.set("vallik.web", "1"); stage(firstStage, code ? "invite" : null); }));
+      const mo = el.querySelector("[data-more]"); if (mo) mo.addEventListener("click", ev => { ev.preventDefault(); const t = el.querySelector(".lp-promo"); if (t) el.scrollTo({ top: t.offsetTop - 8, behavior: "smooth" }); });
       const cp = el.querySelector("[data-copy]"); if (cp) cp.addEventListener("click", () => { try { navigator.clipboard.writeText(location.origin + "/#g=" + cp.dataset.copy); cp.textContent = L("Copiado","Copied"); } catch (e) {} });
       const ta = el.querySelector("[data-to-auth]"); if (ta) ta.addEventListener("click", () => { const w = el.querySelector(".lp-who"); if (w) w.hidden = true; stage("auth"); });
       // Si ya había entrado con Apple o Google en este móvil, no se vuelve a pedir.
