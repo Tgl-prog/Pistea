@@ -312,7 +312,8 @@
     }
     window.vReport = er => report((er && er.message) || String(er), "diag");
     // Errores de antes de que cargara este archivo (por ejemplo, native.js): los guarda index.html.
-    (window.__earlyErr || []).forEach(x => report(x.m, x.s));
+    // Se envían cuando ya está todo definido (report usa NATIVE_UA, que se declara más abajo).
+    setTimeout(() => (window.__earlyErr || []).forEach(x => { try { console.error("[vallik] error previo:", x.m, x.s); report(x.m, x.s); } catch (e) {} }), 0);
     window.addEventListener("error", e => { if (e && e.message) report(e.message, (e.filename || "").split("/").pop() + ":" + (e.lineno || 0) + ":" + (e.colno || 0)); });
     window.addEventListener("unhandledrejection", e => { const r = e && e.reason; if (!r) return; const m = r.message || String(r); if (/permission|offline|unavailable|network|aborted|cancel/i.test(m)) return; report(m, ((r.stack || "").split("\n")[1] || "").trim()); });
   })();
