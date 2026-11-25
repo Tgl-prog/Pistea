@@ -7,6 +7,7 @@
 (function () {
   var C = window.Capacitor;
   if (!C || !C.isNativePlatform || !C.isNativePlatform()) return;
+  if (!C.registerPlugin) { console.error("[vallik] falta Capacitor.registerPlugin (capacitor.js no cargó)"); return; }
 
   var BG = C.registerPlugin("BackgroundGeolocation");
   var Http = (C.Plugins && C.Plugins.CapacitorHttp) || C.registerPlugin("CapacitorHttp");

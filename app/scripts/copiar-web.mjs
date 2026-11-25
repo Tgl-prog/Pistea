@@ -1,6 +1,6 @@
 // Copia la web de Pistea (raíz del repo) a www/, que es lo que va dentro de la app.
 // La web sigue siendo la fuente única: se edita una vez y vale para GitHub Pages y para la app.
-import { cpSync, rmSync, mkdirSync, readdirSync, statSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, rmSync, mkdirSync, readdirSync, statSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -29,5 +29,10 @@ const build = Number(process.env.VALLIK_BUILD || 0), version = String(process.en
 writeFileSync(join(www, "app-build.js"), `window.VALLIK_BUILD = ${build}; window.VALLIK_VERSION = ${JSON.stringify(version)};\n`);
 const idx = join(www, "index.html"), html = readFileSync(idx, "utf8");
 if (!html.includes('<script src="native.js"></script>')) throw new Error("index.html sin native.js: no puedo añadir app-build.js");
-writeFileSync(idx, html.replace('<script src="native.js"></script>', '<script src="app-build.js"></script>\n<script src="native.js"></script>'));
+// capacitor.js (de @capacitor/core) aporta Capacitor.registerPlugin: el puente nativo de iOS no lo trae
+// y sin él native.js no puede hablar con ningún plugin (GPS, App Check, inicio de sesión).
+const core = join(app, "node_modules/@capacitor/core/dist/capacitor.js");
+if (!existsSync(core)) throw new Error("Falta @capacitor/core/dist/capacitor.js: ejecuta npm ci en app/");
+cpSync(core, join(www, "capacitor.js"));
+writeFileSync(idx, html.replace('<script src="native.js"></script>', '<script src="app-build.js"></script>\n<script src="capacitor.js"></script>\n<script src="native.js"></script>'));
 console.log(`Compilación ${build || "(local)"} anotada en app-build.js`);
