@@ -19,6 +19,8 @@
   var FAU = C.registerPlugin("FirebaseAuthentication");
   /* Valoración con el sistema oficial de Apple (SKStoreReviewController). */
   var IAR = C.registerPlugin("InAppReview");
+  /* Actividad en Directo de la ruta (plugin propio en la app: ios/App/App/VallikNav*.swift). */
+  var NAV = C.registerPlugin("VallikNav");
   function acToken() {
     return acReady.then(function () { return FAC.getToken(); }).then(function (r) {
       return { token: r.token, expireTimeMillis: r.expireTimeMillis || (Date.now() + 30 * 60000) };
@@ -93,6 +95,9 @@
     /* Token de App Check para el SDK de Firebase de la web (CustomProvider en backend.js) */
     appCheckToken: acToken,
     askReview: function () { return IAR.requestReview(); },
+    /* d: { dest, step, kind, color, next, nextKind, nextColor, mins, idx, total, done, label }. Empieza o actualiza. */
+    navActivity: function (d) { return NAV.update(d); },
+    navActivityEnd: function () { return NAV.end(); },
     /* k: "apple" o "google". Devuelve { idToken, accessToken, nonce, authorizationCode } */
     signIn: function (k) {
       var f = k === "apple" ? FAU.signInWithApple({ skipNativeAuth: true }) : FAU.signInWithGoogle({ skipNativeAuth: true });
@@ -127,13 +132,17 @@
         if (watcher === "cancel") { BG.removeWatcher({ id: id }); watcher = null; } else watcher = id;
       });
     },
-    /* GPS solo para la ruta paso a paso: sin aviso de segundo plano, así que solo con la app delante
-       y sin mensaje de "tu grupo te ve". Va aparte del directo. */
+    /* GPS solo para la ruta paso a paso. Sigue con el móvil bloqueado (para la Actividad en Directo y la voz),
+       sin el mensaje de "tu grupo te ve". Va aparte del directo. */
     navWatch: function (cb) {
       if (navW === "cancel") { navW = "pending"; return; }
       if (navW) return;
       navW = "pending";
-      BG.addWatcher({ requestPermissions: true, stale: false, distanceFilter: 10 }, function (loc, err) {
+      BG.addWatcher({
+        backgroundTitle: (EN?((CA?"Vallik et guia":FR?"Vallik te guide":"Vallik is guiding you")):"Vallik te guía"),
+        backgroundMessage: (EN?((CA?"Seguint la teva ruta.":FR?"Suit ton itinéraire.":"Following your route.")):"Siguiendo tu ruta."),
+        requestPermissions: true, stale: false, distanceFilter: 10
+      }, function (loc, err) {
         if (err || !loc) return;
         cb({ coords: { latitude: loc.latitude, longitude: loc.longitude, accuracy: loc.accuracy }, timestamp: loc.time || Date.now() });
       }).then(function (id) {

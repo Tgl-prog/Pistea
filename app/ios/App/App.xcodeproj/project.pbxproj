@@ -9,18 +9,54 @@
 /* Begin PBXBuildFile section */
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
 		4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = 4D22ABE82AF431CB00220026 /* CapApp-SPM */; };
+		4EFB0EB849B60E4FCC2F66E5 /* VallikNavLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA44CCC857338CD60E118C1 /* VallikNavLiveActivity.swift */; };
+		4F328CD996A02456745BD435 /* VallikNavAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4AA4DDFFE6704F07ECB3A /* VallikNavAttributes.swift */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
 		504EC30D1FED79650016851F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30B1FED79650016851F /* Main.storyboard */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		741DD08F6F0E95A65BB66B45 /* VallikNavPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BD476C779D0EF5753DED9F /* VallikNavPlugin.swift */; };
+		772BAF62506CB9DD9519D82B /* VallikViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3928E26F390BFEAE8FC1D0B6 /* VallikViewController.swift */; };
+		7756DA3F71E867380F739081 /* VallikNavWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 516DC07457C36A6F35CF158A /* VallikNavWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9028D11DE3D7802930D4280A /* VallikNavWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9037A6AD5316F928652B45DA /* VallikNavWidgetBundle.swift */; };
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
+		974535D578C5E708A641CAAF /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCEDF30F7D2900A216555370 /* SwiftUI.framework */; };
+		97702947988137F6DF979769 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CBA3F91DA355072C5EABC95 /* Foundation.framework */; };
 		A1B2C3D4E5F6A7B8C9D0E1F3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* GoogleService-Info.plist */; };
+		E30CE3A43CAE11AC9EB3C31B /* VallikNavAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4AA4DDFFE6704F07ECB3A /* VallikNavAttributes.swift */; };
+		EBF551768D3F63980699335E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10DC4C9B45E498D0E6196A9D /* WidgetKit.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		30F7AB247A65517CF2C40B33 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5C5D3F22BF4BFA0F3285C3B2;
+			remoteInfo = VallikNavWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F5B3A2A231200EC2555ACBC4 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7756DA3F71E867380F739081 /* VallikNavWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		10DC4C9B45E498D0E6196A9D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
+		3928E26F390BFEAE8FC1D0B6 /* VallikViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VallikViewController.swift; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -29,10 +65,18 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		516DC07457C36A6F35CF158A /* VallikNavWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VallikNavWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CBA3F91DA355072C5EABC95 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		81BD476C779D0EF5753DED9F /* VallikNavPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VallikNavPlugin.swift; sourceTree = "<group>"; };
+		853C3C993536B99EBD5E1CE5 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9037A6AD5316F928652B45DA /* VallikNavWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VallikNavWidgetBundle.swift; sourceTree = "<group>"; };
 		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 		A1B2C3D4E5F6A7B8C9D0E1F2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E1F4 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		B6B4AA4DDFFE6704F07ECB3A /* VallikNavAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VallikNavAttributes.swift; sourceTree = "<group>"; };
+		BCEDF30F7D2900A216555370 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		DEA44CCC857338CD60E118C1 /* VallikNavLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VallikNavLiveActivity.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +85,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BDE1275F08D2A9EF6B0F4BF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				97702947988137F6DF979769 /* Foundation.framework in Frameworks */,
+				EBF551768D3F63980699335E /* WidgetKit.framework in Frameworks */,
+				974535D578C5E708A641CAAF /* SwiftUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,6 +107,8 @@
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
+				B719DF8D56E89A7B9428E8C0 /* Frameworks */,
+				72FB0979BD0E2230FB7782BB /* VallikNavWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				516DC07457C36A6F35CF158A /* VallikNavWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -78,8 +135,40 @@
 				A1B2C3D4E5F6A7B8C9D0E1F4 /* App.entitlements */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				B6B4AA4DDFFE6704F07ECB3A /* VallikNavAttributes.swift */,
+				81BD476C779D0EF5753DED9F /* VallikNavPlugin.swift */,
+				3928E26F390BFEAE8FC1D0B6 /* VallikViewController.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		72FB0979BD0E2230FB7782BB /* VallikNavWidget */ = {
+			isa = PBXGroup;
+			children = (
+				9037A6AD5316F928652B45DA /* VallikNavWidgetBundle.swift */,
+				DEA44CCC857338CD60E118C1 /* VallikNavLiveActivity.swift */,
+				853C3C993536B99EBD5E1CE5 /* Info.plist */,
+			);
+			name = VallikNavWidget;
+			path = VallikNavWidget;
+			sourceTree = "<group>";
+		};
+		B719DF8D56E89A7B9428E8C0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ED10A7981357D078E8AEF61B /* iOS */,
+				10DC4C9B45E498D0E6196A9D /* WidgetKit.framework */,
+				BCEDF30F7D2900A216555370 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		ED10A7981357D078E8AEF61B /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				7CBA3F91DA355072C5EABC95 /* Foundation.framework */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -92,10 +181,12 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				F5B3A2A231200EC2555ACBC4 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				5E91459D02198C60653E9893 /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -104,6 +195,23 @@
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		5C5D3F22BF4BFA0F3285C3B2 /* VallikNavWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0CB777D38FC97AC883110D1 /* Build configuration list for PBXNativeTarget "VallikNavWidget" */;
+			buildPhases = (
+				04119AA4EFBD549007443123 /* Sources */,
+				BDE1275F08D2A9EF6B0F4BF1 /* Frameworks */,
+				6A6521BEF4B7E052674E68C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VallikNavWidget;
+			productName = VallikNavWidget;
+			productReference = 516DC07457C36A6F35CF158A /* VallikNavWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -138,6 +246,7 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				5C5D3F22BF4BFA0F3285C3B2 /* VallikNavWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -157,19 +266,48 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6A6521BEF4B7E052674E68C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		04119AA4EFBD549007443123 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9028D11DE3D7802930D4280A /* VallikNavWidgetBundle.swift in Sources */,
+				4EFB0EB849B60E4FCC2F66E5 /* VallikNavLiveActivity.swift in Sources */,
+				4F328CD996A02456745BD435 /* VallikNavAttributes.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		504EC3001FED79650016851F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
+				E30CE3A43CAE11AC9EB3C31B /* VallikNavAttributes.swift in Sources */,
+				741DD08F6F0E95A65BB66B45 /* VallikNavPlugin.swift in Sources */,
+				772BAF62506CB9DD9519D82B /* VallikViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5E91459D02198C60653E9893 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = VallikNavWidget;
+			target = 5C5D3F22BF4BFA0F3285C3B2 /* VallikNavWidget */;
+			targetProxy = 30F7AB247A65517CF2C40B33 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		504EC30B1FED79650016851F /* Main.storyboard */ = {
@@ -191,6 +329,32 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		4D2E855EE3A18BFCC1148131 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = VallikNavWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.vallik.NavWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		504EC3141FED79650016851F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 958DCC722DB07C7200EA8C5F /* debug.xcconfig */;
@@ -305,9 +469,9 @@
 			baseConfigurationReference = 958DCC722DB07C7200EA8C5F /* debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -328,9 +492,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -345,6 +509,31 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
+		};
+		A8B6E2064EDF39599ACC0324 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = VallikNavWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.vallik.NavWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
@@ -363,6 +552,15 @@
 			buildConfigurations = (
 				504EC3171FED79650016851F /* Debug */,
 				504EC3181FED79650016851F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D0CB777D38FC97AC883110D1 /* Build configuration list for PBXNativeTarget "VallikNavWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D2E855EE3A18BFCC1148131 /* Release */,
+				A8B6E2064EDF39599ACC0324 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
