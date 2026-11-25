@@ -75,7 +75,7 @@
         ${code ? "" : `<p class="lp-msg" role="status"${note ? "" : " hidden"}>${note.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>`}
         <div class="lp-get">
           ${code ? `<p class="lp-code">${L("Te han invitado a un grupo. Descarga Vallik y entra con este código:","You've been invited to a group. Download Vallik and join with this code:")}<span><b>${code}</b><button type="button" class="lp-copy" data-copy="${code}">${L("Copiar","Copy")}</button></span></p>` : `<p class="lp-sub">${L("Gratis para iPhone. Tu grupo en el mapa de Les 3 Vallées, en directo.","Free for iPhone. Your group on the Les 3 Vallées map, live.")}</p>`}
-          <a class="lp-store" href="https://apps.apple.com/app/id6838083819"><img src="badge-appstore-es.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>
+          <a class="lp-store" href="https://apps.apple.com/app/id6838083819"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>
           <button class="lp-skip" type="button" data-web>${L("Seguir en el navegador","Continue in the browser")}</button>
           <p class="lp-tm">${L("Apple y App Store son marcas de Apple Inc., registradas en EE. UU. y en otros países.","Apple and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.")}</p>
         </div>
