@@ -55,16 +55,22 @@
     const note = LS.get("pistea.aviso") || ""; LS.del("pistea.aviso");
     return new Promise(resolve => {
       const el = document.createElement("div");
-      el.className = "join";
+      el.className = "join"; el.dataset.stage = code ? "form" : "pick";
       el.innerHTML = `
-        <div class="lp-snow" aria-hidden="true"></div>
+        <div class="lp-photo" aria-hidden="true"></div>
         <div class="lp" data-lang="${LANG}">
         <div class="lp-lang" role="group" aria-label="Idioma / Language"><button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button><button type="button" data-lang="ca">CA</button></div>
+        <div class="lp-screen">
         <header class="lp-hero">
           <div class="lp-logo"><svg class="lp-mark" width="48" height="48" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#14355A"/><mask id="kcutL" maskUnits="userSpaceOnUse" x="0" y="0" width="110" height="100"><rect width="110" height="100" fill="#fff"/><path d="M8,40 C30,44 46,58 60,66 C72,73 84,74 96,72" fill="none" stroke="#000" stroke-width="4.5" stroke-linecap="round"/></mask><g mask="url(#kcutL)" transform="translate(-5 0)"><rect x="27" y="16" width="17" height="68" fill="#F6F8FA"/><polygon points="43,58 67,32 87,32 43,79" fill="#F6F8FA"/><polygon points="56,65 66,55 88,84 67,84" fill="#C8F03C"/></g></svg><svg class="lp-wm" viewBox="0 0 331 100" width="122" height="37" role="img" aria-label="Vallik"><g fill="#F6F8FA"><path d="M0,34 H21 L33,78 L45,34 H66 L44,100 H22 Z"/><rect x="117" y="34" width="20" height="66"/><rect x="151" y="0" width="20" height="100"/><rect x="185" y="0" width="20" height="100"/><rect x="219" y="34" width="20" height="66"/><rect x="219" y="4" width="20" height="20"/><rect x="253" y="0" width="20" height="100"/><polygon points="272,67 302,34 328,34 272,93"/></g><circle cx="104" cy="67" r="23" fill="none" stroke="#F6F8FA" stroke-width="20"/><polygon points="288,76 301,63 329,100 302,100" fill="#C8F03C"/></svg></div>
           <h1>${L("Que nadie se pierda del grupo","Nobody gets lost from the group")}</h1>
-          <p>${L("Ves a tus amigos y a tu familia en el mapa de pistas, llegas hasta ellos y volvéis juntos antes de que cierren los remontes.","See your friends and family on the piste map, get to them in a few turns and head home together before the lifts close.")}</p>
+          
         </header>
+        ${!code && note ? `<p class="lp-msg" role="status">${note.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>` : ""}
+        ${code ? "" : `<div class="lp-pick">
+          <button class="btn wide" type="button" data-pick="new">${L("Crear un grupo","Create a group")}</button>
+          <button class="btn ghost wide" type="button" data-pick="join">${L("Tengo un código","I have a code")}</button>
+        </div>`}
         ${code ? `<p class="lp-inv">${L("Te han invitado a un grupo. Entra y en un momento os veis todos en el mapa.","You have been invited to a group. Join and you will all be on the map in a moment.")}</p>` : ""}
         <form class="join-card glass" autocomplete="off" novalidate data-mode="${code ? "invite" : "new"}">
           <h2 data-m="new">${L("Crea el grupo del viaje","Create your trip's group")}</h2>
@@ -77,13 +83,17 @@
           <label>${L("Tu nombre","Your name")}<input name="n" maxlength="24" value="${myName.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}" autocapitalize="words" enterkeyhint="${code ? "go" : "next"}"></label>
           ${code ? "" : `<label data-m="join">${L("Enlace o código del grupo","Group link or code")}<span class="join-row"><input name="c" maxlength="400" placeholder="${LANG==="ca"?"Enganxa l'enllaç o el codi":LANG==="fr"?"Colle le lien ou le code":LANG==="en"?"Paste the link or code":"Pega el enlace o el código"}" data-ph-es="Pega el enlace o el código" data-ph-en="Paste the link or code" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go">${navigator.clipboard && navigator.clipboard.readText ? `<button class="btn dark" type="button" data-paste>${L("Pegar","Paste")}</button>` : ""}</span><small>${L("Pídeselo a quien creó el grupo.","Ask whoever created the group.")}</small></label>`}
           <button class="btn wide" type="submit"><span data-m="new">${L("Crear mi grupo","Create my group")}</span><span data-m="join">${L("Entrar al grupo","Join the group")}</span><span data-m="invite">${L("Entrar al grupo","Join the group")}</span></button>
-          ${code ? "" : `<button class="btn ghost wide" type="button" data-swap><span data-m="new">${L("Tengo un enlace de invitación","I have an invite link")}</span><span data-m="join">${L("Mejor crear un grupo nuevo","Create a new group instead")}</span></button>`}
+          ${code ? "" : `<button class="lp-back" type="button" data-back>${L("Volver","Back")}</button>`}
+          ${code ? "" : `<button class="btn ghost wide" type="button" data-swap hidden><span data-m="new">${L("Tengo un enlace de invitación","I have an invite link")}</span><span data-m="join">${L("Mejor crear un grupo nuevo","Create a new group instead")}</span></button>`}
         </form>
         ${canLogin("google") || canLogin("apple") ? `<div class="lp-auth" id="lpauth">
-          ${canLogin("google") ? `<button class="btn ghost wide lp-google" type="button" data-login="google">${G_ICON}${L("Continuar con Google","Continue with Google")}</button>` : ""}
+          ${canLogin("google") ? `<button class="btn ghost wide lp-google" type="button" data-login="google">${G_ICON}${L("Continuar con Google","Continue with Google")}${LS.get("vallik.lastLogin") === "google" ? `<span class="lp-last">${L("Último usado","Last used")}</span>` : ""}</button>` : ""}
           ${canLogin("apple") ? `<button class="btn ghost wide lp-apple" type="button" data-login="apple">${A_ICON}${L("Continuar con Apple","Continue with Apple")}</button>` : ""}
           <small>${L("Opcional. Con Google tu perfil te sigue si cambias de móvil.","Optional. With Google your profile follows you if you change phones.")}</small>
         </div>` : ""}
+        <p class="lp-legal">${L("Al continuar aceptas las","By continuing you accept the")} <a href="${LANG === "fr" ? "fr/conditions/" : LANG === "en" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a> ${L("y la","and the")} <a href="${LANG === "fr" ? "fr/confidentialite/" : LANG === "en" ? "privacy/" : "privacidad/"}">${L("Política de privacidad","Privacy policy")}</a>.</p>
+        </div>
+        <div class="lp-more"${NATIVE_UA ? " hidden" : ""}>
         <h2 class="lp-h2">${L("Lo que hace por tu grupo","What it does for your group")}</h2>
         <ul class="lp-feat">
           <li><p class="lf-k"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="8" r="2.5"/><path d="M16 13.6c2.4 0 4 1.3 4.6 3.9"/></svg><span class="lf-n">01</span>${L("En directo","Live")}</p><b>${L("Tu grupo, en directo","Your group, live")}</b><small>${L("Cada amigo es un punto en el mapa 3D de la estación. Sabes dónde está sin llamar a nadie.","Every friend is a dot on the 3D resort map. You know where they are without calling anyone.")}</small>
@@ -99,6 +109,7 @@
           <nav><a href="${LANG === "fr" ? "fr/confidentialite/" : LANG === "en" ? "privacy/" : "privacidad/"}">${L("Privacidad","Privacy")}</a><a href="${LANG === "fr" ? "fr/conditions/" : LANG === "en" ? "terms/" : "condiciones/"}">${L("Condiciones","Terms")}</a><a href="mailto:vallik-soporte@googlegroups.com">${L("Contacto","Contact")}</a></nav>
           <small>${L("Mapa","Map")} © OpenStreetMap · Copernicus DEM</small>
         </footer>
+        </div>
         </div>`;
       const st = document.createElement("style");
       st.textContent = `.join{position:fixed;inset:0;z-index:30;display:block;padding:calc(var(--sat,0px) + 28px) 16px calc(var(--sab,0px) + 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(14,42,71,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
@@ -163,7 +174,34 @@
       .lp-end{margin-top:18px;padding:22px 0 6px;border-top:1px solid rgba(255,255,255,.08);display:grid;justify-items:center;gap:12px;text-align:center}
       .lp-end p{margin:0;color:var(--tx-2);font-size:14px}
       .lp-end nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.lp-end nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;color:var(--tx);font:500 14px/1 var(--font);text-decoration:none;opacity:.85}
-      .lp-end small{color:var(--tx-3);font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}`;
+      .lp-end small{color:var(--tx-3);font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+      /* Pantalla de inicio: foto real a sangre, botones abajo (al alcance del pulgar), sin recuadros. */
+      .join{padding:0!important;background:#0E2A47!important}
+      .lp-photo{position:absolute;top:0;left:0;right:0;height:max(78svh,560px);pointer-events:none;background:#0E2A47 url(lp-montana.jpg) 50% 38%/cover no-repeat;background-image:image-set("lp-montana.webp" type("image/webp"),"lp-montana.jpg" type("image/jpeg"))}
+      .lp-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,36,.55) 0%,rgba(6,20,36,0) 18%,rgba(14,42,71,0) 40%,rgba(14,42,71,.55) 62%,#0E2A47 86%)}
+      .lp{display:block!important;width:min(100%,440px)!important;padding:calc(var(--sat,0px) + 18px) 20px calc(var(--sab,0px) + 18px);gap:12px!important;align-content:start}
+      .lp-screen{min-height:calc(100svh - var(--sat,0px) - var(--sab,0px) - 36px);display:flex;flex-direction:column;gap:12px}
+      .lp-screen>.lp-hero{flex:1;display:flex!important;flex-direction:column;gap:0!important}
+      .lp-hero h1{margin-top:auto!important;font-size:42px!important;line-height:42px!important;max-width:11ch;padding-bottom:6px}
+      .lp-hero{padding:0!important}
+      .lp-lang{top:0!important}.lp-lang button{min-width:40px!important;font-size:11px!important}
+      .join[data-stage=pick] .join-card,.join[data-stage=pick] .lp-inv{display:none}
+      .join[data-stage=form] .lp-pick{display:none}
+      .join[data-stage=form]:not(:has(.join-card[data-mode=invite])) .lp-auth{display:none}
+      .lp-pick{display:grid;gap:10px}
+      .lp-msg{margin:0;padding:12px 14px;border-radius:14px;background:rgba(14,42,71,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(200,240,60,.35);font-size:15px}
+      .lp-pick .btn,.lp-auth .btn{min-height:54px}
+      .join-card{background:none!important;padding:0!important;box-shadow:none!important;border:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+      .join-card h2{font-size:24px!important}
+      .lp-back{all:unset;cursor:pointer;justify-self:center;min-height:44px;padding:0 14px;color:var(--tx-2);font:500 15px/44px var(--font)}
+      .lp-google{position:relative;background:rgba(14,42,71,.45)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+      .lp-last{position:absolute;top:-9px;right:16px;padding:4px 8px;border-radius:99px;background:var(--acc);color:#0E2A47;font:600 11px/1 var(--font);letter-spacing:0}
+      .lp-auth small{display:none}
+      .join-card [data-swap]{display:none!important}
+      .join[data-stage=form] .lp-hero h1{display:none}
+      .join[data-stage=form] .join-card h2{font-size:30px!important;line-height:32px!important;letter-spacing:-.03em}
+      .lp-legal{margin:2px 0 0;text-align:center;color:var(--tx-2);font-size:12px;line-height:17px}.lp-legal a{color:var(--tx);text-decoration:underline;text-underline-offset:2px}
+      .lp-more{display:grid;gap:12px;margin-top:40px}.lp-more[hidden]{display:none}`;
       document.head.appendChild(st);
       document.body.appendChild(el);
       const f = el.querySelector("form"), noteEl = el.querySelector(".join-note"), btns = el.querySelectorAll("button");
@@ -173,8 +211,13 @@
       const sub = f.querySelector("[type=submit]");
       const sw = el.querySelector("[data-swap]");
       if (sw) sw.addEventListener("click", () => { f.dataset.mode = f.dataset.mode === "new" ? "join" : "new"; say(""); (f.dataset.mode === "join" ? f.c : f.n).focus(); });
-      say(note);
-      f.n.focus({ preventScroll: true });
+      if (code) say(note);
+      // Primero se elige (crear o entrar con código); después, el nombre. Con enlace de invitación se va directo al nombre.
+      const msg = el.querySelector(".lp-msg");
+      const stage = (st2, mode) => { el.dataset.stage = st2; if (mode) f.dataset.mode = mode; say(""); if (msg) msg.remove(); if (st2 === "form") f.n.focus(); el.scrollTop = 0; };
+      el.querySelectorAll("[data-pick]").forEach(b => b.addEventListener("click", () => stage("form", b.dataset.pick)));
+      const bk = el.querySelector("[data-back]"); if (bk) bk.addEventListener("click", () => stage("pick"));
+      if (code) f.n.focus({ preventScroll: true });
       const nameOk = () => { myName = f.n.value.trim().slice(0, 24); if (!myName) { say((EN?((CA?"Escriu el teu nom.":FR?"Écris ton nom.":"Type your name.")):"Escribe tu nombre.")); f.n.focus(); } return !!myName; };
       const finish = () => {
         LS.set("pistea.nombre", myName);
@@ -201,11 +244,12 @@
         const k = b.dataset.login; busy(true, b); say("");
         try {
           const u = await login(k, true);
+          LS.set("vallik.lastLogin", k);
           const box = el.querySelector("#lpauth"), nm = (u.displayName || "").split(" ")[0];
           if (nm && !f.n.value.trim()) f.n.value = nm.slice(0, 24);
           if (box) box.innerHTML = `<div class="lp-done">${k === "apple" ? A_ICON : G_ICON}<span><b>${L("Has entrado con","Signed in with")} ${k === "apple" ? "Apple" : "Google"}</b>${(u.email || "").replace(/</g, "&lt;")}</span></div>`;
           say(code ? (EN?((CA?"Fet. Revisa el teu nom i prem Entrar.":FR?"C'est fait. Vérifie ton nom et appuie sur Rejoindre.":"Done. Check your name and press Join.")):"Ya está. Revisa tu nombre y pulsa Entrar.") : (EN?((CA?"Fet. Ara enganxa l'enllaç del teu grup o crea'n un de nou.":FR?"C'est fait. Colle maintenant le lien de ton groupe ou crées-en un nouveau.":"Done. Now paste your group link or create a new one.")):"Ya está. Ahora pega el enlace de tu grupo o crea uno nuevo."));
-          (f.c || f.n).focus();
+          if (el.dataset.stage === "form") (f.c || f.n).focus();
         } catch (er) { const t = loginErr(er); if (t) say(t); }
         busy(false);
       }));
@@ -250,7 +294,7 @@
   /* Informe de errores: si algo falla en el móvil de alguien, queda una nota técnica en "errores"
      (mensaje, archivo y línea, versión y plataforma). Sin datos personales: sin nombre, sin usuario,
      sin posición; se quita cualquier código de grupo. Como mucho 5 por sesión, y se borran a los 30 días. */
-  const WEB_VER = "v46";
+  const WEB_VER = "v47";
   (function errores() {
     let sent = 0; const seen = new Set();
     const clean = t => String(t || "").replace(/([#&?]g=)[a-z0-9]+/gi, "$1…").replace(/\b[A-Za-z0-9_-]{24,}\b/g, "…").slice(0, 300);
