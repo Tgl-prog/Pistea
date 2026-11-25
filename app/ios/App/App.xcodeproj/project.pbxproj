@@ -25,6 +25,7 @@
 		974535D578C5E708A641CAAF /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCEDF30F7D2900A216555370 /* SwiftUI.framework */; };
 		97702947988137F6DF979769 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CBA3F91DA355072C5EABC95 /* Foundation.framework */; };
 		A1B2C3D4E5F6A7B8C9D0E1F3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* GoogleService-Info.plist */; };
+		BB81AC07D55B7836EAFED5DD /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 22963F2D3A0BFFEFF0266909 /* AppIcon.icon */; };
 		E30CE3A43CAE11AC9EB3C31B /* VallikNavAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4AA4DDFFE6704F07ECB3A /* VallikNavAttributes.swift */; };
 		EBF551768D3F63980699335E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10DC4C9B45E498D0E6196A9D /* WidgetKit.framework */; };
 /* End PBXBuildFile section */
@@ -55,6 +56,7 @@
 
 /* Begin PBXFileReference section */
 		10DC4C9B45E498D0E6196A9D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		22963F2D3A0BFFEFF0266909 /* AppIcon.icon */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
 		3928E26F390BFEAE8FC1D0B6 /* VallikViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VallikViewController.swift; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 				B6B4AA4DDFFE6704F07ECB3A /* VallikNavAttributes.swift */,
 				81BD476C779D0EF5753DED9F /* VallikNavPlugin.swift */,
 				3928E26F390BFEAE8FC1D0B6 /* VallikViewController.swift */,
+				22963F2D3A0BFFEFF0266909 /* AppIcon.icon */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				BB81AC07D55B7836EAFED5DD /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
