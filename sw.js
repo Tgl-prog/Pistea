@@ -8,7 +8,7 @@
  * aunque se olvide subir VERSION, y con mala señal la app abre igual desde la copia. Si la red llega
  * tarde, la respuesta se guarda igualmente para la próxima vez.
  */
-const VERSION = "vallik-v54";
+const VERSION = "vallik-v55";
 const CORE = [
   "./", "index.html", "manifest.webmanifest", "backend.js", "native.js", "firebase-config.js",
   "mapdata.json", "pois.json", "dem.json", "relief.webp",
@@ -45,7 +45,8 @@ self.addEventListener("fetch", e => {
       let done = false;
       const fallback = () => cached().then(hit => { if (hit && !done) { done = true; resolve(hit); } return hit; });
       const timer = setTimeout(fallback, NET_MS);
-      fetch(req).then(r => {
+      // no-cache: pregunta siempre al servidor si hay versión nueva (la caché HTTP de GitHub Pages dura 10 min)
+      fetch(req, { cache: "no-cache" }).then(r => {
         save(req, r); clearTimeout(timer);
         if (!done) { done = true; resolve(r); }
       }).catch(() => {

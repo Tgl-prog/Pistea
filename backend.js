@@ -615,7 +615,7 @@
   /* Informe de errores: si algo falla en el móvil de alguien, queda una nota técnica en "errores"
      (mensaje, archivo y línea, versión y plataforma). Sin datos personales: sin nombre, sin usuario,
      sin posición; se quita cualquier código de grupo. Como mucho 5 por sesión, y se borran a los 30 días. */
-  const WEB_VER = "v54";
+  const WEB_VER = "v55";
   (function errores() {
     let sent = 0; const seen = new Set();
     const clean = t => String(t || "").replace(/([#&?]g=)[a-z0-9]+/gi, "$1…").replace(/\b[A-Za-z0-9_-]{24,}\b/g, "…").slice(0, 300);
