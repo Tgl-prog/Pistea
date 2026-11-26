@@ -19,13 +19,13 @@ Los documentos viven **fuera del repo**, en `~/Documents/Vallik/claude/` (ruta a
    - `business-plan-brief.md`: negocio.
 
 **Reglas de esos documentos:**
-- **Son una copia.** La versión viva está en el proyecto «Vallik» de claude.ai, y Tomás la trae aquí cuando cambia. Si un agente actualiza algo en `claude/` (por ejemplo `estado.md` al terminar una tarea), el orquestador se lo dice a Tomás en su resumen, para que lo pase a claude.ai. Si notas que algo de `claude/` contradice al repo, pregunta cuál vale; no lo resuelvas por tu cuenta.
+- **La carpeta del Mac es la oficial** (decisión de Tomás, 26/11). Los agentes leen y escriben aquí y no hay que copiar nada a claude.ai. El proyecto «Vallik» de claude.ai queda como apoyo: si Tomás quiere usarlo, sube allí los archivos que necesite. Si un agente cambia algo en `claude/`, el orquestador lo dice en su resumen. Si notas que algo de `claude/` contradice al repo, pregunta cuál vale; no lo resuelvas por tu cuenta.
 - **`claude/legal/rat-y-eipd.md` y `business-plan-brief.md` son internos.** Nunca se copian al repo, ni se citan en commits, PR o issues. El repo es público porque vallik.app se publica desde él. `.gitignore` y `.agentes/check.mjs` lo vigilan.
 - **Lo que no está en `claude/`:** el código de los reels (`VallikReel.tsx`) y los scripts de Blender del teaser se bajan desde el proyecto de claude.ai. No se copian a mano: si hacen falta, pídeselos a Tomás. Los diseños son artifacts de claude.ai (enlaces en `README.md`) y solo se abren con la cuenta de Tomás.
 
 ## 1. Qué es Vallik
 
-Vallik («Nadie baja solo.») es la app para que un grupo de amigos o una familia esquíe junto sin perderse en la estación. Incluye:
+Vallik («Todo el valle. Todo el grupo.») es la app para que un grupo de amigos o una familia esquíe junto sin perderse en la estación. Incluye:
 - cada uno en el mapa 3D;
 - rutas por pistas y remontes hasta un amigo o un bar;
 - punto de encuentro y avisos;
@@ -244,7 +244,7 @@ Es el hilo principal en T3, con Claude Opus. No escribe código salvo arreglos p
 6. Publicar solo con su «publícalo» (§3), siguiendo `claude/proceso-publicacion.md` y, para Apple, `claude/checklist-envio-apple.md`.
 7. Al cerrar:
    - actualizar `claude/estado.md` (y el backlog si toca);
-   - decirle a Tomás qué cambió en `claude/` para que lo pase a claude.ai;
+   - decirle a Tomás qué cambió en `claude/`;
    - si se aprendió algo, añadirlo a §7 de este archivo.
 
 **En paralelo sí, choques no.** `index.html` es un único archivo enorme: **nunca dos agentes a la vez en `index.html`**. Sí pueden ir a la vez web y reglas, web y iPhone (si no tocan los mismos archivos), Peter, contenido e innovación. Si dos tareas necesitan `index.html`, van una detrás de otra, y la segunda se rebasa sobre la primera.
@@ -261,8 +261,8 @@ Todos usan Claude Opus 5.5.
 | Datos | `datos.md` | firestore.rules y sus pruebas, App Check, TTL, privacidad |
 | Peter | `peter.md` | función de Vercel, voz y límites de Peter |
 | Revisor | `revisor.md` | revisar cada entrega antes del PR |
-| Creador de contenido | `contenido.md` | motion graphics, animación 3D, reels, carruseles, capturas e impresos, siempre con el libro de marca |
+| Creador de contenido | `contenido.md` | director de arte, montador y motion designer: reels, animación 3D, carruseles, capturas e impresos con el libro de marca, y que se vean y se compartan |
 | Estratega de marca | `estratega.md` | plan de Instagram y de la temporada, guiones de reels, creadores y colaboraciones, cómo crece la marca a más estaciones; propone, Tomás decide |
 | Desarrollo de negocio | `negocio.md` | monetización, estaciones nuevas, alianzas y contactos; todo confidencial en `claude/negocio/`; propone, Tomás decide |
 | Legal y privacidad | `legal.md` | RGPD, LSSI, publicidad e influencers, AI Act, Apple y países nuevos; revisa que lo que hace la app coincida con lo que dicen los textos |
-| Innovador | `innovador.md` | tendencias, competencia y propuestas con fuentes; propone, no implementa |
+| Innovador | `innovador.md` | tendencias, competencia y propuestas con fuentes, también de contenido para redes (cada dos semanas, al estratega); propone, no implementa |
