@@ -1,0 +1,44 @@
+# Comprueba cada PR y cada subida a main o v1xx antes de que llegue a vallik.app.
+# 1) .agentes/check.mjs: JS y JSON sin errores, cuatro idiomas, VERSION del service worker, nada secreto.
+# 2) Reglas de Firestore con el emulador (proyecto demo-vallik: nunca toca la base de datos real).
+name: Comprobar
+
+on:
+  pull_request:
+  push:
+    branches: [main, "v1*"]
+
+concurrency:
+  group: comprobar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Comprobaciones de la web
+        run: |
+          BASE=origin/${{ github.base_ref || 'main' }}
+          if [ "${{ github.ref_name }}" = "main" ] && [ -z "${{ github.base_ref }}" ]; then BASE=HEAD~1; fi
+          node .agentes/check.mjs --base "$BASE"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Reglas de Firestore (emulador)
+        working-directory: .agentes/pruebas
+        run: |
+          npm install -g firebase-tools@14
+          npm install
+          npm run reglas

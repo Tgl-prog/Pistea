@@ -1,0 +1,14 @@
+{
+  "name": "vallik-pruebas",
+  "private": true,
+  "type": "module",
+  "description": "Pruebas de las reglas de Firestore con el emulador (no tocan el proyecto real).",
+  "scripts": {
+    "reglas": "firebase emulators:exec --only firestore --project demo-vallik --config ../../firebase.json \"node --test reglas.test.mjs\"",
+    "web": "firebase emulators:exec --only auth,firestore --project pistea-94bf0 --config ../../firebase.json --ui \"node ../servir.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.0.0"
+  }
+}

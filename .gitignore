@@ -1,0 +1,7 @@
+.DS_Store
+node_modules/
+.www_roto_*/
+*-debug.log
+# Documentos internos del proyecto: viven en ~/Documents/Vallik/claude, nunca en este repo público
+claude/
+*rat-y-eipd*
