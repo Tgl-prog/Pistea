@@ -611,6 +611,11 @@
   })();
   const auth = firebase.auth();
   const fs = firebase.firestore();
+  /* Entorno de pruebas: en este ordenador, localhost/?emu usa los emuladores de Firebase en vez de la base
+     de datos real (ver AGENTS.md, «Entorno de pruebas»). En vallik.app y en la app nunca se activa. */
+  if (/[?&]emu\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    try { auth.useEmulator("http://127.0.0.1:9099", { disableWarnings: true }); fs.useEmulator("127.0.0.1", 8080); window.VALLIK_EMU = true; } catch (e) {}
+  }
 
   /* Informe de errores: si algo falla en el móvil de alguien, queda una nota técnica en "errores"
      (mensaje, archivo y línea, versión y plataforma). Sin datos personales: sin nombre, sin usuario,
