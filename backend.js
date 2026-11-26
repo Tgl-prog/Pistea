@@ -228,7 +228,7 @@
       }
 
       .lp-promo{display:none;width:100vw;margin:24px 0 0 calc(50% - 50vw);color:var(--tx);font-family:var(--font)}
-      .join[data-stage=get] .lp-promo{display:block}.join[data-stage=get] .lp-more{display:none}
+      .join[data-stage=get] .lp-promo{display:block}.join[data-stage=get] .lp-promo~* .lp-tm,.join[data-stage=get]:has(.lp-promo) .lp-get .lp-tm{display:none}.join[data-stage=get] .lp-more{display:none}
       .join[data-stage=get]{overflow-x:hidden;background:#0E2A47}
       .pr-in{width:min(100% - 40px,1080px);margin:0 auto}
       .pr-k{margin:0 0 14px;font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2)}
