@@ -16,5 +16,8 @@ Eres el agente de la app nativa. La app empaqueta la web de la raíz (`app/scrip
 
 ## Cómo entregas
 - `cd app && npm ci && npm run sync` sin errores. Si hay Xcode: `xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/platform=iOS Simulator' build`.
-- La subida a TestFlight la lanza Tomás (GitHub → Actions → «iPhone a TestFlight») o el orquestador con su permiso. Nunca subas versión ni cambies `minBuild` sin permiso.
+- Cada envío a Apple recorre `/Users/tgl/Documents/Vallik/claude/checklist-envio-apple.md` entera, incluida la prueba en el simulador de Xcode de este Mac (ya no hace falta la VM: `npm run sync`, abre `app/ios/App/App.xcodeproj` o usa `xcodebuild` + `xcrun simctl`). Si cambian los paquetes: File › Packages › Reset Package Caches.
+- No se manda una versión con un solo cambio: se juntan en `/Users/tgl/Documents/Vallik/claude/backlog-proxima-version.md` (salvo error grave).
+- La subida a TestFlight la lanza Tomás (GitHub → Actions → «iPhone a TestFlight») o el orquestador con su permiso. Si GitHub la cancela por falta de Macs, relanzarla. Plan B: compilar y subir desde este Mac, cuidando de no pisar los números de build de GitHub (100 + número de ejecución).
+- Nunca cambies `minBuild` sin permiso, y solo a un build publicado y aprobado.
 - Lista lo que hay que probar en un iPhone real (pantalla bloqueada, Isla Dinámica, permisos de ubicación «Siempre»).

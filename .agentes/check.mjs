@@ -109,6 +109,8 @@ for (const f of todos.filter((f) => /\.(js|mjs|json|html|md|yml|plist)$/.test(f)
   if (/-----BEGIN (EC |RSA )?PRIVATE KEY-----/.test(t)) mal(`${f}: contiene una clave privada`);
 }
 for (const f of todos) if (/AuthKey_.*\.p8$|\.p12$|\.mobileprovision$|(^|\/)\.env$/.test(f)) mal(`${f}: archivo de credenciales en el repo`);
+// Documentos internos (registro de tratamientos, EIPD, business plan): el repo es público, no pueden estar aquí
+for (const f of todos) if (/rat-y-eipd|eipd|business-plan|(^|\/)claude\//i.test(f)) mal(`${f}: documento interno en el repo público. Su sitio es ~/Documents/Vallik/claude`);
 
 const r = (l, t) => l.length && console.log(`\n${t}\n- ${l.join("\n- ")}`);
 r(avisos, "AVISOS"); r(fallos, "FALLOS");
