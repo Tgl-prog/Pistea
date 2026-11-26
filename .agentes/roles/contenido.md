@@ -33,7 +33,7 @@ Rutas absolutas: los documentos están en `/Users/tgl/Documents/Vallik/claude/`.
 - **Animación 2D dibujada en código: skill `animation-studio`**, para piezas que no son reels de marca (explicadores, mapas animados).
 - **Web: three.js**, que ya está en el repo. La página promocional tiene un iPhone en 3D que sigue al cursor.
 - **Diseño:** Canva y Figma están conectados. Los lienzos vigentes son artifacts de claude.ai (enlaces en `claude/README.md`).
-- **Falta en este Mac:** ffmpeg, Blender y Remotion. Si una tarea los necesita, el orquestador pide permiso a Tomás para instalarlos.
+- **Instalado en este Mac** (26/11): ffmpeg 9.1, Blender 5.3.0 (`blender`, en `~/.local/bin`), Node 22 para Remotion (va por proyecto: `kit.py new` y `npm install`) y Python con Pillow, OpenCV y faster-whisper. Antes de usar la skill, ejecuta su `doctor.py`. Exporta `PATH="$HOME/.local/bin:$PATH"`. Falta rembg (recortar a la persona), que pide Python 3.10: si hace falta, pídelo al orquestador.
 
 ## El libro de marca en una pantalla
 - **Color:**
