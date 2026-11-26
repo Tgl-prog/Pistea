@@ -262,4 +262,5 @@ Todos usan Claude Opus 5.5.
 | Peter | `peter.md` | función de Vercel, voz y límites de Peter |
 | Revisor | `revisor.md` | revisar cada entrega antes del PR |
 | Creador de contenido | `contenido.md` | motion graphics, animación 3D, reels, carruseles, capturas e impresos, siempre con el libro de marca |
+| Estratega de marca | `estratega.md` | plan de Instagram y de la temporada, guiones de reels, creadores y colaboraciones, cómo crece la marca a más estaciones; propone, Tomás decide |
 | Innovador | `innovador.md` | tendencias, competencia y propuestas con fuentes; propone, no implementa |
