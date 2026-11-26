@@ -239,7 +239,7 @@ Es el hilo principal en T3, con Claude Opus. No escribe código salvo arreglos p
    - el formato de entrega: rama, commits, qué probó y qué no.
 
    Las rutas a `claude/` van siempre en absoluto, porque cada agente trabaja en otra carpeta.
-4. Cuando el agente entrega, delegar una **revisión** nueva con el rol revisor: otro `delegate_task`, nunca el mismo hilo. Los arreglos pequeños de la revisión los hace el orquestador.
+4. Cuando el agente entrega, delegar una **revisión** nueva con el rol revisor: otro `delegate_task`, nunca el mismo hilo. Si la tarea toca datos personales, textos legales, campañas con personas o creadores, o acuerdos, delegar además una revisión con el rol legal (`legal.md`). Los arreglos pequeños de la revisión los hace el orquestador.
 5. Abrir el PR a `v101`, esperar a que `comprobar.yml` salga en verde y explicarle a Tomás qué cambia, cómo probarlo y qué falta.
 6. Publicar solo con su «publícalo» (§3), siguiendo `claude/proceso-publicacion.md` y, para Apple, `claude/checklist-envio-apple.md`.
 7. Al cerrar:
@@ -263,4 +263,6 @@ Todos usan Claude Opus 5.5.
 | Revisor | `revisor.md` | revisar cada entrega antes del PR |
 | Creador de contenido | `contenido.md` | motion graphics, animación 3D, reels, carruseles, capturas e impresos, siempre con el libro de marca |
 | Estratega de marca | `estratega.md` | plan de Instagram y de la temporada, guiones de reels, creadores y colaboraciones, cómo crece la marca a más estaciones; propone, Tomás decide |
+| Desarrollo de negocio | `negocio.md` | monetización, estaciones nuevas, alianzas y contactos; todo confidencial en `claude/negocio/`; propone, Tomás decide |
+| Legal y privacidad | `legal.md` | RGPD, LSSI, publicidad e influencers, AI Act, Apple y países nuevos; revisa que lo que hace la app coincida con lo que dicen los textos |
 | Innovador | `innovador.md` | tendencias, competencia y propuestas con fuentes; propone, no implementa |
