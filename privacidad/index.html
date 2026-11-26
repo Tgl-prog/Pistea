@@ -42,7 +42,7 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <a class="lang" href="../privacy/" hreflang="en">English</a> <a class="lang" href="../fr/confidentialite/" hreflang="fr">Français</a>
 
 <h1>Política de privacidad</h1>
-<p class="fecha">Última actualización: 25 de noviembre de 2026</p>
+<p class="fecha">Última actualización: 26 de noviembre de 2026</p>
 
 <div class="resumen"><p><b>En resumen:</b> Vallik usa tu nombre y tu posición en la estación para que las personas de tu grupo te vean en el mapa. Solo las ve tu grupo, no vendemos datos ni mostramos publicidad, y puedes borrarlo todo cuando quieras.</p></div>
 
@@ -55,7 +55,8 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <tbody>
 <tr><td>Tu nombre</td><td>Que tu grupo sepa quién eres en el mapa y en los mensajes.</td></tr>
 <tr><td>Tu foto de perfil, si decides ponerla</td><td>Que tu grupo te reconozca en el mapa. Se guarda reducida (unos 160 px) y solo la ve tu grupo. Puedes quitarla cuando quieras desde tu perfil.</td></tr>
-<tr><td>Tu cuenta de Google o Apple (nombre y correo), si eliges entrar con ella</td><td>Recuperar tu perfil en otro móvil. Si entras solo con tu nombre, no usamos ninguna cuenta.</td></tr>
+<tr><td>Tu cuenta de Google o Apple (nombre y correo), si eliges entrar con ella</td><td>Recuperar tu perfil en otro móvil. Si entras solo con tu nombre, no usamos ninguna cuenta de Google ni de Apple.</td></tr>
+<tr><td>Un identificador anónimo</td><td>Cuando entras en un grupo o la app tiene que guardar un informe de errores, Firebase te asigna un identificador al azar, sin tu nombre ni tu correo, para que solo tú puedas cambiar lo tuyo en el grupo.</td></tr>
 <tr><td>Tu posición</td><td>Mostrarte en el mapa a tu grupo, calcular rutas, la vuelta a casa y el punto de encuentro. Se guarda cuando pulsas «Estoy aquí» o mientras tienes activado «En directo», nunca sin que lo actives.</td></tr>
 <tr><td>Tu recorrido del día</td><td>Mientras tienes «En directo» activado, la app guarda tu recorrido <b>solo en tu móvil</b> para que puedas volver a verlo en «Mi día». No se envía a nadie y se borra solo pasados unos 15 días.</td></tr>
 <tr><td>Tu posición mientras usas la guía por voz</td><td>Si activas la guía por voz en una ruta, la app lee tu GPS <b>solo en tu móvil</b> para avisarte de cada paso. No se guarda ni se envía a nadie, salvo que también tengas activado «En directo».</td></tr>
@@ -63,16 +64,17 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <tr><td>Mensajes y avisos</td><td>«Os espero aquí», «Necesito ayuda», puntos de encuentro y avisos sobre pistas o remontes que compartes con tu grupo.</td></tr>
 <tr><td>Preguntas a Peter</td><td>Responderte. Ver el apartado sobre Peter.</td></tr>
 <tr><td>Informes de errores</td><td>Si algo falla en la app, se guarda una nota técnica para poder arreglarlo: el mensaje del error, la versión y si es la web o el iPhone. No incluye tu nombre, tu posición ni tu grupo, y se borra sola a los 30 días.</td></tr>
+<tr><td>Estado oficial de pistas (en el iPhone)</td><td>Para saber qué está cerrado, la app consulta desde tu móvil la web pública de Les 3 Vallées (les3vallees.com), igual que si la abrieras tú. Esa web ve tu conexión como la de cualquier visitante. No le enviamos nada tuyo.</td></tr>
 <tr><td>Datos guardados en tu móvil</td><td>Tu nombre, el código del grupo, el idioma, dónde dormís, tu recorrido y la copia del mapa, para que la app funcione sin cobertura. No salen de tu móvil.</td></tr>
 </tbody>
 </table>
-<p>La base legal es tu consentimiento, que das al entrar en un grupo y al activar la ubicación, y la prestación del servicio que pides. Puedes retirarlo en cualquier momento dejando de compartir tu posición o saliendo del grupo.</p>
+<p>La base legal es tu consentimiento, que das al entrar en un grupo y al activar la ubicación, y la prestación del servicio que pides. Puedes retirarlo en cualquier momento dejando de compartir tu posición o saliendo del grupo. Los informes de errores y la comprobación de App Check se basan en nuestro interés legítimo en que la app funcione y nadie abuse de ella.</p>
 
 <h2>Quién ve tus datos</h2>
 <p>Tu nombre, tu foto, tu posición, tus mensajes y tus pistas solo los ven las personas que están en tu grupo, es decir, quienes tienen su enlace o su código. No hay perfiles públicos, no vendemos datos y no los usamos para publicidad.</p>
 
 <h2>Peter, el guía con inteligencia artificial</h2>
-<p>Cuando preguntas algo a Peter, enviamos tu pregunta junto con un contexto mínimo: la estación, la hora, el idioma, el nombre de la pista o el sitio donde estás, los restaurantes y bares cercanos, lo que está cerrado y los avisos del grupo. <b>No enviamos los nombres ni las fotos de las personas de tu grupo.</b> La pregunta pasa por nuestro servidor y la responde un modelo de Anthropic (Claude), que no usa esas conversaciones para entrenar sus modelos.</p>
+<p>Cuando preguntas algo a Peter, enviamos tu pregunta junto con un contexto mínimo: la estación, la hora, el idioma, el nombre de la pista o el sitio donde estás, los restaurantes y bares cercanos, lo que está cerrado, los avisos del grupo y el punto de encuentro (sitio y hora). <b>No enviamos los nombres ni las fotos de las personas de tu grupo.</b> La pregunta pasa por nuestro servidor y la responde un modelo de Anthropic (Claude), que no usa esas conversaciones para entrenar sus modelos. Nuestro servidor no guarda las conversaciones: solo comprueba que usas Vallik y mira la dirección IP de tu conexión para frenar abusos. Anthropic guarda las peticiones un tiempo limitado, según sus condiciones. Lo que escribes a Peter es texto libre: no le pongas datos personales tuyos ni de otras personas.</p>
 
 <h2>Si entras con tu cuenta de Google o de Apple</h2>
 <p>Entrar con una cuenta es opcional. Si lo haces, esto es lo único que Vallik recibe y lo que hace con ello:</p>
@@ -100,6 +102,8 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <li>Si quien creó el grupo te quita, se borran igual.</li>
 <li>Además, todo se borra solo: tu posición y tus mensajes a los 2 días; los avisos y el punto de encuentro, un día después de caducar; tu perfil, a los 60 días de la última vez que abriste el grupo; y cada pista del diario, a los 60 días de apuntarla.</li>
 <li>Con <b>Borrar mi cuenta</b>, en tu perfil dentro de la app, se borran tu perfil, tu foto, tu posición, tus mensajes, tus avisos y tus pistas en el grupo en el que estás, y tu cuenta. Si estuviste en otros grupos antes, escríbenos y los borramos en un plazo máximo de 30 días.</li>
+<li>Tu identificador anónimo dura hasta que pulses <b>Borrar mi cuenta</b>. Si dejas de usar Vallik sin borrarla, escríbenos y lo borramos.</li>
+<li>Los correos que nos mandas, el tiempo necesario para resolver tu consulta y, como mucho, un año después.</li>
 <li>Los datos guardados en tu móvil, incluido tu recorrido, se borran al borrar la app o los datos del navegador.</li>
 </ul>
 
@@ -107,7 +111,7 @@ footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
 <p>Puedes pedir acceder a tus datos, corregirlos, borrarlos, limitar su uso, llevártelos o oponerte a su tratamiento escribiendo a <a href="mailto:vallik-soporte@googlegroups.com">vallik-soporte@googlegroups.com</a>. Si crees que no los tratamos bien, puedes reclamar ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es">aepd.es</a>).</p>
 
 <h2>Menores</h2>
-<p>Vallik no está pensada para menores de 14 años en España, ni de 15 en Francia. Si eres menor de esa edad, usa la app solo con permiso de tus padres o tutores.</p>
+<p>Vallik no está pensada para menores de 14 años en España, ni de 15 en Francia. Si eres menor de esa edad, solo puedes usar Vallik si tu madre, tu padre o tu tutor lo autoriza, porque son ellos quienes deciden si compartes tu ubicación con el grupo.</p>
 
 <h2>Cambios</h2>
 <p>Si cambiamos esta política, actualizaremos la fecha de arriba y, si el cambio es importante, lo avisaremos dentro de la app.</p>
