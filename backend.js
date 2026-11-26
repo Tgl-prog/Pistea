@@ -52,6 +52,9 @@
   /* Solo el idioma activo: cambiar de idioma recarga la página, y así Google lee un único idioma por dirección. */
   const L = (es, en) => LANG === "es" ? es : LANG === "fr" ? (LFR[en] || en) : LANG === "ca" ? (LCA[en] || es) : en;
   /* ----- Página promocional (solo en la web, en la pantalla de descarga) ----- */
+  /* Enlace al App Store con campaña: si se llegó con ?ref= (pegatinas, carteles), esa etiqueta se usa como campaña para medir las descargas. */
+  const STORE_CT = (() => { try { const r = new URLSearchParams(location.search).get("ref") || ""; return /^[a-z0-9-]{1,40}$/.test(r) ? r : "web-boton"; } catch (e) { return "web-boton"; } })();
+  const STORE_URL = "https://apps.apple.com/app/apple-store/id6838083819?pt=129850069&amp;ct=" + STORE_CT + "&amp;mt=8";
   const PT = {
     sub: ["Gratis para iPhone. Ves a tu grupo en el mapa de pistas y llegas hasta ellos.", "Free for iPhone. See your crew on the piste map and get to them.", "Gratuit sur iPhone. Tu vois ton groupe sur le plan des pistes et tu le rejoins.", "Gratis per a iPhone. Veus el teu grup al mapa de pistes i hi arribes."],
     more: ["Cómo funciona", "How it works", "Comment ça marche", "Com funciona"],
@@ -94,7 +97,7 @@
   };
   const P = k => { const r = PT[k]; return LANG === "en" ? r[1] : LANG === "fr" ? r[2] : LANG === "ca" ? r[3] : r[0]; };
   function promoHTML() {
-    const badge = `<a class="pr-store" href="https://apps.apple.com/app/apple-store/id6838083819?pt=129850069&amp;ct=web-boton&amp;mt=8"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>`;
+    const badge = `<a class="pr-store" href="${STORE_URL}"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>`;
     const feat = (n, img, flip) => `<section class="pr-f${flip ? " flip" : ""}"><div class="pr-ft"><p class="pr-k">${P("f" + n + "k")}</p><h3>${P("f" + n + "h")}</h3><p>${P("f" + n + "p")}</p></div><img class="pr-ph" src="web/app-${img}.webp" width="600" height="1300" loading="lazy" alt=""></section>`;
     return `<div class="lp-promo">
       <section class="pr-prob"><div class="pr-in pr-rv">
@@ -126,7 +129,7 @@
     </div>`;
   }
   function deskHTML() {
-    const badge = `<a class="pr-store" href="https://apps.apple.com/app/apple-store/id6838083819?pt=129850069&amp;ct=web-boton&amp;mt=8"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>`;
+    const badge = `<a class="pr-store" href="${STORE_URL}"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>`;
     const legal = LANG === "fr" ? ["fr/confidentialite/", "fr/conditions/"] : LANG === "en" ? ["privacy/", "terms/"] : ["privacidad/", "condiciones/"];
     return `<div class="pr-desk">
       <div class="pr-dk-bg" aria-hidden="true"></div>
@@ -317,7 +320,7 @@
         ${code ? "" : `<p class="lp-msg" role="status"${note ? "" : " hidden"}>${note.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>`}
         <div class="lp-get">
           ${code ? `<p class="lp-code">${L("Te han invitado a un grupo. Descarga Vallik y entra con este código:","You've been invited to a group. Download Vallik and join with this code:")}<span><b>${code}</b><button type="button" class="lp-copy" data-copy="${code}">${L("Copiar","Copy")}</button></span></p>` : `<p class="lp-sub">${P("sub")}</p>`}
-          <a class="lp-store" href="https://apps.apple.com/app/apple-store/id6838083819?pt=129850069&amp;ct=web-boton&amp;mt=8"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>
+          <a class="lp-store" href="${STORE_URL}"><img src="badge-appstore-${LANG === "en" || LANG === "fr" || LANG === "ca" ? LANG : "es"}.svg" width="162" height="54" alt="${L("Descargar en el App Store","Download on the App Store")}"></a>
           <button class="lp-skip" type="button" data-web>${L("Seguir en el navegador","Continue in the browser")}</button>
           <p class="lp-tm">${L("Apple y App Store son marcas de Apple Inc., registradas en EE. UU. y en otros países.","Apple and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.")}</p>
           ${NATIVE_UA || code ? "" : `<div class="pr-more"><a href="#promo" data-more>${P("more")} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a></div>`}
