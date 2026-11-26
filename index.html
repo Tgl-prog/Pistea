@@ -1118,7 +1118,8 @@ if (EN) (function () {
       const g = (LIFT[f.t] || LIFT.tsd).g.replace(/^el /, "del ").replace(/^la /, "de la ");
       if (FR) return (top ? "en haut " : "en bas ") + g.replace(/^le /, "du ").replace(/^la /, "de la ") + (nm ? " " + nm : "");
       if (CA) return (top ? "a dalt " : "a baix ") + g.replace(/^el /, "del ").replace(/^la /, "de la ") + (nm ? " " + nm : "");
-      return (EN ? ((CA?top ? "a dalt " : "a baix ":top ? "at the top of " : "at the bottom of ")) : (top ? "arriba " : "abajo ")) + g + (nm ? " " + nm : "");
+      // Francés y catalán ya han salido arriba: aquí solo queda inglés o español
+      return (EN ? (top ? "at the top of " : "at the bottom of ") : (top ? "arriba " : "abajo ")) + g + (nm ? " " + nm : "");
     }
     if (CA) return "a " + (nm ? (f.d === "i" ? "l'itinerari " : "la " + DIF[f.d].s.toLowerCase() + " ") + nm : "una pista " + DIF[f.d].s.toLowerCase());
     if (FR) return "sur " + (nm ? (f.d === "i" ? "l'itinéraire " : "la " + DIF[f.d].s.toLowerCase() + " ") + nm : "une piste " + DIF[f.d].s.toLowerCase());
