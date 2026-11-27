@@ -8,7 +8,7 @@
 <meta name="description" content="Vallik es una app gratuita para grupos de esquiadores: ves dónde está cada uno en el mapa, calculas la ruta hasta un amigo o un bar y sabes cuándo volver antes de que cierren los remontes.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vallik">
-<meta property="og:title" content="Vallik · Que nadie se pierda del grupo">
+<meta property="og:title" content="Vallik · Todo el valle. Todo el grupo.">
 <meta property="og:description" content="Tu grupo en el mapa de la estación: dónde está cada uno, cómo llegar y cuándo volver. Gratis y sin instalar nada.">
 <meta property="og:locale" content="es_ES">
 <meta property="og:locale:alternate" content="en_GB">
@@ -633,6 +633,8 @@ body.glance #sheet { visibility: hidden; pointer-events: none; }
 .gl-sos svg { color: var(--bad); }
 .gl-sos.on { background: var(--bad); color: #fff; }
 .gl-sos.on svg { color: #fff; }
+/* Si «Necesito ayuda» no cabe al lado de tu pastilla sin aplastarla (pasa en muchos móviles, según el idioma), baja a su propia fila, encima de las tarjetas, con el texto entero */
+.gl-row { flex-wrap: wrap; row-gap: 10px; } .gl-me { max-width: 100%; }
 .gl-cards { display: flex; gap: 10px; overflow-x: auto; padding: 2px 12px 4px; scroll-snap-type: x mandatory; scrollbar-width: none; max-width: 640px; margin: 0 auto; width: 100%; }
 .gl-cards::-webkit-scrollbar { display: none; }
 #glance .gl-row.gut { padding-right: 76px; }
@@ -3594,7 +3596,7 @@ ${casaStrip()}${(mode === "live" || mode === "demo") ? (() => { const mm = S.men
     const mm = S.mensajes.get(me), helpOn = !!(mm && mm.tipo === "ayuda" && Date.now() - mm.at < MSG_HELP_MS);
     const title = mp ? cap(placeOf(mp) || (EN ? ((CA?"Al mapa":FR?"Sur la carte":"On the map")) : "En el mapa")) : (EN ? ((CA?"Marca on ets":FR?"Indique où tu es":"Mark where you are")) : "Marca dónde estás");
     const sub = LIVE.on ? (EN ? ((CA?"En directe · gravant":FR?"En direct · enregistrement":"Live · recording")) : "En directo · grabando") : mp ? (EN ? ((CA?"Marcat ":FR?"Indiqué ":"Marked ")) : "Marcado ") + ago(mp.at) : (EN ? ((CA?"El grup encara no et veu":FR?"Le groupe ne te voit pas encore":"The group can't see you yet")) : "El grupo no te ve todavía");
-    const sos = `<button class="gl-sos glass2${helpOn ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${helpOn}">${MSG_IC.ayuda}<span>${helpOn ? (EN ? ((CA?"Ajuda enviada":FR?"Aide envoyée":"Help sent")) : "Aviso enviado") : confirmAct === "msg:ayuda" ? (EN ? ((CA?"Torna a tocar":FR?"Touche encore":"Tap again")) : "Toca otra vez") : (EN ? ((CA?"Ajuda":FR?"Aide":"Help")) : "Ayuda")}</span></button>`;
+    const sos = `<button class="gl-sos glass2${helpOn ? " on" : ""}" data-act="msg" data-t="ayuda" aria-pressed="${helpOn}">${MSG_IC.ayuda}<span>${helpOn ? (EN ? ((CA?"Ajuda enviada":FR?"Aide envoyée":"Help sent")) : "Aviso enviado") : confirmAct === "msg:ayuda" ? (EN ? ((CA?"Torna a tocar":FR?"Touche encore":"Tap again")) : "Toca otra vez") : (EN ? ((CA?"Necessito ajuda":FR?"J'ai besoin d'aide":"I need help")) : "Necesito ayuda")}</span></button>`;
     const cards = fl.length ? fl.map(({ p, help, t }) => `<button class="gl-card glass2${help ? " help" : ""}" data-act="person" data-uid="${esc(p.uid)}"><span class="top">${av(p.uid)}<b>${esc(who(p.uid))}</b>${isLive(p) ? `<span class="ld" aria-label="${EN ? ((CA?"en directe":FR?"en direct":"live")) : "en directo"}"></span>` : ""}</span><span class="n">${t == null || t < 1 ? minsHtml(t) : `${t}<small>${EN ? ((CA?"min de tu":FR?"min de toi":"min away")) : "min de ti"}</small>`}</span><span class="w">${help ? (EN ? ((CA?"Necessita ajuda":FR?"A besoin d'aide":"Needs help")) : "Necesita ayuda") : esc(cap(placeOf(p) || ""))}</span></button>`).join("")
       : `<button class="gl-card glass2 invite" data-act="invite"><b style="font:600 15px/1.2 var(--font)">${EN ? ((CA?"Convida el teu grup":FR?"Invite ton groupe":"Invite your group")) : "Invita a tu grupo"}</b><span class="w">${EN ? ((CA?"Envia'ls l'enllaç i els veuràs aquí.":FR?"Envoie-leur le lien et tu les verras ici.":"Send them the link and you'll see them here.")) : "Mándales el enlace y los verás aquí."}</span></button>`;
     return `<div class="gl-row"><button class="gl-me glass2" data-act="glance-open">${av(me)}<span><b>${esc(title)}</b><small${LIVE.on ? ` class="live"` : ""}>${esc(sub)}</small></span></button>${sos}</div><div class="gl-cards">${cards}</div>`;
