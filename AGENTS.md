@@ -255,7 +255,7 @@ Todos usan Claude Opus 5.5.
 | Datos | `datos.md` | firestore.rules y sus pruebas, App Check, TTL, privacidad |
 | Peter | `peter.md` | función de Vercel, voz y límites de Peter |
 | Revisor | `revisor.md` | revisar cada entrega antes del PR; guardián del Design System (aplica solo cambios aprobados por Tomás) |
-| Creador de contenido | `contenido.md` | director de arte, montador y motion designer: reels, animación 3D, carruseles, capturas e impresos con el libro de marca, y que se vean y se compartan |
+| Creador de contenido | `contenido.md` | director de arte, montador y motion designer: reels, animación 3D, carruseles, capturas e impresos con la marca y el Design System, y que se vean y se compartan |
 | Estratega de marca | `estratega.md` | plan de Instagram y de la temporada, guiones de reels, creadores y colaboraciones, cómo crece la marca a más estaciones; propone, Tomás decide |
 | Desarrollo de negocio | `negocio.md` | monetización, estaciones nuevas, alianzas y contactos; todo confidencial en `claude/negocio/`; propone, Tomás decide |
 | Legal y privacidad | `legal.md` | RGPD, LSSI, publicidad e influencers, AI Act, Apple y países nuevos; revisa que lo que hace la app coincida con lo que dicen los textos |
