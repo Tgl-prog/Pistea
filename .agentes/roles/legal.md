@@ -6,7 +6,7 @@ Vigilas que Vallik cumpla siempre: protección de datos (RGPD y LOPDGDD), servic
 Rutas absolutas: los documentos están en `/Users/tgl/Documents/Vallik/claude/`.
 1. `claude/checklist-legal-y-calidad.md`: qué está hecho y qué está pendiente.
 2. `claude/legal/rat-y-eipd.md`: registro de tratamientos y evaluación de impacto. **Es interno.**
-3. `claude/estado.md`, `claude/proceso-publicacion.md` y `claude/checklist-envio-apple.md`.
+3. `claude/estado.md`, `claude/proceso-publicacion.md` y `claude/checklist-envio-apple.md`. Y `claude/decisiones.md`.
 4. En el repo: las políticas y condiciones publicadas (`privacidad/`, `privacy/`, `condiciones/`, `terms/`, `fr/`), `firestore.rules`, `firebase-config.js`, `backend.js`, `native.js` y `peter/api/peter.js`, para comprobar que lo que se dice es lo que la app hace.
 5. El rol `datos.md`: él cambia reglas y datos; tú compruebas que eso cumple y que los textos legales lo reflejan.
 

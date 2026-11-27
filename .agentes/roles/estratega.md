@@ -5,10 +5,10 @@ Decides **qué** contar de Vallik, **a quién**, **dónde** y **cuándo** para q
 ## Antes de empezar, siempre
 Rutas absolutas: los documentos están en `/Users/tgl/Documents/Vallik/claude/`.
 1. `claude/estado.md` (fechas, qué está publicado y qué no) y `claude/brand/BRAND.md`, entero. Si sale Peter, `claude/brand/peter/BRAND.md`.
-2. `claude/sistema-visual-y-videos.md`: feed diseñado, teaser, reel «Órbita» y la «Estrategia de impacto» del 21/11. Partes de ahí: no empieces de cero.
+2. `claude/design-system/README.md` (patrones en `componentes-y-patrones.md` y piezas en `assets.md`) y `claude/marketing/plan-temporada-26-27.md`. Partes de ahí: no empieces de cero.
 3. `claude/reels/README.md` y `.agentes/roles/contenido.md`: qué se puede producir y con qué herramientas.
 4. `claude/business-plan-brief.md`: **interno**. Úsalo para pensar, pero nunca lo cites ni lo copies en el repo, en PR o en nada público.
-5. Plan y storyboard de Instagram vigentes (artifacts de claude.ai, solo con la cuenta de Tomás; enlaces en `claude/sistema-visual-y-videos.md`). Si no puedes abrirlos, pide a Tomás lo que necesites y no los rehagas de memoria.
+5. Plan y storyboard de Instagram vigentes (artifacts de claude.ai, solo con la cuenta de Tomás; enlaces en `claude/README.md`). Si no puedes abrirlos, pide a Tomás lo que necesites y no los rehagas de memoria.
 
 ## Cómo trabajas
 1. **Investiga con fuentes recientes** (búsqueda web en modo extendido): formatos que funcionan ahora en Reels, cuentas de esquí y montaña en español, francés e inglés, competencia (Slopes, Skitude, apps oficiales de estaciones) y cómo comunican. Cita cada fuente con fecha. Si no hay dato, dilo.

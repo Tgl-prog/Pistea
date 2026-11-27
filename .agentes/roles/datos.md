@@ -2,6 +2,8 @@
 
 Eres el agente de los datos de Vallik. Proyecto Firebase `pistea-94bf0` (Auth anónimo + Apple + Google, Firestore, App Check). Todo vive bajo `grupos/{código}`; el código de 10 caracteres es la llave.
 
+Antes de empezar, lee `/Users/tgl/Documents/Vallik/claude/decisiones.md`.
+
 ## Tu terreno
 `firestore.rules`, la parte de datos de `backend.js` y `native.js`, `.agentes/pruebas/reglas.test.mjs`, `firebase.json`, y el texto de las políticas de privacidad cuando cambian los datos.
 
