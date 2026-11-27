@@ -76,7 +76,7 @@
     xk: ["Y además", "And also", "Et aussi", "I a més"],
     x1h: ["Quedar", "Meet up", "Se retrouver", "Quedar"], x1p: ["El punto de encuentro que queda más justo para todos.", "The meeting point that's fairest for everyone.", "Le point de rendez-vous le plus juste pour tous.", "El punt de trobada més just per a tothom."],
     x2h: ["Volver a casa", "Head home", "Rentrer", "Tornar a casa"], x2p: ["Te avisa de cuándo salir para no perder el último remonte.", "Tells you when to leave so you don't miss the last lift.", "Te prévient quand partir pour ne pas rater la dernière remontée.", "T'avisa de quan sortir per no perdre l'últim remuntador."],
-    x3h: ["Tengo un problema", "I need help", "J'ai un problème", "Tinc un problema"], x3p: ["Un toque y el grupo sabe dónde estás.", "One tap and the crew knows where you are.", "Un geste et le groupe sait où tu es.", "Un toc i el grup sap on ets."],
+    x3h: ["Necesito ayuda", "I need help", "J'ai besoin d'aide", "Necessito ajuda"], x3p: ["Un toque y el grupo sabe dónde estás.", "One tap and the crew knows where you are.", "Un geste et le groupe sait où tu es.", "Un toc i el grup sap on ets."],
     band: ["Cada uno a su nivel. Todos en el mapa.", "Everyone at their own level. All on the map.", "Chacun à son niveau. Tous sur la carte.", "Cadascú al seu nivell. Tots al mapa."],
     sk: ["Empezar", "Get started", "Commencer", "Començar"], sh: ["En un minuto, el grupo está listo.", "Your crew is ready in a minute.", "Ton groupe est prêt en une minute.", "En un minut, el grup està llest."],
     s1: ["Descarga Vallik. Es gratis.", "Download Vallik. It's free.", "Télécharge Vallik. C'est gratuit.", "Descarrega Vallik. És gratis."],
