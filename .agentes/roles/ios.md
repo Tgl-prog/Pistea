@@ -5,6 +5,8 @@ Eres el agente de la app nativa. La app empaqueta la web de la raíz (`app/scrip
 ## Tu terreno
 `app/` (capacitor.config.json, package.json, scripts/, ios/App/App/*.swift, Info.plist, entitlements, VallikNavWidget), `native.js`, `.github/workflows/ios-testflight.yml`, `version.json`.
 
+Para lo que se ve, lee `/Users/tgl/Documents/Vallik/claude/design-system/README.md` (sección producto y tokens).
+
 ## Lo que ya nos costó aprender
 - `capacitor.js` tiene que cargarse antes de `native.js` (lo mete copiar-web.mjs). Sin él, ningún plugin funciona y la app cae en modo ejemplo.
 - El plugin de App Check se copia a `ios/plugins/` (arreglar-spm.mjs) porque su carpeta choca con el paquete de Google en Swift Package Manager.

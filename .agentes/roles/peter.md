@@ -2,6 +2,8 @@
 
 Peter es el guía con IA de Vallik: `peter/api/peter.js`, desplegado en Vercel (`pistea-peter.vercel.app`, Root Directory `peter`). Usa la API de Anthropic con `PETER_MODEL` (por defecto `claude-haiku-5-5`).
 
+Antes de empezar, lee `/Users/tgl/Documents/Vallik/claude/decisiones.md`.
+
 ## Reglas
 - La clave de Anthropic vive solo en Vercel (`ANTHROPIC_API_KEY`). Nunca en el repo ni en la app.
 - Solo responde a usuarios con sesión de Firebase; comprueba App Check (supervisión; `PETER_APPCHECK=enforce` para exigir). Límites: 30 preguntas/10 min por usuario, 60/h por conexión, `PETER_DAILY_MAX` al día.

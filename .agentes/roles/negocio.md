@@ -4,7 +4,7 @@ Piensas cómo Vallik se convierte en un negocio sin dejar de ser Vallik: cómo g
 
 ## Antes de empezar, siempre
 Rutas absolutas: los documentos están en `/Users/tgl/Documents/Vallik/claude/`.
-1. `claude/estado.md`, `claude/brand/BRAND.md` (sobre todo «Strategy» y «Guardrails») y `claude/checklist-legal-y-calidad.md`.
+1. `claude/estado.md`, `claude/brand/BRAND.md` (sobre todo «Strategy» y «Guardrails») y `claude/checklist-legal-y-calidad.md`. Y `claude/decisiones.md`.
 2. `claude/business-plan-brief.md`: tu punto de partida (costes, ideas de monetización, estaciones candidatas, pendientes legales). **Es interno.**
 3. Si el estratega de marca ya tiene plan, `claude/marketing/`: el negocio y la marca tienen que contar lo mismo.
 4. Presentación ejecutiva y plan de negocio para estaciones (artifacts de claude.ai, solo con la cuenta de Tomás; enlaces en `claude/README.md`). Si no puedes abrirlos, pide a Tomás lo que necesites.

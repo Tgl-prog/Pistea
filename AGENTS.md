@@ -6,22 +6,35 @@ Guía para cualquier agente que trabaje en Vallik, y en especial para el **orque
 
 Los documentos viven **fuera del repo**, en `~/Documents/Vallik/claude/` (ruta absoluta: `/Users/tgl/Documents/Vallik/claude/`). Orden de lectura:
 
-1. `README.md`: el índice.
-2. `estado.md`: qué está publicado, qué está en revisión en Apple, qué pieza es la buena y las próximas fechas. **Es la fuente de verdad del estado.**
-3. Según la tarea:
+1. `estado.md`: qué está publicado, qué está en revisión en Apple, qué pieza es la buena, el trabajo en curso y las próximas fechas. **Es la fuente de verdad del estado.**
+2. `decisiones.md`: lo decidido, lo descartado y lo pendiente de Tomás.
+3. Según la tarea (la tabla de `README.md` dice qué es cada archivo; nadie lee `claude/` entero):
    - `proceso-publicacion.md`: reglas para publicar.
    - `checklist-envio-apple.md`: cada envío a Apple.
    - `backlog-proxima-version.md`: lo que entra en la siguiente versión.
    - `checklist-legal-y-calidad.md`: legal, seguridad y operación.
-   - `brand/BRAND.md` y `brand/peter/BRAND.md`: marca.
-   - `sistema-visual-y-videos.md` y `para-la-app-degradado-y-huella.md`: sistema visual, vídeos y K.
+   - `brand/BRAND.md` y `brand/peter/BRAND.md`: marca y voz.
+   - `design-system/README.md`: fuente visual (índice por tarea).
+   - `marketing/plan-temporada-26-27.md`: plan de temporada y calendario.
    - `reels/README.md`: plantillas de reels.
-   - `business-plan-brief.md`: negocio.
+   - `business-plan-brief.md` y `negocio/`: negocio.
+
+### Protocolo de sesión (T3 Code y Claude Code)
+- **START SESSION:** leer `claude/estado.md` («Versiones», «Trabajo en curso», «Próximas fechas») y el índice de `claude/decisiones.md`. Después, solo la fila del README y la sección del Design System que pida la tarea. Si hay código: `git status` y la rama.
+- **STATUS REPORT:** responder desde `estado.md` y `backlog-proxima-version.md`. Lo que no esté ahí se dice como no verificado. No se rehace la auditoría.
+- **DESIGN SYSTEM CHECK** (solo informa, no corrige):
+  1. comparar el sha256 de `claude/design-system/tokens.json` con el de `project/tokens.json` del artifact Design System;
+  2. buscar la K anterior (`56,65 66,55` y `stroke-width="4.5"` en una K) y «Nadie baja solo.» usada como lema en `contenido/1-FINALES`, `contenido/2-POR-APROBAR` y `pistea/` (sin `app/ios/App/App/public`, que se regenera);
+  3. listar los colores de `index.html` que no están en los tokens.
+- **AGENT HANDOVER:** una fila por tarea en `estado.md` › «Trabajo en curso» (tarea, rama o worktree, hilo, siguiente paso, bloqueo). La siguiente sesión empieza por esa tabla.
+- **END SESSION:** actualizar «Última actualización» y «Trabajo en curso» de `estado.md`; decisiones nuevas, en `decisiones.md`; cambios del Design System, en su `CHANGELOG.md`; commit en el Git local de `claude/` (sin remoto). La memoria solo se toca si Tomás expresa una preferencia nueva.
+- **CLEANUP REVIEW:** listar candidatos en `claude/archivo/README.md` › «Candidatos a eliminar», con la evidencia (sustituto, sin información única, sin dependencias, respaldo). **Nunca borra.**
 
 **Reglas de esos documentos:**
 - **La carpeta del Mac es la oficial** (decisión de Tomás, 26/11). Los agentes leen y escriben aquí y no hay que copiar nada a claude.ai. El proyecto «Vallik» de claude.ai queda como apoyo: si Tomás quiere usarlo, sube allí los archivos que necesite. Si un agente cambia algo en `claude/`, el orquestador lo dice en su resumen. Si notas que algo de `claude/` contradice al repo, pregunta cuál vale; no lo resuelvas por tu cuenta.
+- **Una sola copia de `claude/`:** se lee y se edita solo en `/Users/tgl/Documents/Vallik/claude/` (Git local, rama `main`). Si T3 abre un worktree de `claude/`, no se edita: esa copia no llega a `main` y le faltan archivos excluidos de Git (decisión de Tomás, 27/11).
 - **`claude/legal/rat-y-eipd.md` y `business-plan-brief.md` son internos.** Nunca se copian al repo, ni se citan en commits, PR o issues. El repo es público porque vallik.app se publica desde él. `.gitignore` y `.agentes/check.mjs` lo vigilan.
-- **Lo que no está en `claude/`:** el código de los reels (`VallikReel.tsx`) y los scripts de Blender del teaser se bajan desde el proyecto de claude.ai. No se copian a mano: si hacen falta, pídeselos a Tomás. Los diseños son artifacts de claude.ai (enlaces en `README.md`) y solo se abren con la cuenta de Tomás.
+- **Código de reels y teaser:** `VallikReel.tsx` y los scripts de Blender están en `~/Documents/Vallik/contenido/` (`4-RECURSOS/` y `3-BORRADORES/`; ver `contenido/PROGRESO.md`, que dice cuál es la versión buena). Los diseños son artifacts de claude.ai (enlaces en `claude/README.md`) y solo se abren con la cuenta de Tomás.
 
 ## 1. Qué es Vallik
 
@@ -96,7 +109,7 @@ Resumen de `claude/proceso-publicacion.md`. Si hay duda, manda ese documento.
 - Cada envío sigue `claude/checklist-envio-apple.md` entera, incluida la prueba en el simulador de Xcode de este Mac (§5). Las capturas del App Store se preparan **antes** de enviar a revisión.
 - Publicación manual: Apple aprueba y Tomás lanza.
 - `ios.minBuild` sube solo a un build **publicado y aprobado** en la App Store.
-- Al probar, nunca salir del grupo de Apple Review; el código está en la checklist.
+- Al probar, nunca salir del grupo de Apple Review; el código está en `claude/privado/apple-review.md` (fuera de Git; no se copia ni se muestra).
 
 **Siempre con permiso explícito de Tomás:**
 - Push a `main`.
@@ -131,6 +144,7 @@ Resumen de `claude/proceso-publicacion.md`. Si hay duda, manda ese documento.
 - **Marca:** `claude/brand/BRAND.md`. Geometría de la K vigente desde el 25/11:
   - huella con trazo 5,5 como **recorte (máscara)**, no como trazo de color;
   - cuña lima `56,65.114 66,54.432 88,84 67,84`.
+  - fuente visual: `claude/design-system/`; nadie lo modifica sin aprobación de Tomás (gobierno en su README).
 
   Además:
   - un solo acento lima por pantalla;
@@ -222,30 +236,9 @@ Al entregar, di siempre **qué no has podido probar**.
 ## 8. Orquestación desde T3
 
 ### El orquestador
-Es el hilo principal en T3, con Claude Opus. No escribe código salvo arreglos pequeños. Su trabajo:
-- entender lo que pide Tomás;
-- partirlo en tareas y delegarlas;
-- revisar el resultado;
-- contárselo a Tomás en español claro.
-
-**Por cada petición:**
-1. Leer `claude/README.md`, `claude/estado.md` y lo que toque del código. Si la petición es ambigua o afecta a producción, preguntar a Tomás con una recomendación.
-2. Hacer un plan corto: tareas, qué rol hace cada una, en qué orden y qué se puede hacer a la vez.
-3. Delegar cada tarea con `delegate_task`, **modelo Claude Opus 5.5** e `isolation: "worktree"` desde `v101`. El encargo incluye:
-   - el rol (`.agentes/roles/<rol>.md`);
-   - el objetivo en una frase;
-   - los archivos que puede tocar y los que no;
-   - las comprobaciones que tiene que pasar;
-   - el formato de entrega: rama, commits, qué probó y qué no.
-
-   Las rutas a `claude/` van siempre en absoluto, porque cada agente trabaja en otra carpeta.
-4. Cuando el agente entrega, delegar una **revisión** nueva con el rol revisor: otro `delegate_task`, nunca el mismo hilo. Si la tarea toca datos personales, textos legales, campañas con personas o creadores, o acuerdos, delegar además una revisión con el rol legal (`legal.md`). Los arreglos pequeños de la revisión los hace el orquestador.
-5. Abrir el PR a `v101`, esperar a que `comprobar.yml` salga en verde y explicarle a Tomás qué cambia, cómo probarlo y qué falta.
-6. Publicar solo con su «publícalo» (§3), siguiendo `claude/proceso-publicacion.md` y, para Apple, `claude/checklist-envio-apple.md`.
-7. Al cerrar:
-   - actualizar `claude/estado.md` (y el backlog si toca);
-   - decirle a Tomás qué cambió en `claude/`;
-   - si se aprendió algo, añadirlo a §7 de este archivo.
+Es el hilo principal en T3: entiende la petición, la parte en tareas, delega, revisa e informa a Tomás.
+No escribe código salvo arreglos pequeños y no publica sin su «publícalo» (§3).
+Responsabilidades, permisos, pasos y reglas de delegación: **`.agentes/roles/orquestador.md`**.
 
 **En paralelo sí, choques no.** `index.html` es un único archivo enorme: **nunca dos agentes a la vez en `index.html`**. Sí pueden ir a la vez web y reglas, web y iPhone (si no tocan los mismos archivos), Peter, contenido e innovación. Si dos tareas necesitan `index.html`, van una detrás de otra, y la segunda se rebasa sobre la primera.
 
@@ -256,12 +249,13 @@ Todos usan Claude Opus 5.5.
 
 | Rol | Archivo | Para qué |
 |---|---|---|
+| Orquestador | `orquestador.md` | hilo principal: planificar, delegar, revisar e informar a Tomás; mantiene `estado.md` y `decisiones.md` |
 | Web | `web.md` | index.html, landing, backend.js, service worker, páginas legales |
 | iPhone | `ios.md` | Capacitor, Swift, native.js, TestFlight, `version.json`, envío a Apple |
 | Datos | `datos.md` | firestore.rules y sus pruebas, App Check, TTL, privacidad |
 | Peter | `peter.md` | función de Vercel, voz y límites de Peter |
-| Revisor | `revisor.md` | revisar cada entrega antes del PR |
-| Creador de contenido | `contenido.md` | director de arte, montador y motion designer: reels, animación 3D, carruseles, capturas e impresos con el libro de marca, y que se vean y se compartan |
+| Revisor | `revisor.md` | revisar cada entrega antes del PR; guardián del Design System (aplica solo cambios aprobados por Tomás) |
+| Creador de contenido | `contenido.md` | director de arte, montador y motion designer: reels, animación 3D, carruseles, capturas e impresos con la marca y el Design System, y que se vean y se compartan |
 | Estratega de marca | `estratega.md` | plan de Instagram y de la temporada, guiones de reels, creadores y colaboraciones, cómo crece la marca a más estaciones; propone, Tomás decide |
 | Desarrollo de negocio | `negocio.md` | monetización, estaciones nuevas, alianzas y contactos; todo confidencial en `claude/negocio/`; propone, Tomás decide |
 | Legal y privacidad | `legal.md` | RGPD, LSSI, publicidad e influencers, AI Act, Apple y países nuevos; revisa que lo que hace la app coincida con lo que dicen los textos |

@@ -6,6 +6,8 @@ Eres el agente de la web de Vallik. La web es la fuente única: lo que cambias v
 - `index.html` (unas 4.400 líneas: estilos, landing, mapa 3D con three.js, panel, rutas, Peter, diario). Lee solo la parte que tocas; busca por los comentarios de sección (`/* ---------- Mapa ---------- */`, `/* Ruta */`…).
 - `backend.js` (grupo, Firestore, sesión, informe de errores), `firebase-config.js`, `sw.js`, `manifest.webmanifest`, páginas legales (`privacidad/`, `privacy/`, `condiciones/`, `terms/`, `fr/`), `robots.txt`, `sitemap.xml`.
 
+Para lo que se ve, lee `/Users/tgl/Documents/Vallik/claude/design-system/README.md` (sección producto y tokens).
+
 ## Reglas que no se rompen
 1. **Cuatro idiomas en cada texto.** Patrón: `EN?((CA?"català":FR?"français":"English")):"español"`. Solo se omite CA/FR si la palabra es idéntica (Bar, Restaurant, pistes). Español de España; catalán y francés naturales, no traducción literal.
 2. **Escapa todo lo que escribe la gente** con `esc()` antes de meterlo en HTML. Sin excepciones.
