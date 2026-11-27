@@ -4,11 +4,11 @@ Guía para cualquier agente que trabaje en Vallik, y en especial para el **orque
 
 ## 0. Antes de empezar: los documentos del proyecto
 
-Los documentos viven **fuera del repo**, en `~/Documents/Vallik/claude/` (ruta absoluta: `/Users/tgl/Documents/Vallik/claude/`). Orden de lectura:
+Los documentos viven **fuera del repo**, en `~/Documents/Vallik/claude/` (ruta absoluta: `/Users/tgl/Documents/Vallik/claude/`). Orden de lectura (es el de START SESSION, en «Protocolo de sesión», más abajo):
 
-1. `estado.md`: qué está publicado, qué está en revisión en Apple, qué pieza es la buena, el trabajo en curso y las próximas fechas. **Es la fuente de verdad del estado.**
-2. `decisiones.md`: lo decidido, lo descartado y lo pendiente de Tomás.
-3. Según la tarea (la tabla de `README.md` dice qué es cada archivo; nadie lee `claude/` entero):
+1. `estado.md`: qué está publicado, qué está en revisión en Apple, qué pieza es la buena, el trabajo en curso y las próximas fechas. **Es la fuente de verdad del estado.** Al empezar, solo «Versiones», «Trabajo en curso» y «Próximas fechas».
+2. `decisiones.md`: lo decidido, lo descartado y lo pendiente de Tomás. Al empezar, solo su índice: la sección `## Índice`, desde ese encabezado hasta el siguiente `## ` (sin incluirlo). Después, la sección que pida la tarea.
+3. Después, solo lo que pida la tarea (la tabla de `README.md` dice qué es cada archivo: se consulta la fila que haga falta, no el README entero; nadie lee `claude/` entero):
    - `proceso-publicacion.md`: reglas para publicar.
    - `checklist-envio-apple.md`: cada envío a Apple.
    - `backlog-proxima-version.md`: lo que entra en la siguiente versión.
@@ -20,7 +20,7 @@ Los documentos viven **fuera del repo**, en `~/Documents/Vallik/claude/` (ruta a
    - `business-plan-brief.md` y `negocio/`: negocio.
 
 ### Protocolo de sesión (T3 Code y Claude Code)
-- **START SESSION:** leer `claude/estado.md` («Versiones», «Trabajo en curso», «Próximas fechas») y el índice de `claude/decisiones.md`. Después, solo la fila del README y la sección del Design System que pida la tarea. Si hay código: `git status` y la rama.
+- **START SESSION:** leer `claude/estado.md` («Versiones», «Trabajo en curso», «Próximas fechas») y el índice de `claude/decisiones.md` (solo la sección `## Índice`, hasta el siguiente `## `). Nada más de `claude/` hasta saber la tarea. Después, solo la fila del README y la sección del Design System que pida la tarea. Si hay código: `git status` y la rama.
 - **STATUS REPORT:** responder desde `estado.md` y `backlog-proxima-version.md`. Lo que no esté ahí se dice como no verificado. No se rehace la auditoría.
 - **DESIGN SYSTEM CHECK** (solo informa, no corrige):
   1. comparar el sha256 de `claude/design-system/tokens.json` con el de `project/tokens.json` del artifact Design System;
