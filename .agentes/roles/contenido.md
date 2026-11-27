@@ -55,11 +55,11 @@ Rutas absolutas: los documentos están en `/Users/tgl/Documents/Vallik/claude/`.
   - Hay un perfil de marca `vallik`: tono story, movimiento calm, estilo «brand», subtítulos «typewriter», Geist y Geist Mono en local, y la CTA «Mándaselo a quien siempre pregunta.».
   - La composición propia es **`VallikReel.tsx`**, con escenas `type`, `hook`, `chat`, `stat`, `peter`, `slogan` y `end`, y transiciones `cut` o `wipe` (corte a 47° con filo lima).
   - Las escenas genéricas del kit no siguen el sistema de marca: no las uses tal cual.
-  - El código de `VallikReel.tsx` y el perfil `brands/vallik` **no están en este Mac**. Pídeselos a Tomás, que los baja desde el proyecto de claude.ai. No los rehagas de memoria.
-  - Ojo: la escena final del reel lleva la K vieja (cuña `56,65 66,55 88,84 67,84`, trazo 4,5). En la próxima edición se pasa a la geometría vigente.
+  - El código de `VallikReel.tsx` está en `/Users/tgl/Documents/Vallik/contenido/`: la buena es `3-BORRADORES/09-reels-estrella/reels/src/VallikReel.tsx` (ver `contenido/PROGRESO.md`). El perfil de marca está en `contenido/4-RECURSOS/sistema-visual/08-reels/perfil-marca-it-reelsmaker/`. No los rehagas de memoria.
+  - Ojo: la copia buena ya lleva la K vigente (26/11). Las de `4-RECURSOS/plantilla/` y `4-RECURSOS/sistema-visual/08-reels/` llevan la K anterior: no las uses (`claude/design-system/assets.md` › «No usar»).
 - **3D: Blender (Cycles) y Python.**
   - Hechos hasta hoy: la K hundida en la nieve, nieve con huellas, macro al atardecer, el icono 3D, el forfait en su cinta y el plano del teaser.
-  - Los scripts están en `claude/teaser/`, en claude.ai; pídeselos a Tomás.
+  - Los scripts están en `contenido/`: `3-BORRADORES/12-teaser/`, `4-RECURSOS/plantilla/teaser/` y `4-RECURSOS/sistema-visual/10-scripts/`. Algunos llevan la K anterior (`claude/design-system/assets.md` › «No usar»).
   - Con la K vieja todavía: el icono 3D del post 02, el forfait del post 01 y la K del post 09. Hay que rehacerlos con la geometría nueva.
 - **Animación 2D dibujada en código: skill `animation-studio`**, para piezas que no son reels de marca (explicadores, mapas animados).
 - **Web: three.js**, que ya está en el repo. La página promocional tiene un iPhone en 3D que sigue al cursor.

@@ -32,6 +32,7 @@ Los documentos viven **fuera del repo**, en `~/Documents/Vallik/claude/` (ruta a
 
 **Reglas de esos documentos:**
 - **La carpeta del Mac es la oficial** (decisión de Tomás, 26/11). Los agentes leen y escriben aquí y no hay que copiar nada a claude.ai. El proyecto «Vallik» de claude.ai queda como apoyo: si Tomás quiere usarlo, sube allí los archivos que necesite. Si un agente cambia algo en `claude/`, el orquestador lo dice en su resumen. Si notas que algo de `claude/` contradice al repo, pregunta cuál vale; no lo resuelvas por tu cuenta.
+- **Una sola copia de `claude/`:** se lee y se edita solo en `/Users/tgl/Documents/Vallik/claude/` (Git local, rama `main`). Si T3 abre un worktree de `claude/`, no se edita: esa copia no llega a `main` y le faltan archivos excluidos de Git (decisión de Tomás, 27/11).
 - **`claude/legal/rat-y-eipd.md` y `business-plan-brief.md` son internos.** Nunca se copian al repo, ni se citan en commits, PR o issues. El repo es público porque vallik.app se publica desde él. `.gitignore` y `.agentes/check.mjs` lo vigilan.
 - **Código de reels y teaser:** `VallikReel.tsx` y los scripts de Blender están en `~/Documents/Vallik/contenido/` (`4-RECURSOS/` y `3-BORRADORES/`; ver `contenido/PROGRESO.md`, que dice cuál es la versión buena). Los diseños son artifacts de claude.ai (enlaces en `claude/README.md`) y solo se abren con la cuenta de Tomás.
 
@@ -108,7 +109,7 @@ Resumen de `claude/proceso-publicacion.md`. Si hay duda, manda ese documento.
 - Cada envío sigue `claude/checklist-envio-apple.md` entera, incluida la prueba en el simulador de Xcode de este Mac (§5). Las capturas del App Store se preparan **antes** de enviar a revisión.
 - Publicación manual: Apple aprueba y Tomás lanza.
 - `ios.minBuild` sube solo a un build **publicado y aprobado** en la App Store.
-- Al probar, nunca salir del grupo de Apple Review; el código está en la checklist.
+- Al probar, nunca salir del grupo de Apple Review; el código está en `claude/privado/apple-review.md` (fuera de Git; no se copia ni se muestra).
 
 **Siempre con permiso explícito de Tomás:**
 - Push a `main`.
@@ -141,10 +142,9 @@ Resumen de `claude/proceso-publicacion.md`. Si hay duda, manda ese documento.
   - la clave web de Firebase y la de reCAPTCHA son públicas por diseño.
 - **No inventar datos:** ni estado de pistas, ni horarios, ni cifras de usuarios, ni testimonios. La fuente oficial (les3vallees.com) se muestra.
 - **Marca:** `claude/brand/BRAND.md`. Geometría de la K vigente desde el 25/11:
-
-  Fuente visual: `claude/design-system/`; nadie lo modifica sin aprobación de Tomás (gobierno en su README).
   - huella con trazo 5,5 como **recorte (máscara)**, no como trazo de color;
   - cuña lima `56,65.114 66,54.432 88,84 67,84`.
+  - fuente visual: `claude/design-system/`; nadie lo modifica sin aprobación de Tomás (gobierno en su README).
 
   Además:
   - un solo acento lima por pantalla;

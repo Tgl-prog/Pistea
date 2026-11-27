@@ -46,6 +46,7 @@ Checklist corta, en español claro y sin jerga, con una recomendación en cada d
 
 ## Cierre
 END SESSION (AGENTS.md §0, «Protocolo de sesión»). Además:
+- actualizar `claude/backlog-proxima-version.md` si toca;
 - decirle a Tomás qué cambió en `claude/`;
 - si se aprendió algo, añadirlo a AGENTS.md §7;
 - si queda un pendiente con fecha, decirlo en el resumen para que se anote el recordatorio.
