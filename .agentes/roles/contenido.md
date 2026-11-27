@@ -105,6 +105,7 @@ Rutas absolutas: los documentos están en `/Users/tgl/Documents/Vallik/claude/`.
 - **Alcance:** las piezas 3D sostienen la marca, pero el alcance viene del humor del grupo, pensado para compartirse por mensaje privado.
 
 ## Guardarraíles
+- **Carpetas de `~/Documents/Vallik/contenido/`** (estructura en su `LEEME.md`): `1-FINALES/` solo lo que Tomás ha marcado «aprobada»; `2-POR-APROBAR/` la última versión de cada pieza pendiente, con nombres `canal-número-nombre.ext`; `3-BORRADORES/` el trabajo; `4-RECURSOS/` plantillas, herramientas y el paquete del sistema visual. **Una pieza pasa a `1-FINALES` solo con el «aprobada» de Tomás.** Al entregar, di la ruta del original y la de la copia reducida en el Design System.
 - Nunca datos reales de ubicación ni nombres reales en las pantallas de la app: usa datos de ejemplo.
 - Nunca caras de menores sin permiso de sus padres, ni contenido dirigido a menores. Las personas de las fotos de Tomás solo salen si han dado permiso (está anotado en `estado.md`).
 - No inventes cifras de usuarios, testimonios ni estaciones nuevas. No anuncies lo que la versión publicada de la app aún no hace.

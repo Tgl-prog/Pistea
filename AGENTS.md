@@ -171,7 +171,7 @@ GitHub Actions repite las dos primeras en cada PR (`comprobar.yml`). Un PR en ro
 
 **Herramientas de este Mac** (en `~/.local/bin`): Node 22, npm, Firebase CLI y Java 21 (para los emuladores). Xcode 27 está instalado. Para contenido (desde el 26/11):
 - ffmpeg y ffprobe 9.1 (binario estático arm64 de martin-riedl.de);
-- Blender 5.3.0 en `~/Applications/Blender.app`, con el enlace `blender`;
+- Blender 5.3.0 en `~/Applications/Blender.app`, con el enlace `blender` (si un agente no lo encuentra, le falta `~/.local/bin` en el PATH);
 - Remotion va por proyecto (`npm install` en la carpeta de reels; la skill `it-reelsmaker` la crea con `kit.py new`). Probado con Remotion 4.0.526;
 - Python 3.9 del sistema con Pillow, OpenCV y faster-whisper (instalados con `pip --user`), y el modelo de Whisper `medium` ya bajado. El modelo de caras YuNet está en `~/.local/share/modelos/face_detection_yunet_2023mar.onnx` (se indica en `it-reelsmaker.json` como `face_model`). No está rembg (recortar a la persona): pide Python 3.10 o más.
 
